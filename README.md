@@ -21,6 +21,7 @@ A static HTML portfolio site for Microsoft security architecture tools, framewor
 
 Clone the repository and open any `.html` file directly in a browser — no server or build tool needed.
 
+
 ```bash
 git clone https://github.com/marcusjacobson/portfolio.git
 cd portfolio
