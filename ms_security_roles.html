@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microsoft Security Roles Reference</title>
+  <style>
+    :root {
+      --ms-blue: #0078d4;
+      --ms-dark: #1b1b1b;
+      --ms-gray: #323130;
+      --ms-light: #f3f2f1;
+      --ms-white: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--ms-dark);
+      color: var(--ms-white);
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1e2a3a 100%);
+      border-bottom: 2px solid var(--ms-blue);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-icon { width: 40px; height: 40px; }
+    .logo h1 { font-size: 1.4rem; font-weight: 600; }
+    .logo span { color: var(--ms-blue); }
+    nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+    nav a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav a:hover, nav a.active {
+      background: var(--ms-blue);
+      color: var(--ms-white);
+    }
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .page-header {
+      padding: 2rem 0 1.5rem;
+      border-bottom: 1px solid #333;
+      margin-bottom: 2rem;
+    }
+    .page-header h2 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .page-header p { color: #aaa; font-size: 1rem; max-width: 700px; }
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.6rem 1rem;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: var(--ms-white);
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .search-box:focus { border-color: var(--ms-blue); }
+    .filter-btns {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid #444;
+      border-radius: 20px;
+      background: transparent;
+      color: #ccc;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--ms-blue);
+      border-color: var(--ms-blue);
+      color: white;
+    }
+    .roles-table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    thead {
+      background: #1e1e1e;
+    }
+    thead th {
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: #aaa;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #333;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    thead th:hover { color: var(--ms-blue); }
+    thead th .sort-icon { margin-left: 0.3rem; opacity: 0.5; }
+    thead th.sorted .sort-icon { opacity: 1; color: var(--ms-blue); }
+    tbody tr {
+      border-bottom: 1px solid #2a2a2a;
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: #252525; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td {
+      padding: 0.85rem 1rem;
+      vertical-align: top;
+    }
+    .role-name {
+      font-weight: 600;
+      color: var(--ms-white);
+      white-space: nowrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-identity { background: rgba(0,120,212,0.2); color: #5ba4f5; }
+    .badge-compliance { background: rgba(135,100,184,0.2); color: #c5aee8; }
+    .badge-threat { background: rgba(16,124,16,0.2); color: #6ec96e; }
+    .badge-siem { background: rgba(0,183,195,0.2); color: #6edfe9; }
+    .badge-cloud { background: rgba(255,185,0,0.2); color: #ffd966; }
+    .badge-governance { background: rgba(232,17,35,0.2); color: #f56b7a; }
+    .permission-list {
+      list-style: none;
+      padding: 0;
+    }
+    .permission-list li {
+      color: #bbb;
+      font-size: 0.85rem;
+      padding: 0.1rem 0;
+    }
+    .permission-list li::before {
+      content: '▸ ';
+      color: var(--ms-blue);
+    }
+    .use-case {
+      color: #999;
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+      display: none;
+    }
+    .section-divider {
+      background: #222;
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+    }
+    .cards-section {
+      margin-top: 3rem;
+    }
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--ms-white);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #444;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .role-card {
+      background: #252525;
+      border: 1px solid #3a3a3a;
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .role-card h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--ms-white);
+    }
+    .role-card p { color: #999; font-size: 0.88rem; line-height: 1.5; }
+    .role-card .scope {
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--ms-blue);
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-size: 0.85rem;
+      border-top: 1px solid #333;
+      margin-top: 3rem;
+    }
+    footer a { color: var(--ms-blue); text-decoration: none; }
+    @media (max-width: 600px) {
+      main { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="19" height="19" fill="#f25022"/>
+        <rect x="21" width="19" height="19" fill="#7fba00"/>
+        <rect y="21" width="19" height="19" fill="#00a4ef"/>
+        <rect x="21" y="21" width="19" height="19" fill="#ffb900"/>
+      </svg>
+      <h1>Security <span>Compass</span></h1>
+    </div>
+    <nav>
+      <a href="index.html">Compass</a>
+      <a href="ms_security_roles.html" class="active">Roles</a>
+      <a href="ms_security_projects.html">Projects</a>
+      <a href="certification_strategy.html">Certifications</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h2>👥 Microsoft Security Roles Reference</h2>
+      <p>A comprehensive reference for Microsoft Entra ID built-in security roles — covering permissions, scope, and typical use cases for security architects and administrators.</p>
+    </div>
+
+    <div class="controls">
+      <input type="text" class="search-box" id="roleSearch" placeholder="Search roles, permissions, or use cases…" aria-label="Search roles" />
+      <div class="filter-btns">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="identity">Identity</button>
+        <button class="filter-btn" data-filter="compliance">Compliance</button>
+        <button class="filter-btn" data-filter="threat">Threat Protection</button>
+        <button class="filter-btn" data-filter="cloud">Cloud Security</button>
+        <button class="filter-btn" data-filter="governance">Governance</button>
+      </div>
+    </div>
+
+    <div class="roles-table-wrap">
+      <table id="rolesTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">Role Name <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable(1)">Category <span class="sort-icon">↕</span></th>
+            <th>Key Permissions</th>
+            <th>Typical Use Case</th>
+          </tr>
+        </thead>
+        <tbody id="rolesBody">
+          <tr data-category="identity">
+            <td class="role-name">Security Administrator</td>
+            <td><span class="badge badge-identity">Identity</span></td>
+            <td><ul class="permission-list"><li>Manage security policies</li><li>View security alerts</li><li>Configure MFA settings</li><li>Manage Conditional Access</li></ul></td>
+            <td class="use-case">Day-to-day security operations, policy configuration, and alert triage across M365 and Entra ID.</td>
+          </tr>
+          <tr data-category="identity">
+            <td class="role-name">Security Reader</td>
+            <td><span class="badge badge-identity">Identity</span></td>
+            <td><ul class="permission-list"><li>Read-only security settings</li><li>View security alerts &amp; reports</li><li>Read Secure Score</li></ul></td>
+            <td class="use-case">Auditors, compliance reviewers, and stakeholders who need visibility without change authority.</td>
+          </tr>
+          <tr data-category="identity">
+            <td class="role-name">Global Administrator</td>
+            <td><span class="badge badge-identity">Identity</span></td>
+            <td><ul class="permission-list"><li>Full tenant control</li><li>Manage all admin roles</li><li>Access all resources</li><li>Reset any password</li></ul></td>
+            <td class="use-case">Break-glass accounts and tenant bootstrapping. Should be heavily restricted and monitored via PIM.</td>
+          </tr>
+          <tr data-category="identity">
+            <td class="role-name">Privileged Role Administrator</td>
+            <td><span class="badge badge-identity">Identity</span></td>
+            <td><ul class="permission-list"><li>Manage PIM assignments</li><li>Configure role settings</li><li>Approve activation requests</li></ul></td>
+            <td class="use-case">Managing who has access to privileged roles, enforcing just-in-time access controls.</td>
+          </tr>
+          <tr data-category="identity">
+            <td class="role-name">Privileged Authentication Administrator</td>
+            <td><span class="badge badge-identity">Identity</span></td>
+            <td><ul class="permission-list"><li>Reset MFA for all users</li><li>Manage authentication methods</li><li>Register/deregister devices</li></ul></td>
+            <td class="use-case">Authentication hygiene — managing MFA registrations, SSPR, and authentication method policies.</td>
+          </tr>
+          <tr data-category="identity">
+            <td class="role-name">Conditional Access Administrator</td>
+            <td><span class="badge badge-identity">Identity</span></td>
+            <td><ul class="permission-list"><li>Create/edit CA policies</li><li>Manage named locations</li><li>Configure sign-in risk policies</li></ul></td>
+            <td class="use-case">Designing and maintaining conditional access policies to enforce contextual access controls.</td>
+          </tr>
+          <tr data-category="compliance">
+            <td class="role-name">Compliance Administrator</td>
+            <td><span class="badge badge-compliance">Compliance</span></td>
+            <td><ul class="permission-list"><li>Manage compliance policies</li><li>Access compliance portal</li><li>Manage DLP policies</li><li>View audit logs</li></ul></td>
+            <td class="use-case">Data protection officers and compliance teams managing regulatory requirements (GDPR, HIPAA, ISO).</td>
+          </tr>
+          <tr data-category="compliance">
+            <td class="role-name">Compliance Data Administrator</td>
+            <td><span class="badge badge-compliance">Compliance</span></td>
+            <td><ul class="permission-list"><li>Manage sensitivity labels</li><li>Configure information protection</li><li>Manage retention policies</li></ul></td>
+            <td class="use-case">Information protection specialists managing Purview data classification and labeling frameworks.</td>
+          </tr>
+          <tr data-category="compliance">
+            <td class="role-name">eDiscovery Administrator</td>
+            <td><span class="badge badge-compliance">Compliance</span></td>
+            <td><ul class="permission-list"><li>Create &amp; manage eDiscovery cases</li><li>Access all content searches</li><li>Manage legal holds</li></ul></td>
+            <td class="use-case">Legal and compliance teams conducting investigations, litigation holds, and content searches.</td>
+          </tr>
+          <tr data-category="threat">
+            <td class="role-name">Security Operator</td>
+            <td><span class="badge badge-threat">Threat Protection</span></td>
+            <td><ul class="permission-list"><li>Manage security alerts</li><li>Run investigations</li><li>View security info</li><li>Limited remediation</li></ul></td>
+            <td class="use-case">SOC Tier 1/2 analysts who investigate and respond to alerts in Microsoft Defender XDR.</td>
+          </tr>
+          <tr data-category="threat">
+            <td class="role-name">Attack Simulation Administrator</td>
+            <td><span class="badge badge-threat">Threat Protection</span></td>
+            <td><ul class="permission-list"><li>Create attack simulations</li><li>Manage payloads</li><li>View simulation reports</li></ul></td>
+            <td class="use-case">Security awareness teams running phishing simulations and measuring employee security posture.</td>
+          </tr>
+          <tr data-category="threat">
+            <td class="role-name">Cloud App Security Administrator</td>
+            <td><span class="badge badge-threat">Threat Protection</span></td>
+            <td><ul class="permission-list"><li>Full Defender for Cloud Apps access</li><li>Manage app connectors</li><li>Configure CASB policies</li></ul></td>
+            <td class="use-case">Governing shadow IT, cloud app risk, and data movement through Defender for Cloud Apps policies.</td>
+          </tr>
+          <tr data-category="cloud">
+            <td class="role-name">Azure Security Engineer</td>
+            <td><span class="badge badge-cloud">Cloud Security</span></td>
+            <td><ul class="permission-list"><li>Configure Defender for Cloud</li><li>Manage security baselines</li><li>Implement CSPM recommendations</li></ul></td>
+            <td class="use-case">Azure-focused security engineers hardening workloads and implementing cloud security benchmarks.</td>
+          </tr>
+          <tr data-category="cloud">
+            <td class="role-name">Key Vault Contributor</td>
+            <td><span class="badge badge-cloud">Cloud Security</span></td>
+            <td><ul class="permission-list"><li>Manage Key Vault resources</li><li>Configure access policies</li><li>Manage certificates &amp; secrets</li></ul></td>
+            <td class="use-case">Managing cryptographic material, certificates, and secrets for applications and services.</td>
+          </tr>
+          <tr data-category="governance">
+            <td class="role-name">Identity Governance Administrator</td>
+            <td><span class="badge badge-governance">Governance</span></td>
+            <td><ul class="permission-list"><li>Manage access packages</li><li>Configure access reviews</li><li>Manage entitlement policies</li></ul></td>
+            <td class="use-case">Lifecycle management of access rights — provisioning, reviews, and deprovisioning via Entitlement Management.</td>
+          </tr>
+          <tr data-category="governance">
+            <td class="role-name">User Administrator</td>
+            <td><span class="badge badge-governance">Governance</span></td>
+            <td><ul class="permission-list"><li>Create/manage users &amp; groups</li><li>Reset non-admin passwords</li><li>Manage user licenses</li></ul></td>
+            <td class="use-case">IT helpdesk and identity administrators managing the user lifecycle and group memberships.</td>
+          </tr>
+          <tr data-category="governance">
+            <td class="role-name">Directory Readers</td>
+            <td><span class="badge badge-governance">Governance</span></td>
+            <td><ul class="permission-list"><li>Read directory data</li><li>View group memberships</li><li>Read service principals</li></ul></td>
+            <td class="use-case">Applications and services that need read access to Entra ID directory data without write permissions.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="no-results" id="noResults">No roles match your search criteria.</div>
+    </div>
+
+    <div class="cards-section">
+      <h2 class="section-title">Role Design Principles</h2>
+      <div class="cards-grid">
+        <div class="role-card">
+          <h4>🔑 Principle of Least Privilege</h4>
+          <p>Assign the most specific role that fulfills the requirement. Avoid Global Administrator when Security Administrator will suffice. Scope to a single resource or resource group where possible.</p>
+          <div class="scope">Core Zero Trust Principle</div>
+        </div>
+        <div class="role-card">
+          <h4>⏱️ Just-In-Time Access with PIM</h4>
+          <p>Use Privileged Identity Management (PIM) to make all privileged role assignments eligible rather than permanent. Require approval, justification, and time-bounds for activation.</p>
+          <div class="scope">Microsoft Entra PIM</div>
+        </div>
+        <div class="role-card">
+          <h4>🔍 Continuous Access Reviews</h4>
+          <p>Schedule recurring access reviews for privileged roles using Identity Governance. Auto-remediate stale assignments and remove roles when no longer needed.</p>
+          <div class="scope">Entra Identity Governance</div>
+        </div>
+        <div class="role-card">
+          <h4>🚨 Break-Glass Accounts</h4>
+          <p>Maintain two Global Administrator break-glass accounts that are cloud-only, MFA-exempt, and monitored by high-priority alerts. Exclude from all Conditional Access policies.</p>
+          <div class="scope">Business Continuity</div>
+        </div>
+        <div class="role-card">
+          <h4>📋 Role Separation</h4>
+          <p>Separate Security Administrator and Compliance Administrator duties. A single person controlling both security posture and audit logs creates an insider threat risk.</p>
+          <div class="scope">Separation of Duties</div>
+        </div>
+        <div class="role-card">
+          <h4>🏢 Administrative Units</h4>
+          <p>Use Administrative Units to scope role assignments to specific departments, regions, or subsidiaries — preventing lateral movement through over-privileged helpdesk accounts.</p>
+          <div class="scope">Entra Administrative Units</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Microsoft Security Architecture Portfolio &middot;
+      <a href="index.html">← Back to Compass</a> &middot;
+      <a href="https://learn.microsoft.com/entra/identity/role-based-access-control/permissions-reference" target="_blank" rel="noopener">Microsoft Docs: Role Reference</a>
+    </p>
+  </footer>
+
+  <script>
+    // Search functionality
+    const searchInput = document.getElementById('roleSearch');
+    const rolesBody = document.getElementById('rolesBody');
+    const noResults = document.getElementById('noResults');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    let currentFilter = 'all';
+
+    function applyFilters() {
+      const query = searchInput.value.toLowerCase();
+      const rows = rolesBody.querySelectorAll('tr');
+      let visible = 0;
+
+      rows.forEach(row => {
+        const category = row.dataset.category || '';
+        const text = row.textContent.toLowerCase();
+        const matchesFilter = currentFilter === 'all' || category === currentFilter;
+        const matchesSearch = !query || text.includes(query);
+        if (matchesFilter && matchesSearch) {
+          row.style.display = '';
+          visible++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      noResults.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    // Sort functionality
+    let sortState = { col: -1, asc: true };
+    function sortTable(colIndex) {
+      const tbody = document.getElementById('rolesBody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const headers = document.querySelectorAll('thead th');
+
+      if (sortState.col === colIndex) {
+        sortState.asc = !sortState.asc;
+      } else {
+        sortState.col = colIndex;
+        sortState.asc = true;
+      }
+
+      headers.forEach((th, i) => {
+        th.classList.remove('sorted');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) icon.textContent = '↕';
+      });
+      headers[colIndex].classList.add('sorted');
+      const activeIcon = headers[colIndex].querySelector('.sort-icon');
+      if (activeIcon) activeIcon.textContent = sortState.asc ? '↑' : '↓';
+
+      rows.sort((a, b) => {
+        const aText = a.cells[colIndex]?.textContent.trim() || '';
+        const bText = b.cells[colIndex]?.textContent.trim() || '';
+        return sortState.asc ? aText.localeCompare(bText) : bText.localeCompare(aText);
+      });
+
+      rows.forEach(row => tbody.appendChild(row));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microsoft Security Projects Portfolio</title>
+  <style>
+    :root {
+      --ms-blue: #0078d4;
+      --ms-dark: #1b1b1b;
+      --ms-white: #ffffff;
+      --entra: #0078d4;
+      --defender: #107c10;
+      --purview: #8764b8;
+      --sentinel: #00b7c3;
+      --azure: #0050a0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--ms-dark);
+      color: var(--ms-white);
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1e2a3a 100%);
+      border-bottom: 2px solid var(--ms-blue);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon { width: 40px; height: 40px; }
+    .logo h1 { font-size: 1.4rem; font-weight: 600; }
+    .logo span { color: var(--ms-blue); }
+    nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+    nav a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav a:hover, nav a.active { background: var(--ms-blue); color: var(--ms-white); }
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .page-header {
+      padding: 2rem 0 1.5rem;
+      border-bottom: 1px solid #333;
+      margin-bottom: 2rem;
+    }
+    .page-header h2 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .page-header p { color: #aaa; font-size: 1rem; max-width: 700px; }
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .filter-chip {
+      padding: 0.45rem 1rem;
+      border: 1px solid #444;
+      border-radius: 20px;
+      background: transparent;
+      color: #ccc;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-chip:hover, .filter-chip.active {
+      background: var(--ms-blue);
+      border-color: var(--ms-blue);
+      color: white;
+    }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .project-card {
+      background: #242424;
+      border: 1px solid #383838;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    }
+    .project-card-header {
+      padding: 1.25rem 1.25rem 0.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .project-icon {
+      font-size: 2.2rem;
+      flex-shrink: 0;
+    }
+    .project-meta {
+      flex: 1;
+    }
+    .project-meta h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      line-height: 1.3;
+    }
+    .category-badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .cat-entra { background: rgba(0,120,212,0.25); color: #5ba4f5; }
+    .cat-defender { background: rgba(16,124,16,0.25); color: #6ec96e; }
+    .cat-purview { background: rgba(135,100,184,0.25); color: #c5aee8; }
+    .cat-sentinel { background: rgba(0,183,195,0.25); color: #6edfe9; }
+    .cat-azure { background: rgba(0,80,160,0.25); color: #7eb8f5; }
+    .cat-zeroTrust { background: rgba(232,17,35,0.2); color: #f56b7a; }
+    .project-divider { height: 1px; background: #333; margin: 0 1.25rem; }
+    .project-body { padding: 0.75rem 1.25rem 1.25rem; flex: 1; }
+    .project-desc {
+      color: #bbb;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .outcomes {
+      margin-bottom: 1rem;
+    }
+    .outcomes h4 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #777;
+      margin-bottom: 0.4rem;
+    }
+    .outcome-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: #ccc;
+      margin-bottom: 0.25rem;
+    }
+    .outcome-item::before {
+      content: '✓';
+      color: #107c10;
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+    .tools-used {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .tool-tag {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      background: #2e2e2e;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: #aaa;
+    }
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1.25rem;
+      background: #1e1e1e;
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 0.4rem;
+    }
+    .status-completed .status-dot { background: #107c10; }
+    .status-inprogress .status-dot { background: #ffb900; }
+    .status-planned .status-dot { background: #666; }
+    .status-text { display: flex; align-items: center; }
+    .timeline-section { margin-bottom: 3rem; }
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: #444; }
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--ms-blue), #333);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.65rem;
+      top: 0.45rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--ms-blue);
+      border: 2px solid var(--ms-dark);
+    }
+    .timeline-date {
+      font-size: 0.78rem;
+      color: var(--ms-blue);
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .timeline-item h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .timeline-item p { color: #999; font-size: 0.88rem; line-height: 1.5; }
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+      grid-column: 1 / -1;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-size: 0.85rem;
+      border-top: 1px solid #333;
+      margin-top: 1rem;
+    }
+    footer a { color: var(--ms-blue); text-decoration: none; }
+    @media (max-width: 600px) {
+      main { padding: 1rem; }
+      .projects-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="19" height="19" fill="#f25022"/>
+        <rect x="21" width="19" height="19" fill="#7fba00"/>
+        <rect y="21" width="19" height="19" fill="#00a4ef"/>
+        <rect x="21" y="21" width="19" height="19" fill="#ffb900"/>
+      </svg>
+      <h1>Security <span>Compass</span></h1>
+    </div>
+    <nav>
+      <a href="index.html">Compass</a>
+      <a href="ms_security_roles.html">Roles</a>
+      <a href="ms_security_projects.html" class="active">Projects</a>
+      <a href="certification_strategy.html">Certifications</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h2>📁 Security Architecture Projects</h2>
+      <p>A portfolio of Microsoft security architecture engagements — from Zero Trust deployments to SIEM migrations — each demonstrating real-world application of the Microsoft security ecosystem.</p>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-chip active" data-filter="all">All Projects</button>
+      <button class="filter-chip" data-filter="entra">Entra ID</button>
+      <button class="filter-chip" data-filter="defender">Defender</button>
+      <button class="filter-chip" data-filter="purview">Purview</button>
+      <button class="filter-chip" data-filter="sentinel">Sentinel</button>
+      <button class="filter-chip" data-filter="zeroTrust">Zero Trust</button>
+      <button class="filter-chip" data-filter="azure">Azure Security</button>
+    </div>
+
+    <div class="projects-grid" id="projectsGrid">
+      <div class="project-card" data-category="zeroTrust entra">
+        <div class="project-card-header">
+          <div class="project-icon">🏢</div>
+          <div class="project-meta">
+            <h3>Enterprise Zero Trust Architecture Deployment</h3>
+            <span class="category-badge cat-zeroTrust">Zero Trust</span>
+          </div>
+        </div>
+        <div class="project-divider"></div>
+        <div class="project-body">
+          <p class="project-desc">Designed and implemented a comprehensive Zero Trust architecture for a 5,000-seat enterprise, replacing implicit perimeter trust with identity-centric access controls across all workloads.</p>
+          <div class="outcomes">
+            <h4>Key Outcomes</h4>
+            <div class="outcome-item">Eliminated VPN dependency for 90% of remote workers</div>
+            <div class="outcome-item">Reduced lateral movement risk through network micro-segmentation</div>
+            <div class="outcome-item">Achieved NIST 800-207 Zero Trust Architecture alignment</div>
+          </div>
+          <div class="tools-used">
+            <span class="tool-tag">Entra ID</span>
+            <span class="tool-tag">Conditional Access</span>
+            <span class="tool-tag">Intune</span>
+            <span class="tool-tag">Azure Firewall</span>
+            <span class="tool-tag">App Proxy</span>
+          </div>
+        </div>
+        <div class="status-row status-completed">
+          <span class="status-text"><span class="status-dot"></span>Completed</span>
+          <span>Q2 2024</span>
+        </div>
+      </div>
+
+      <div class="project-card" data-category="sentinel">
+        <div class="project-card-header">
+          <div class="project-icon">📡</div>
+          <div class="project-meta">
+            <h3>SIEM Migration to Microsoft Sentinel</h3>
+            <span class="category-badge cat-sentinel">Sentinel</span>
+          </div>
+        </div>
+        <div class="project-divider"></div>
+        <div class="project-body">
+          <p class="project-desc">Led migration from legacy on-premises SIEM to Microsoft Sentinel, including data connector configuration, analytics rule migration, and SOAR playbook development for automated response.</p>
+          <div class="outcomes">
+            <h4>Key Outcomes</h4>
+            <div class="outcome-item">Onboarded 150+ data sources via native and custom connectors</div>
+            <div class="outcome-item">Reduced MTTR by 60% through automated playbook responses</div>
+            <div class="outcome-item">Rebuilt 200+ detection rules using MITRE ATT&CK framework mapping</div>
+          </div>
+          <div class="tools-used">
+            <span class="tool-tag">Microsoft Sentinel</span>
+            <span class="tool-tag">KQL</span>
+            <span class="tool-tag">Logic Apps</span>
+            <span class="tool-tag">MITRE ATT&CK</span>
+            <span class="tool-tag">Watchlists</span>
+          </div>
+        </div>
+        <div class="status-row status-completed">
+          <span class="status-text"><span class="status-dot"></span>Completed</span>
+          <span>Q4 2023</span>
+        </div>
+      </div>
+
+      <div class="project-card" data-category="purview">
+        <div class="project-card-header">
+          <div class="project-icon">🏛️</div>
+          <div class="project-meta">
+            <h3>Data Classification &amp; DLP Framework</h3>
+            <span class="category-badge cat-purview">Purview</span>
+          </div>
+        </div>
+        <div class="project-divider"></div>
+        <div class="project-body">
+          <p class="project-desc">Built a comprehensive data classification taxonomy and enforced it via Microsoft Purview sensitivity labels, DLP policies, and insider risk management to meet GDPR and financial compliance requirements.</p>
+          <div class="outcomes">
+            <h4>Key Outcomes</h4>
+            <div class="outcome-item">Classified 2M+ documents across SharePoint, OneDrive, and Exchange</div>
+            <div class="outcome-item">Blocked 300+ accidental external sharing incidents per month</div>
+            <div class="outcome-item">Achieved GDPR audit readiness in 90-day timeline</div>
+          </div>
+          <div class="tools-used">
+            <span class="tool-tag">Purview</span>
+            <span class="tool-tag">Sensitivity Labels</span>
+            <span class="tool-tag">DLP</span>
+            <span class="tool-tag">Insider Risk</span>
+            <span class="tool-tag">Compliance Score</span>
+          </div>
+        </div>
+        <div class="status-row status-completed">
+          <span class="status-text"><span class="status-dot"></span>Completed</span>
+          <span>Q1 2024</span>
+        </div>
+      </div>
+
+      <div class="project-card" data-category="entra">
+        <div class="project-card-header">
+          <div class="project-icon">🔐</div>
+          <div class="project-meta">
+            <h3>Privileged Access Workstation (PAW) Program</h3>
+            <span class="category-badge cat-entra">Entra ID</span>
+          </div>
+        </div>
+        <div class="project-divider"></div>
+        <div class="project-body">
+          <p class="project-desc">Designed and deployed a tiered privileged access model with dedicated PAW devices for Tier 0 administration, PIM just-in-time activation, and admin forest isolation for Active Directory.</p>
+          <div class="outcomes">
+            <h4>Key Outcomes</h4>
+            <div class="outcome-item">Eliminated pass-the-hash attack surface for domain admins</div>
+            <div class="outcome-item">100% of privileged access moved to just-in-time via PIM</div>
+            <div class="outcome-item">Reduced standing privileged accounts from 45 to 3 break-glass</div>
+          </div>
+          <div class="tools-used">
+            <span class="tool-tag">Entra PIM</span>
+            <span class="tool-tag">PAW Devices</span>
+            <span class="tool-tag">Intune</span>
+            <span class="tool-tag">ESAE</span>
+            <span class="tool-tag">Conditional Access</span>
+          </div>
+        </div>
+        <div class="status-row status-completed">
+          <span class="status-text"><span class="status-dot"></span>Completed</span>
+          <span>Q3 2023</span>
+        </div>
+      </div>
+
+      <div class="project-card" data-category="defender">
+        <div class="project-card-header">
+          <div class="project-icon">🛡️</div>
+          <div class="project-meta">
+            <h3>Defender XDR SOC Modernization</h3>
+            <span class="category-badge cat-defender">Defender</span>
+          </div>
+        </div>
+        <div class="project-divider"></div>
+        <div class="project-body">
+          <p class="project-desc">Consolidated disparate security tools into the Microsoft Defender XDR platform, enabling unified incident investigation, automated attack disruption, and integrated threat intelligence.</p>
+          <div class="outcomes">
+            <h4>Key Outcomes</h4>
+            <div class="outcome-item">Consolidated 8 point security tools into unified XDR platform</div>
+            <div class="outcome-item">Automated attack disruption blocked 3 ransomware precursors</div>
+            <div class="outcome-item">Reduced analyst tool-switching from 12 to 2 consoles</div>
+          </div>
+          <div class="tools-used">
+            <span class="tool-tag">Defender for Endpoint</span>
+            <span class="tool-tag">Defender for Identity</span>
+            <span class="tool-tag">Defender for O365</span>
+            <span class="tool-tag">Defender XDR</span>
+          </div>
+        </div>
+        <div class="status-row status-completed">
+          <span class="status-text"><span class="status-dot"></span>Completed</span>
+          <span>Q1 2023</span>
+        </div>
+      </div>
+
+      <div class="project-card" data-category="azure">
+        <div class="project-card-header">
+          <div class="project-icon">☁️</div>
+          <div class="project-meta">
+            <h3>Azure Landing Zone Security Baseline</h3>
+            <span class="category-badge cat-azure">Azure Security</span>
+          </div>
+        </div>
+        <div class="project-divider"></div>
+        <div class="project-body">
+          <p class="project-desc">Architected a secure Azure Landing Zone with enforced policy guardrails, hub-spoke network topology, centralized logging, and Defender for Cloud CSPM covering multi-subscription environments.</p>
+          <div class="outcomes">
+            <h4>Key Outcomes</h4>
+            <div class="outcome-item">Achieved 95%+ Microsoft Secure Score within 60 days</div>
+            <div class="outcome-item">Enforced CIS Azure Foundations Benchmark via Azure Policy</div>
+            <div class="outcome-item">Established immutable audit logging to centralized Log Analytics</div>
+          </div>
+          <div class="tools-used">
+            <span class="tool-tag">Defender for Cloud</span>
+            <span class="tool-tag">Azure Policy</span>
+            <span class="tool-tag">Management Groups</span>
+            <span class="tool-tag">Log Analytics</span>
+            <span class="tool-tag">Azure Firewall</span>
+          </div>
+        </div>
+        <div class="status-row status-inprogress">
+          <span class="status-text"><span class="status-dot"></span>In Progress</span>
+          <span>Q2 2025</span>
+        </div>
+      </div>
+
+      <div class="project-card" data-category="entra purview">
+        <div class="project-card-header">
+          <div class="project-icon">🔄</div>
+          <div class="project-meta">
+            <h3>Identity Lifecycle Automation</h3>
+            <span class="category-badge cat-entra">Entra ID</span>
+          </div>
+        </div>
+        <div class="project-divider"></div>
+        <div class="project-body">
+          <p class="project-desc">Implemented automated joiner/mover/leaver workflows using Entra ID Lifecycle Workflows and HR-driven provisioning, eliminating manual identity provisioning delays and orphaned accounts.</p>
+          <div class="outcomes">
+            <h4>Key Outcomes</h4>
+            <div class="outcome-item">Automated provisioning for 500+ new hire onboardings per year</div>
+            <div class="outcome-item">Reduced account deprovisioning from 3 days to under 1 hour</div>
+            <div class="outcome-item">Eliminated 1,200+ orphaned accounts discovered in access review</div>
+          </div>
+          <div class="tools-used">
+            <span class="tool-tag">Lifecycle Workflows</span>
+            <span class="tool-tag">HR Provisioning</span>
+            <span class="tool-tag">Entitlement Mgmt</span>
+            <span class="tool-tag">Access Reviews</span>
+          </div>
+        </div>
+        <div class="status-row status-completed">
+          <span class="status-text"><span class="status-dot"></span>Completed</span>
+          <span>Q3 2024</span>
+        </div>
+      </div>
+
+      <div class="project-card" data-category="sentinel defender">
+        <div class="project-card-header">
+          <div class="project-icon">🎯</div>
+          <div class="project-meta">
+            <h3>Threat Hunting Program Development</h3>
+            <span class="category-badge cat-sentinel">Sentinel</span>
+          </div>
+        </div>
+        <div class="project-divider"></div>
+        <div class="project-body">
+          <p class="project-desc">Established a proactive threat hunting program using KQL analytics in Microsoft Sentinel, building a library of 80+ hunting queries aligned to MITRE ATT&CK and performing structured hunts.</p>
+          <div class="outcomes">
+            <h4>Key Outcomes</h4>
+            <div class="outcome-item">Discovered 4 previously undetected threat actor TTPs</div>
+            <div class="outcome-item">Developed 80+ reusable KQL hunting queries in shared library</div>
+            <div class="outcome-item">Reduced mean dwell time from 45 days to under 7 days</div>
+          </div>
+          <div class="tools-used">
+            <span class="tool-tag">Microsoft Sentinel</span>
+            <span class="tool-tag">KQL</span>
+            <span class="tool-tag">MITRE ATT&CK</span>
+            <span class="tool-tag">Threat Intelligence</span>
+          </div>
+        </div>
+        <div class="status-row status-inprogress">
+          <span class="status-text"><span class="status-dot"></span>In Progress</span>
+          <span>Ongoing</span>
+        </div>
+      </div>
+      <div class="no-results" id="noResults">No projects match the selected filter.</div>
+    </div>
+
+    <div class="timeline-section">
+      <h2 class="section-title">Project Timeline</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">Q2 2025 — In Progress</div>
+          <h4>Azure Landing Zone Security Baseline</h4>
+          <p>Multi-subscription governance, Defender for Cloud CSPM, and immutable logging architecture.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Q3 2024</div>
+          <h4>Identity Lifecycle Automation</h4>
+          <p>HR-driven provisioning and automated joiner/mover/leaver workflows via Lifecycle Workflows.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Q2 2024</div>
+          <h4>Enterprise Zero Trust Architecture Deployment</h4>
+          <p>Full Zero Trust transformation for 5,000-seat enterprise, eliminating VPN dependency.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Q1 2024</div>
+          <h4>Data Classification &amp; DLP Framework</h4>
+          <p>GDPR-compliant data governance using Microsoft Purview sensitivity labels and DLP policies.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Q4 2023</div>
+          <h4>SIEM Migration to Microsoft Sentinel</h4>
+          <p>Full migration from legacy SIEM including 150+ connectors and 200+ detection rules.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Q3 2023</div>
+          <h4>Privileged Access Workstation (PAW) Program</h4>
+          <p>Tiered PAW model with PIM just-in-time access eliminating standing privileged accounts.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Q1 2023</div>
+          <h4>Defender XDR SOC Modernization</h4>
+          <p>Consolidated 8 security tools into unified Defender XDR with automated attack disruption.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Microsoft Security Architecture Portfolio &middot;
+      <a href="index.html">← Back to Compass</a>
+    </p>
+  </footer>
+
+  <script>
+    const filterBar = document.getElementById('filterBar');
+    const grid = document.getElementById('projectsGrid');
+    const noResults = document.getElementById('noResults');
+
+    filterBar.addEventListener('click', (e) => {
+      const chip = e.target.closest('.filter-chip');
+      if (!chip) return;
+
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+
+      const filter = chip.dataset.filter;
+      const cards = grid.querySelectorAll('.project-card');
+      let visible = 0;
+
+      cards.forEach(card => {
+        const cats = card.dataset.category || '';
+        if (filter === 'all' || cats.includes(filter)) {
+          card.style.display = '';
+          visible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      noResults.style.display = visible === 0 ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>
