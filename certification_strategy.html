@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microsoft Security Certification Strategy</title>
+  <style>
+    :root {
+      --ms-blue: #0078d4;
+      --ms-dark: #1b1b1b;
+      --ms-white: #ffffff;
+      --gold: #ffb900;
+      --silver: #a0a0a0;
+      --completed: #107c10;
+      --inprogress: #ffb900;
+      --planned: #555;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--ms-dark);
+      color: var(--ms-white);
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1e2a3a 100%);
+      border-bottom: 2px solid var(--ms-blue);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon { width: 40px; height: 40px; }
+    .logo h1 { font-size: 1.4rem; font-weight: 600; }
+    .logo span { color: var(--ms-blue); }
+    nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+    nav a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav a:hover, nav a.active { background: var(--ms-blue); color: var(--ms-white); }
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .page-header {
+      padding: 2rem 0 1.5rem;
+      border-bottom: 1px solid #333;
+      margin-bottom: 2rem;
+    }
+    .page-header h2 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .page-header p { color: #aaa; font-size: 1rem; max-width: 700px; }
+    .legend {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-completed { background: var(--completed); }
+    .dot-inprogress { background: var(--inprogress); }
+    .dot-planned { background: var(--planned); }
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: #444; }
+    /* Certification cards */
+    .certs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .cert-card {
+      background: #242424;
+      border: 1px solid #383838;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cert-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+    }
+    .cert-card::before {
+      content: '';
+      display: block;
+      height: 4px;
+    }
+    .cert-card.completed::before { background: var(--completed); }
+    .cert-card.inprogress::before { background: var(--inprogress); }
+    .cert-card.planned::before { background: var(--planned); }
+    .cert-status-ribbon {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .cert-card.completed .cert-status-ribbon { background: rgba(16,124,16,0.25); color: #6ec96e; }
+    .cert-card.inprogress .cert-status-ribbon { background: rgba(255,185,0,0.2); color: #ffd966; }
+    .cert-card.planned .cert-status-ribbon { background: rgba(85,85,85,0.3); color: #888; }
+    .cert-body { padding: 1.25rem; }
+    .cert-code {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ms-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+    .cert-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      padding-right: 4rem;
+      line-height: 1.35;
+    }
+    .cert-level {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 0.75rem;
+    }
+    .level-fundamentals { background: rgba(0,120,212,0.2); color: #5ba4f5; }
+    .level-associate { background: rgba(0,183,195,0.2); color: #6edfe9; }
+    .level-expert { background: rgba(135,100,184,0.2); color: #c5aee8; }
+    .level-specialty { background: rgba(255,185,0,0.2); color: #ffd966; }
+    .cert-desc {
+      font-size: 0.87rem;
+      color: #aaa;
+      line-height: 1.55;
+      margin-bottom: 0.9rem;
+    }
+    .cert-meta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: #666;
+      border-top: 1px solid #333;
+      padding-top: 0.75rem;
+    }
+    .cert-meta span strong { color: #999; }
+    .cert-topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+    }
+    .cert-topic {
+      font-size: 0.72rem;
+      padding: 0.18rem 0.5rem;
+      background: #2e2e2e;
+      border: 1px solid #3a3a3a;
+      border-radius: 4px;
+      color: #888;
+    }
+    /* Roadmap section */
+    .roadmap-section { margin-bottom: 3rem; }
+    .roadmap {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+    .roadmap-phase {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 1.5rem;
+      margin-bottom: 0;
+      position: relative;
+    }
+    .roadmap-phase::before {
+      content: '';
+      position: absolute;
+      left: 56px;
+      top: 40px;
+      bottom: -24px;
+      width: 2px;
+      background: #333;
+    }
+    .roadmap-phase:last-child::before { display: none; }
+    .phase-label {
+      text-align: right;
+      padding-top: 0.5rem;
+    }
+    .phase-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--ms-blue);
+      font-weight: 700;
+      font-size: 1rem;
+      margin-left: auto;
+    }
+    .phase-certs {
+      padding: 0.5rem 0 2.5rem;
+    }
+    .phase-certs h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .phase-certs p {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 0.75rem;
+    }
+    .phase-cert-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .phase-cert-pill {
+      padding: 0.35rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .pill-completed { background: rgba(16,124,16,0.2); color: #6ec96e; border: 1px solid rgba(16,124,16,0.3); }
+    .pill-inprogress { background: rgba(255,185,0,0.15); color: #ffd966; border: 1px solid rgba(255,185,0,0.25); }
+    .pill-planned { background: rgba(85,85,85,0.2); color: #888; border: 1px solid #444; }
+    /* Study strategy */
+    .strategy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+    .strategy-card {
+      background: #242424;
+      border: 1px solid #383838;
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .strategy-card h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .strategy-card p { color: #999; font-size: 0.87rem; line-height: 1.55; }
+    .strategy-card .resource-list {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .strategy-card .resource-list a {
+      color: var(--ms-blue);
+      font-size: 0.82rem;
+      text-decoration: none;
+    }
+    .strategy-card .resource-list a:hover { text-decoration: underline; }
+    /* Progress tracker */
+    .progress-section { margin-bottom: 3rem; }
+    .progress-bar-wrap {
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .progress-row:last-child { margin-bottom: 0; }
+    .progress-label {
+      width: 200px;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+    }
+    .progress-label .prog-code { color: var(--ms-blue); font-weight: 600; font-size: 0.8rem; }
+    .progress-track {
+      flex: 1;
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease;
+    }
+    .fill-done { background: var(--completed); }
+    .fill-prog { background: var(--inprogress); }
+    .fill-plan { background: var(--planned); }
+    .progress-pct {
+      width: 40px;
+      text-align: right;
+      font-size: 0.85rem;
+      color: #888;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-size: 0.85rem;
+      border-top: 1px solid #333;
+    }
+    footer a { color: var(--ms-blue); text-decoration: none; }
+    @media (max-width: 600px) {
+      main { padding: 1rem; }
+      .roadmap-phase { grid-template-columns: 50px 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="19" height="19" fill="#f25022"/>
+        <rect x="21" width="19" height="19" fill="#7fba00"/>
+        <rect y="21" width="19" height="19" fill="#00a4ef"/>
+        <rect x="21" y="21" width="19" height="19" fill="#ffb900"/>
+      </svg>
+      <h1>Security <span>Compass</span></h1>
+    </div>
+    <nav>
+      <a href="index.html">Compass</a>
+      <a href="ms_security_roles.html">Roles</a>
+      <a href="ms_security_projects.html">Projects</a>
+      <a href="certification_strategy.html" class="active">Certifications</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h2>🎓 Microsoft Security Certification Strategy</h2>
+      <p>A structured roadmap for Microsoft security certifications — from foundational concepts to expert-level credentials — with study strategies and resource recommendations.</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot dot-completed"></div> Completed</div>
+      <div class="legend-item"><div class="legend-dot dot-inprogress"></div> In Progress</div>
+      <div class="legend-item"><div class="legend-dot dot-planned"></div> Planned</div>
+    </div>
+
+    <h2 class="section-title">Certification Portfolio</h2>
+    <div class="certs-grid">
+
+      <div class="cert-card completed">
+        <div class="cert-status-ribbon">✓ Completed</div>
+        <div class="cert-body">
+          <div class="cert-code">SC-900</div>
+          <div class="cert-name">Microsoft Security, Compliance, and Identity Fundamentals</div>
+          <span class="cert-level level-fundamentals">Fundamentals</span>
+          <p class="cert-desc">Foundational knowledge of Microsoft security, compliance, and identity concepts — the entry point for the security certification path.</p>
+          <div class="cert-topics">
+            <span class="cert-topic">Zero Trust</span>
+            <span class="cert-topic">Entra ID</span>
+            <span class="cert-topic">Purview basics</span>
+            <span class="cert-topic">Compliance concepts</span>
+          </div>
+          <div class="cert-meta">
+            <span><strong>Exam:</strong> SC-900</span>
+            <span><strong>Duration:</strong> ~1 month study</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card completed">
+        <div class="cert-status-ribbon">✓ Completed</div>
+        <div class="cert-body">
+          <div class="cert-code">SC-300</div>
+          <div class="cert-name">Microsoft Identity and Access Administrator</div>
+          <span class="cert-level level-associate">Associate</span>
+          <p class="cert-desc">Designing and implementing identity and access management solutions using Microsoft Entra ID, including SSO, MFA, PIM, and conditional access.</p>
+          <div class="cert-topics">
+            <span class="cert-topic">Entra ID</span>
+            <span class="cert-topic">Conditional Access</span>
+            <span class="cert-topic">PIM</span>
+            <span class="cert-topic">B2B/B2C</span>
+            <span class="cert-topic">Hybrid Identity</span>
+          </div>
+          <div class="cert-meta">
+            <span><strong>Exam:</strong> SC-300</span>
+            <span><strong>Duration:</strong> ~2 months study</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card completed">
+        <div class="cert-status-ribbon">✓ Completed</div>
+        <div class="cert-body">
+          <div class="cert-code">SC-200</div>
+          <div class="cert-name">Microsoft Security Operations Analyst</div>
+          <span class="cert-level level-associate">Associate</span>
+          <p class="cert-desc">Mitigating threats using Microsoft Sentinel, Defender XDR, and Defender for Cloud — focused on SOC operations, threat hunting, and incident response.</p>
+          <div class="cert-topics">
+            <span class="cert-topic">Microsoft Sentinel</span>
+            <span class="cert-topic">Defender XDR</span>
+            <span class="cert-topic">KQL</span>
+            <span class="cert-topic">SOAR</span>
+            <span class="cert-topic">Threat Hunting</span>
+          </div>
+          <div class="cert-meta">
+            <span><strong>Exam:</strong> SC-200</span>
+            <span><strong>Duration:</strong> ~2 months study</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card completed">
+        <div class="cert-status-ribbon">✓ Completed</div>
+        <div class="cert-body">
+          <div class="cert-code">SC-400</div>
+          <div class="cert-name">Microsoft Information Protection and Compliance Administrator</div>
+          <span class="cert-level level-associate">Associate</span>
+          <p class="cert-desc">Implementing information protection and compliance solutions using Microsoft Purview — DLP, sensitivity labels, retention, and insider risk.</p>
+          <div class="cert-topics">
+            <span class="cert-topic">Sensitivity Labels</span>
+            <span class="cert-topic">DLP</span>
+            <span class="cert-topic">Retention</span>
+            <span class="cert-topic">Insider Risk</span>
+            <span class="cert-topic">eDiscovery</span>
+          </div>
+          <div class="cert-meta">
+            <span><strong>Exam:</strong> SC-400</span>
+            <span><strong>Duration:</strong> ~2 months study</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card completed">
+        <div class="cert-status-ribbon">✓ Completed</div>
+        <div class="cert-body">
+          <div class="cert-code">AZ-500</div>
+          <div class="cert-name">Microsoft Azure Security Engineer</div>
+          <span class="cert-level level-associate">Associate</span>
+          <p class="cert-desc">Implementing security controls, maintaining security posture, and identifying and remediating vulnerabilities in Azure environments.</p>
+          <div class="cert-topics">
+            <span class="cert-topic">Azure Networking</span>
+            <span class="cert-topic">Key Vault</span>
+            <span class="cert-topic">Defender for Cloud</span>
+            <span class="cert-topic">Azure Policy</span>
+            <span class="cert-topic">Container Security</span>
+          </div>
+          <div class="cert-meta">
+            <span><strong>Exam:</strong> AZ-500</span>
+            <span><strong>Duration:</strong> ~2 months study</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card inprogress">
+        <div class="cert-status-ribbon">In Progress</div>
+        <div class="cert-body">
+          <div class="cert-code">MS-500</div>
+          <div class="cert-name">Microsoft 365 Security Administrator</div>
+          <span class="cert-level level-associate">Associate</span>
+          <p class="cert-desc">Implementing, managing, and monitoring security and compliance solutions for Microsoft 365 environments.</p>
+          <div class="cert-topics">
+            <span class="cert-topic">M365 Defender</span>
+            <span class="cert-topic">Exchange Protection</span>
+            <span class="cert-topic">SharePoint Security</span>
+            <span class="cert-topic">Teams Security</span>
+          </div>
+          <div class="cert-meta">
+            <span><strong>Exam:</strong> MS-500</span>
+            <span><strong>Target:</strong> Q3 2025</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card planned">
+        <div class="cert-status-ribbon">Planned</div>
+        <div class="cert-body">
+          <div class="cert-code">SC-100</div>
+          <div class="cert-name">Microsoft Cybersecurity Architect</div>
+          <span class="cert-level level-expert">Expert</span>
+          <p class="cert-desc">The pinnacle Microsoft security certification — designing end-to-end cybersecurity solutions across Zero Trust, GRC, security operations, and data/application security.</p>
+          <div class="cert-topics">
+            <span class="cert-topic">Zero Trust Design</span>
+            <span class="cert-topic">GRC</span>
+            <span class="cert-topic">Security Operations</span>
+            <span class="cert-topic">Hybrid Architecture</span>
+          </div>
+          <div class="cert-meta">
+            <span><strong>Exam:</strong> SC-100</span>
+            <span><strong>Target:</strong> Q1 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card planned">
+        <div class="cert-status-ribbon">Planned</div>
+        <div class="cert-body">
+          <div class="cert-code">AZ-700</div>
+          <div class="cert-name">Azure Network Engineer Associate</div>
+          <span class="cert-level level-associate">Associate</span>
+          <p class="cert-desc">Designing and implementing Azure network infrastructure to support Zero Trust network access and secure hybrid connectivity patterns.</p>
+          <div class="cert-topics">
+            <span class="cert-topic">Azure Networking</span>
+            <span class="cert-topic">Azure Firewall</span>
+            <span class="cert-topic">Private Endpoints</span>
+            <span class="cert-topic">ExpressRoute</span>
+          </div>
+          <div class="cert-meta">
+            <span><strong>Exam:</strong> AZ-700</span>
+            <span><strong>Target:</strong> Q2 2026</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Progress bars -->
+    <div class="progress-section">
+      <h2 class="section-title">Study Progress</h2>
+      <div class="progress-bar-wrap">
+        <div class="progress-row">
+          <div class="progress-label"><div class="prog-code">SC-900</div>Security Fundamentals</div>
+          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
+          <div class="progress-pct">100%</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label"><div class="prog-code">SC-300</div>Identity Admin</div>
+          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
+          <div class="progress-pct">100%</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label"><div class="prog-code">SC-200</div>Security Operations</div>
+          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
+          <div class="progress-pct">100%</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label"><div class="prog-code">SC-400</div>Info Protection</div>
+          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
+          <div class="progress-pct">100%</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label"><div class="prog-code">AZ-500</div>Azure Security</div>
+          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
+          <div class="progress-pct">100%</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label"><div class="prog-code">MS-500</div>M365 Security</div>
+          <div class="progress-track"><div class="progress-fill fill-prog" style="width:60%"></div></div>
+          <div class="progress-pct">60%</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label"><div class="prog-code">SC-100</div>Cybersecurity Architect</div>
+          <div class="progress-track"><div class="progress-fill fill-plan" style="width:10%"></div></div>
+          <div class="progress-pct">10%</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label"><div class="prog-code">AZ-700</div>Network Engineer</div>
+          <div class="progress-track"><div class="progress-fill fill-plan" style="width:0%"></div></div>
+          <div class="progress-pct">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Roadmap -->
+    <div class="roadmap-section">
+      <h2 class="section-title">Recommended Certification Roadmap</h2>
+      <div class="roadmap">
+        <div class="roadmap-phase">
+          <div class="phase-label">
+            <div class="phase-num">1</div>
+          </div>
+          <div class="phase-certs">
+            <h3>Foundation</h3>
+            <p>Establish core security concepts across Microsoft's cloud and compliance pillars.</p>
+            <div class="phase-cert-list">
+              <span class="phase-cert-pill pill-completed">✓ SC-900 — Security Fundamentals</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-phase">
+          <div class="phase-label">
+            <div class="phase-num">2</div>
+          </div>
+          <div class="phase-certs">
+            <h3>Identity &amp; Access Specialization</h3>
+            <p>Deep dive into Entra ID, conditional access, PIM, and hybrid identity patterns.</p>
+            <div class="phase-cert-list">
+              <span class="phase-cert-pill pill-completed">✓ SC-300 — Identity Admin</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-phase">
+          <div class="phase-label">
+            <div class="phase-num">3</div>
+          </div>
+          <div class="phase-certs">
+            <h3>Security Operations &amp; Compliance</h3>
+            <p>Build SOC skills with Sentinel/Defender XDR and governance skills with Purview.</p>
+            <div class="phase-cert-list">
+              <span class="phase-cert-pill pill-completed">✓ SC-200 — Security Operations</span>
+              <span class="phase-cert-pill pill-completed">✓ SC-400 — Info Protection</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-phase">
+          <div class="phase-label">
+            <div class="phase-num">4</div>
+          </div>
+          <div class="phase-certs">
+            <h3>Azure &amp; M365 Platform Security</h3>
+            <p>Broaden to platform-level security across Azure infrastructure and Microsoft 365.</p>
+            <div class="phase-cert-list">
+              <span class="phase-cert-pill pill-completed">✓ AZ-500 — Azure Security Engineer</span>
+              <span class="phase-cert-pill pill-inprogress">⟳ MS-500 — M365 Security Admin</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-phase">
+          <div class="phase-label">
+            <div class="phase-num">5</div>
+          </div>
+          <div class="phase-certs">
+            <h3>Expert Architecture</h3>
+            <p>Synthesize all domains into end-to-end security architecture design at the expert level.</p>
+            <div class="phase-cert-list">
+              <span class="phase-cert-pill pill-planned">SC-100 — Cybersecurity Architect</span>
+              <span class="phase-cert-pill pill-planned">AZ-700 — Network Engineer</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Study strategy -->
+    <h2 class="section-title">Study Strategy</h2>
+    <div class="strategy-grid">
+      <div class="strategy-card">
+        <h4>📚 Official Microsoft Learn</h4>
+        <p>Microsoft Learn provides free, structured learning paths aligned to each exam. Complete the full learning path before scheduling the exam.</p>
+        <div class="resource-list">
+          <a href="https://learn.microsoft.com/certifications/browse/?type=role-based&levels=intermediate" target="_blank" rel="noopener">Browse Certification Paths</a>
+          <a href="https://learn.microsoft.com/certifications/practice-assessments-for-microsoft-certifications" target="_blank" rel="noopener">Practice Assessments</a>
+        </div>
+      </div>
+      <div class="strategy-card">
+        <h4>🧪 Hands-On Labs</h4>
+        <p>Theory alone is insufficient. Configure a dev tenant, use Microsoft Learn sandbox labs, and replicate real-world scenarios hands-on before exam day.</p>
+        <div class="resource-list">
+          <a href="https://developer.microsoft.com/microsoft-365/dev-program" target="_blank" rel="noopener">M365 Developer Tenant</a>
+          <a href="https://learn.microsoft.com/training/modules/get-started-with-azure-sandbox/" target="_blank" rel="noopener">Azure Sandbox Labs</a>
+        </div>
+      </div>
+      <div class="strategy-card">
+        <h4>📝 Practice Exams</h4>
+        <p>Use Microsoft's official practice assessments plus third-party question banks to identify knowledge gaps. Target 85%+ on practice tests before scheduling.</p>
+        <div class="resource-list">
+          <a href="https://learn.microsoft.com/certifications/practice-assessments-for-microsoft-certifications" target="_blank" rel="noopener">Official Practice Assessments</a>
+        </div>
+      </div>
+      <div class="strategy-card">
+        <h4>🎯 John Savill's Study Crams</h4>
+        <p>John Savill's YouTube exam cram sessions provide high-quality, whiteboard-style reviews of each certification. Watch 1-2 weeks before your exam.</p>
+        <div class="resource-list">
+          <a href="https://www.youtube.com/@NTFAQGuy" target="_blank" rel="noopener">YouTube: John Savill Technical Training</a>
+        </div>
+      </div>
+      <div class="strategy-card">
+        <h4>📅 Study Scheduling</h4>
+        <p>Schedule the exam before you feel fully ready — a booked exam date creates urgency. Study 1-2 hours daily for 6-8 weeks per Associate-level exam.</p>
+      </div>
+      <div class="strategy-card">
+        <h4>🔄 Renewal Strategy</h4>
+        <p>Microsoft certifications renew annually for free via an online renewal assessment on Microsoft Learn. Set a calendar reminder 6 months before expiry to avoid re-exams.</p>
+        <div class="resource-list">
+          <a href="https://learn.microsoft.com/certifications/renew-your-microsoft-certification" target="_blank" rel="noopener">Certification Renewal Guide</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Microsoft Security Architecture Portfolio &middot;
+      <a href="index.html">← Back to Compass</a> &middot;
+      <a href="https://learn.microsoft.com/certifications/browse/?type=role-based&levels=intermediate" target="_blank" rel="noopener">Microsoft Certifications</a>
+    </p>
+  </footer>
+</body>
+</html>

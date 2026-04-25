@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microsoft Security Compass</title>
+  <style>
+    :root {
+      --ms-blue: #0078d4;
+      --ms-dark: #1b1b1b;
+      --ms-gray: #323130;
+      --ms-light: #f3f2f1;
+      --ms-white: #ffffff;
+      --entra: #0078d4;
+      --defender: #107c10;
+      --purview: #8764b8;
+      --sentinel: #00b7c3;
+      --zero-trust: #e81123;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--ms-dark);
+      color: var(--ms-white);
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1e2a3a 100%);
+      border-bottom: 2px solid var(--ms-blue);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+    }
+    .logo h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--ms-white);
+    }
+    .logo span {
+      color: var(--ms-blue);
+    }
+    nav {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav a:hover, nav a.active {
+      background: var(--ms-blue);
+      color: var(--ms-white);
+    }
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+    }
+    .hero h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(90deg, var(--ms-blue), var(--sentinel));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: #aaa;
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    .compass-container {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto 3rem;
+    }
+    .compass-svg {
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0 0 30px rgba(0,120,212,0.3));
+    }
+    .compass-svg .segment {
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .compass-svg .segment:hover {
+      opacity: 0.85;
+    }
+    .compass-tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.9);
+      border: 1px solid var(--ms-blue);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      max-width: 200px;
+      z-index: 10;
+    }
+    .compass-tooltip.visible {
+      opacity: 1;
+    }
+    .compass-tooltip h4 {
+      color: var(--ms-blue);
+      margin-bottom: 0.25rem;
+    }
+    .compass-tooltip p {
+      color: #ccc;
+      line-height: 1.4;
+    }
+    .domains-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .domain-card {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .domain-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .domain-card.entra { border-top: 3px solid var(--entra); }
+    .domain-card.entra:hover { border-color: var(--entra); box-shadow: 0 8px 24px rgba(0,120,212,0.3); }
+    .domain-card.defender { border-top: 3px solid var(--defender); }
+    .domain-card.defender:hover { border-color: var(--defender); box-shadow: 0 8px 24px rgba(16,124,16,0.3); }
+    .domain-card.purview { border-top: 3px solid var(--purview); }
+    .domain-card.purview:hover { border-color: var(--purview); box-shadow: 0 8px 24px rgba(135,100,184,0.3); }
+    .domain-card.sentinel { border-top: 3px solid var(--sentinel); }
+    .domain-card.sentinel:hover { border-color: var(--sentinel); box-shadow: 0 8px 24px rgba(0,183,195,0.3); }
+    .domain-card.zero-trust { border-top: 3px solid var(--zero-trust); }
+    .domain-card.zero-trust:hover { border-color: var(--zero-trust); box-shadow: 0 8px 24px rgba(232,17,35,0.3); }
+    .domain-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .domain-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .domain-card p {
+      color: #aaa;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .domain-card .tag-list {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .tag {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      color: #ddd;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--ms-white);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #444;
+    }
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--ms-white);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .quick-link:hover {
+      background: #333;
+      border-color: var(--ms-blue);
+    }
+    .quick-link .icon { font-size: 1.3rem; }
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--ms-blue);
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 0.25rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-size: 0.85rem;
+      border-top: 1px solid #333;
+    }
+    footer a { color: var(--ms-blue); text-decoration: none; }
+    @media (max-width: 600px) {
+      .hero h2 { font-size: 1.8rem; }
+      main { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="19" height="19" fill="#f25022"/>
+        <rect x="21" width="19" height="19" fill="#7fba00"/>
+        <rect y="21" width="19" height="19" fill="#00a4ef"/>
+        <rect x="21" y="21" width="19" height="19" fill="#ffb900"/>
+      </svg>
+      <h1>Security <span>Compass</span></h1>
+    </div>
+    <nav>
+      <a href="index.html" class="active">Compass</a>
+      <a href="ms_security_roles.html">Roles</a>
+      <a href="ms_security_projects.html">Projects</a>
+      <a href="certification_strategy.html">Certifications</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>Microsoft Security Architecture</h2>
+      <p>An interactive reference for navigating the Microsoft security ecosystem — from identity to compliance, threat protection to zero trust.</p>
+    </section>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-value">5</div>
+        <div class="stat-label">Security Domains</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">30+</div>
+        <div class="stat-label">Products & Services</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Certifications</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">∞</div>
+        <div class="stat-label">Zero Trust Journey</div>
+      </div>
+    </div>
+
+    <div class="compass-container">
+      <svg class="compass-svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer ring -->
+        <circle cx="250" cy="250" r="230" fill="none" stroke="#333" stroke-width="2"/>
+        <circle cx="250" cy="250" r="145" fill="none" stroke="#333" stroke-width="1.5"/>
+        <circle cx="250" cy="250" r="75" fill="#1e1e1e" stroke="#444" stroke-width="2"/>
+
+        <!-- Segment: Entra ID (Identity) - top right -->
+        <path class="segment" id="seg-entra"
+          d="M250,250 L250,20 A230,230 0 0,1 450.5,120 Z"
+          fill="#0078d4" fill-opacity="0.8" stroke="#0a0a0a" stroke-width="2"/>
+        <!-- Segment: Defender (Threat Protection) - right -->
+        <path class="segment" id="seg-defender"
+          d="M250,250 L450.5,120 A230,230 0 0,1 450.5,380 Z"
+          fill="#107c10" fill-opacity="0.8" stroke="#0a0a0a" stroke-width="2"/>
+        <!-- Segment: Purview (Compliance) - bottom right -->
+        <path class="segment" id="seg-purview"
+          d="M250,250 L450.5,380 A230,230 0 0,1 250,480 Z"
+          fill="#8764b8" fill-opacity="0.8" stroke="#0a0a0a" stroke-width="2"/>
+        <!-- Segment: Sentinel (SIEM) - bottom left -->
+        <path class="segment" id="seg-sentinel"
+          d="M250,250 L250,480 A230,230 0 0,1 49.5,380 Z"
+          fill="#00b7c3" fill-opacity="0.8" stroke="#0a0a0a" stroke-width="2"/>
+        <!-- Segment: Zero Trust - left -->
+        <path class="segment" id="seg-zt"
+          d="M250,250 L49.5,380 A230,230 0 0,1 49.5,120 Z"
+          fill="#e81123" fill-opacity="0.8" stroke="#0a0a0a" stroke-width="2"/>
+        <!-- Segment: Azure Security - top left -->
+        <path class="segment" id="seg-azure"
+          d="M250,250 L49.5,120 A230,230 0 0,1 250,20 Z"
+          fill="#0050a0" fill-opacity="0.8" stroke="#0a0a0a" stroke-width="2"/>
+
+        <!-- Inner labels -->
+        <text x="320" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Entra ID</text>
+        <text x="390" y="255" text-anchor="middle" fill="white" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Defender</text>
+        <text x="340" y="375" text-anchor="middle" fill="white" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Purview</text>
+        <text x="165" y="400" text-anchor="middle" fill="white" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Sentinel</text>
+        <text x="110" y="255" text-anchor="middle" fill="white" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Zero Trust</text>
+        <text x="165" y="130" text-anchor="middle" fill="white" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Azure Sec</text>
+
+        <!-- Center hub -->
+        <circle cx="250" cy="250" r="72" fill="linear-gradient" />
+        <circle cx="250" cy="250" r="72" fill="#1a1a1a" stroke="#0078d4" stroke-width="2"/>
+        <text x="250" y="244" text-anchor="middle" fill="#0078d4" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">SECURITY</text>
+        <text x="250" y="262" text-anchor="middle" fill="#0078d4" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">COMPASS</text>
+      </svg>
+      <div class="compass-tooltip" id="compass-tooltip">
+        <h4 id="tooltip-title"></h4>
+        <p id="tooltip-desc"></p>
+      </div>
+    </div>
+
+    <h2 class="section-title">Security Domains</h2>
+    <div class="domains-grid">
+      <div class="domain-card entra">
+        <div class="domain-icon">🔐</div>
+        <h3>Microsoft Entra ID</h3>
+        <p>Identity and access management — the cornerstone of Zero Trust. Manage users, groups, conditional access, and privileged identity.</p>
+        <div class="tag-list">
+          <span class="tag">Conditional Access</span>
+          <span class="tag">PIM</span>
+          <span class="tag">MFA</span>
+          <span class="tag">SSPR</span>
+        </div>
+      </div>
+      <div class="domain-card defender">
+        <div class="domain-icon">🛡️</div>
+        <h3>Microsoft Defender</h3>
+        <p>Unified threat protection across endpoints, cloud apps, email, and identity. XDR that correlates signals across your entire estate.</p>
+        <div class="tag-list">
+          <span class="tag">XDR</span>
+          <span class="tag">EDR</span>
+          <span class="tag">CSPM</span>
+          <span class="tag">CWPP</span>
+        </div>
+      </div>
+      <div class="domain-card purview">
+        <div class="domain-icon">🏛️</div>
+        <h3>Microsoft Purview</h3>
+        <p>Data governance, compliance, and information protection. Discover, classify, and protect sensitive data across hybrid environments.</p>
+        <div class="tag-list">
+          <span class="tag">DLP</span>
+          <span class="tag">MIP</span>
+          <span class="tag">eDiscovery</span>
+          <span class="tag">Audit</span>
+        </div>
+      </div>
+      <div class="domain-card sentinel">
+        <div class="domain-icon">📡</div>
+        <h3>Microsoft Sentinel</h3>
+        <p>Cloud-native SIEM/SOAR that ingests signals at scale, applies ML-driven analytics, and automates response with playbooks.</p>
+        <div class="tag-list">
+          <span class="tag">SIEM</span>
+          <span class="tag">SOAR</span>
+          <span class="tag">KQL</span>
+          <span class="tag">Playbooks</span>
+        </div>
+      </div>
+      <div class="domain-card zero-trust">
+        <div class="domain-icon">🔒</div>
+        <h3>Zero Trust Architecture</h3>
+        <p>Never trust, always verify. A strategic approach spanning identity, devices, network, applications, data, and infrastructure.</p>
+        <div class="tag-list">
+          <span class="tag">Verify Explicitly</span>
+          <span class="tag">Least Privilege</span>
+          <span class="tag">Assume Breach</span>
+        </div>
+      </div>
+      <div class="domain-card" style="border-top:3px solid #0050a0;">
+        <div class="domain-icon">☁️</div>
+        <h3>Azure Security</h3>
+        <p>Infrastructure security for cloud workloads — network segmentation, key management, policy governance, and secure DevOps pipelines.</p>
+        <div class="tag-list">
+          <span class="tag">Key Vault</span>
+          <span class="tag">Firewall</span>
+          <span class="tag">Policy</span>
+          <span class="tag">Blueprints</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Quick Navigation</h2>
+    <div class="quick-links">
+      <a href="ms_security_roles.html" class="quick-link">
+        <span class="icon">👥</span> Security Roles Reference
+      </a>
+      <a href="ms_security_projects.html" class="quick-link">
+        <span class="icon">📁</span> Projects Portfolio
+      </a>
+      <a href="certification_strategy.html" class="quick-link">
+        <span class="icon">🎓</span> Certification Strategy
+      </a>
+      <a href="https://learn.microsoft.com/security/" target="_blank" rel="noopener" class="quick-link">
+        <span class="icon">📚</span> MS Learn Security
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    <p>Microsoft Security Architecture Portfolio &middot; Built with HTML, CSS &amp; JavaScript &middot;
+      <a href="https://marcusjacobson.github.io/portfolio/" target="_blank" rel="noopener">Live Site</a>
+    </p>
+  </footer>
+
+  <script>
+    const tooltipData = {
+      'seg-entra': {
+        title: 'Microsoft Entra ID',
+        desc: 'Identity platform — SSO, MFA, Conditional Access, PIM, and hybrid identity management.'
+      },
+      'seg-defender': {
+        title: 'Microsoft Defender',
+        desc: 'XDR platform — endpoint, email, cloud app, and identity threat protection with unified SOC tools.'
+      },
+      'seg-purview': {
+        title: 'Microsoft Purview',
+        desc: 'Compliance & governance — data classification, DLP, sensitivity labels, retention, and audit logs.'
+      },
+      'seg-sentinel': {
+        title: 'Microsoft Sentinel',
+        desc: 'Cloud SIEM/SOAR — aggregate logs, hunt threats with KQL, automate response with Logic Apps.'
+      },
+      'seg-zt': {
+        title: 'Zero Trust',
+        desc: 'Security model: verify every access request explicitly, enforce least privilege, assume breach at all times.'
+      },
+      'seg-azure': {
+        title: 'Azure Security',
+        desc: 'Platform security — network isolation, managed identities, Key Vault, RBAC, and Defender for Cloud.'
+      }
+    };
+
+    const tooltip = document.getElementById('compass-tooltip');
+    const tooltipTitle = document.getElementById('tooltip-title');
+    const tooltipDesc = document.getElementById('tooltip-desc');
+    const container = document.querySelector('.compass-container');
+
+    document.querySelectorAll('.compass-svg .segment').forEach(seg => {
+      seg.addEventListener('mouseenter', (e) => {
+        const data = tooltipData[seg.id];
+        if (!data) return;
+        tooltipTitle.textContent = data.title;
+        tooltipDesc.textContent = data.desc;
+        tooltip.classList.add('visible');
+      });
+      seg.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        let x = e.clientX - rect.left + 15;
+        let y = e.clientY - rect.top + 15;
+        if (x + 210 > rect.width) x = e.clientX - rect.left - 225;
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+      });
+      seg.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('visible');
+      });
+    });
+  </script>
+</body>
+</html>
