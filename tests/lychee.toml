@@ -24,4 +24,6 @@ exclude = [
     "^https?://127\\.0\\.0\\.1",
     # Example placeholders
     "example\\.com",
+    # User-scoped GitHub Projects (v2) require auth; lychee gets 404 unauthenticated
+    "^https?://github\\.com/users/[^/]+/projects/",
 ]
