@@ -52,7 +52,7 @@ $contexts = @(
     'build',                # pages-deploy
     'lint',                 # html-css-lint
     'lychee',               # link-check
-    'playwright',           # visual-regression
+    # 'playwright',         # visual-regression — advisory until Linux baselines are committed
     'analyze',              # codeql
     'scan'                  # gitleaks
 )

@@ -19,6 +19,10 @@ permissions:
 jobs:
   playwright:
     runs-on: ubuntu-latest
+    # Option B: visual regression is advisory until Linux baselines are committed.
+    # Generate baselines via `docker run --rm -v ${PWD}:/work -w /work mcr.microsoft.com/playwright:v1.48.0-jammy bash -c "npm ci && npx playwright test --update-snapshots"`,
+    # commit `tests/visual/__snapshots__/`, then remove this `continue-on-error` flag.
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
