@@ -1,0 +1,29 @@
+name: Project auto-add to roadmap
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: project-autoadd-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  add-to-project:
+    name: Add Project-labeled issue to Security Portfolio Roadmap
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'Project') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'Project'))
+    steps:
+      - name: Add issue to project #13
+        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/13
+          # Reuses the classic-PAT secret that already powers bug-autoadd.yml.
+          # Project scope on the same user-owned account covers project #13.
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
