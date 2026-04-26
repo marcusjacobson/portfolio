@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marcus Jacobson — Skills Inventory</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --purple:#534AB7;--purple-hi:#EEEDFE;--purple-mid:#7068C8;
+    --blue:#185FA5;--blue-hi:#E6F1FB;--blue-mid:#3D7EC4;
+    --coral:#993C1D;--coral-hi:#FAECE7;--coral-mid:#B85838;
+    --teal:#0F6E56;--teal-hi:#E1F5EE;--teal-mid:#168860;
+    --amber:#854F0B;--amber-hi:#FAEEDA;--amber-mid:#A86E28;
+    --gray:#5F5E5A;--gray-hi:#F1EFE8;--gray-mid:#888780;
+    --bg:#111110;--bg2:#1C1C1A;--bg3:#242422;
+    --text:#E8E6E0;--text2:rgba(232,230,224,0.7);--text3:rgba(232,230,224,0.4);
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  }
+  html,body{background:var(--bg);color:var(--text);font-family:'Courier New',Courier,monospace;min-height:100vh}
+
+  /* — Nav — */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:.75rem 2rem;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3)}
+  .nav-links{display:flex;gap:1.25rem}
+  .nav-links a{color:var(--text3);text-decoration:none;transition:color .15s}
+  .nav-links a:hover{color:var(--text2)}
+  .nav-links a.back{color:var(--text2);border:1px solid var(--border2);padding:3px 10px;border-radius:20px}
+
+  /* — Page — */
+  .page{max-width:860px;margin:0 auto;padding:3.5rem 2rem 6rem}
+
+  /* — Hero — */
+  .eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem}
+  .hero-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:400;line-height:1.1;letter-spacing:-.02em;margin-bottom:.75rem}
+  .hero-title em{font-style:italic;color:var(--text2)}
+  .hero-sub{font-size:13px;color:var(--text2);line-height:1.8;max-width:540px;margin-bottom:.75rem;font-family:system-ui,sans-serif}
+
+
+  /* — Section — */
+  .section{margin-bottom:3rem}
+  .section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border2)}
+  .section-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+  .section-sub{font-size:11px;color:var(--text3);font-family:system-ui,sans-serif}
+  .compass-link{font-size:10px;color:var(--text3);text-decoration:none;border:1px solid var(--border2);padding:2px 9px;border-radius:20px;font-family:'Courier New',monospace;transition:color .15s,border-color .15s}
+  .compass-link:hover{color:var(--text2);border-color:rgba(255,255,255,0.3)}
+
+  /* — Skills grid — */
+  .skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:.75rem}
+  .skill{background:var(--bg2);padding:.85rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+  .skill:hover{background:var(--bg3)}
+  .skill-name{font-size:12px;color:var(--text);font-family:system-ui,sans-serif;line-height:1.4}
+  .skill-meta{font-size:10px;color:var(--text3);font-family:'Courier New',monospace;margin-top:2px}
+
+  /* — Stars — */
+  .stars{display:flex;gap:3px;flex-shrink:0}
+  .star{width:10px;height:10px;border-radius:50%;background:var(--border2)}
+  .star.on{background:currentColor}
+
+  /* Per-section accent colors */
+  .section.purview  .section-label{color:#9B93E8}
+  .section.purview  .star.on{color:#7068C8}
+  .section.entra    .section-label{color:#6AAEE8}
+  .section.entra    .star.on{color:#3D7EC4}
+  .section.sentinel .section-label{color:#3AC49E}
+  .section.sentinel .star.on{color:#168860}
+  .section.defender .section-label{color:#6AAEE8}
+  .section.defender .star.on{color:#185FA5}
+  .section.azure    .section-label{color:#EFAB52}
+  .section.azure    .star.on{color:#A86E28}
+  .section.cross    .section-label{color:var(--text2)}
+  .section.cross    .star.on{color:var(--gray-mid)}
+
+  /* — Legend block — */
+  .legend-block{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:2.5rem}
+  .legend-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem}
+  .legend-rows{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem}
+  .legend-row{display:grid;grid-template-columns:70px 90px 1fr;align-items:start;gap:.75rem}
+  .legend-dots{display:flex;gap:3px;padding-top:2px}
+  .legend-dot{width:10px;height:10px;border-radius:50%;background:var(--border2)}
+  .legend-dot.on{background:#168860}
+  .legend-label{font-size:11px;color:var(--text2);font-family:'Courier New',monospace;padding-top:1px}
+  .legend-desc{font-size:11px;color:var(--text3);font-family:system-ui,sans-serif;line-height:1.5}
+  .legend-tags{display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;padding-top:.75rem;border-top:1px solid var(--border);margin-top:.25rem}
+  .legend-tag-pair{display:flex;align-items:center;gap:.4rem}
+  .legend-tag-desc{font-size:11px;color:var(--text3);font-family:system-ui,sans-serif}
+  @media(max-width:600px){.legend-row{grid-template-columns:60px 80px 1fr;gap:.5rem}}
+
+  /* — Status tags — */
+  .status-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.4rem}
+  .stag{font-size:9px;padding:1px 8px;border-radius:20px;letter-spacing:.06em;font-family:'Courier New',monospace}
+  .stag.current{background:rgba(15,110,86,.2);border:1px solid rgba(15,110,86,.4);color:#3AC49E}
+  .stag.developing{background:rgba(133,79,11,.15);border:1px solid rgba(133,79,11,.35);color:#EFAB52}
+
+  /* — Footer — */
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border2);font-size:10px;color:var(--text3);font-family:monospace;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+  .footer a{color:inherit;text-decoration:none;opacity:.6}
+  .footer a:hover{opacity:1}
+
+  @media(max-width:600px){
+    .nav{padding:.75rem 1rem}
+    .page{padding:2rem 1rem 4rem}
+    .skills{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span>Marcus Jacobson · Skills Inventory</span>
+  <div class="nav-links">
+    <a href="ms_security_projects.html">Projects →</a>
+    <a href="certification_strategy.html">Certifications →</a>
+    <a class="back" href="index.html">← Home</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="eyebrow">Technical Skills · v1</div>
+  <h1 class="hero-title">Skills &amp;<br><em>Competencies</em></h1>
+  <p class="hero-sub">Hands-on technical skills across the Microsoft security stack, organized by product area. Ratings reflect demonstrated delivery across lab and project work.</p>
+
+  <!-- Legend -->
+  <div class="legend-block">
+    <div class="legend-title">Proficiency key</div>
+    <div class="legend-rows">
+      <div class="legend-row">
+        <div class="legend-dots"><div class="legend-dot on"></div><div class="legend-dot"></div><div class="legend-dot"></div><div class="legend-dot"></div><div class="legend-dot"></div></div>
+        <div class="legend-label">Awareness</div>
+        <div class="legend-desc">Understand the concept and can discuss it. e.g. know what Insider Risk policies do, have reviewed the portal but haven't configured in production.</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dots"><div class="legend-dot on"></div><div class="legend-dot on"></div><div class="legend-dot"></div><div class="legend-dot"></div><div class="legend-dot"></div></div>
+        <div class="legend-label">Foundational</div>
+        <div class="legend-desc">Configured in a lab or followed guided steps in production. e.g. deployed a Logic App playbook from a template, ran Purview scans against M365 sources.</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dots"><div class="legend-dot on"></div><div class="legend-dot on"></div><div class="legend-dot on"></div><div class="legend-dot"></div><div class="legend-dot"></div></div>
+        <div class="legend-label">Practitioner</div>
+        <div class="legend-desc">Designed and delivered end-to-end in real or production-equivalent environments. e.g. authored KQL analytic rules deployed to Sentinel, configured CA policies across MFA and device compliance conditions.</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dots"><div class="legend-dot on"></div><div class="legend-dot on"></div><div class="legend-dot on"></div><div class="legend-dot on"></div><div class="legend-dot"></div></div>
+        <div class="legend-label">Advanced</div>
+        <div class="legend-desc">Delivered across multiple scenarios, can troubleshoot edge cases, and advises others. e.g. designed a full sensitivity label taxonomy with sublabels and protection actions, deployed Sentinel workspace and connectors via Bicep pipeline.</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dots"><div class="legend-dot on"></div><div class="legend-dot on"></div><div class="legend-dot on"></div><div class="legend-dot on"></div><div class="legend-dot on"></div></div>
+        <div class="legend-label">Expert</div>
+        <div class="legend-desc">Deep specialist-level command. Can extend, teach, and handle non-standard architectures. e.g. designs cross-pillar Zero Trust reference architectures, owns detection engineering strategy across a SOC.</div>
+      </div>
+    </div>
+    <div class="legend-tags">
+      <div class="legend-tag-pair"><span class="stag current">Current</span><span class="legend-tag-desc">Proficient now — demonstrated in lab or delivery</span></div>
+      <div class="legend-tag-pair"><span class="stag developing">Developing</span><span class="legend-tag-desc">Actively building — hands-on experience limited</span></div>
+    </div>
+  </div>
+
+  <!-- ══ PURVIEW ══ -->
+  <div class="section purview">
+    <div class="section-header">
+      <div>
+        <div class="section-label">Microsoft Purview</div>
+        <div class="section-sub">Information Protection · DLP · Compliance · eDiscovery</div>
+      </div>
+      <a class="compass-link" href="ms_security_compass.html#ov-pu-solo" target="_blank">Compass ↗</a>
+    </div>
+    <div class="skills">
+      <div class="skill"><div><div class="skill-name">Sensitivity Label Taxonomy Design</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Data Loss Prevention (DLP) Policy Design</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Auto-Labeling Policy Configuration</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Insider Risk Management</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">eDiscovery &amp; Compliance Hold Workflows</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Compliance Manager &amp; Regulatory Mapping</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">DSPM for AI &amp; Data Security Posture</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Purview as Code (IaC / PowerShell)</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ══ ENTRA ══ -->
+  <div class="section entra">
+    <div class="section-header">
+      <div>
+        <div class="section-label">Microsoft Entra ID</div>
+        <div class="section-sub">Identity · Access Management · Zero Trust · Governance</div>
+      </div>
+      <a class="compass-link" href="ms_security_compass.html#ov-en-solo" target="_blank">Compass ↗</a>
+    </div>
+    <div class="skills">
+      <div class="skill"><div><div class="skill-name">Conditional Access Policy Design</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Privileged Identity Management (PIM)</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Identity Governance &amp; Entitlement Management</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Multi-Factor Authentication (MFA) Deployment</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">External Identities &amp; B2B Collaboration</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Zero Trust Architecture (Identity Layer)</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Entra ID as Code (IaC / Graph API)</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Entra Permissions Management (CIEM)</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ══ SENTINEL ══ -->
+  <div class="section sentinel">
+    <div class="section-header">
+      <div>
+        <div class="section-label">Microsoft Sentinel</div>
+        <div class="section-sub">SIEM · SOAR · Detection Engineering · Threat Hunting</div>
+      </div>
+      <a class="compass-link" href="ms_security_compass.html#iac-sentinel" target="_blank">Compass ↗</a>
+    </div>
+    <div class="skills">
+      <div class="skill"><div><div class="skill-name">Workspace Architecture &amp; Data Connector Setup</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">KQL — Analytic Rule Authoring</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">SOAR Playbook Development (Logic Apps)</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Sentinel as Code (Bicep / ARM / Terraform)</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Incident Triage &amp; Investigation Workflows</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Threat Hunting (KQL / MITRE ATT&amp;CK)</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">SIEM Migration (Splunk / QRadar → Sentinel)</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Retention Tiering &amp; Cost Optimization</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ══ DEFENDER ══ -->
+  <div class="section defender">
+    <div class="section-header">
+      <div>
+        <div class="section-label">Microsoft Defender XDR</div>
+        <div class="section-sub">Endpoint · Identity · Cloud Apps · Threat Detection &amp; Response</div>
+      </div>
+      <a class="compass-link" href="ms_security_compass.html#ov-dx-solo" target="_blank">Compass ↗</a>
+    </div>
+    <div class="skills">
+      <div class="skill"><div><div class="skill-name">Defender for Endpoint — Deployment &amp; Config</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Defender for Identity — Lateral Movement Detection</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Defender for Cloud Apps (CASB)</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Defender for Office 365 — Anti-Phishing Config</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Microsoft Secure Score — Remediation Planning</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">XDR Incident Correlation &amp; Response</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Defender for Cloud (CSPM / CWPP)</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ══ AZURE ══ -->
+  <div class="section azure">
+    <div class="section-header">
+      <div>
+        <div class="section-label">Microsoft Azure</div>
+        <div class="section-sub">Cloud Security · IaC · DevSecOps · Posture Management</div>
+      </div>
+      <a class="compass-link" href="ms_security_compass.html#dep-azure" target="_blank">Compass ↗</a>
+    </div>
+    <div class="skills">
+      <div class="skill"><div><div class="skill-name">Azure Policy &amp; Regulatory Compliance</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Bicep / ARM Template Authoring</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Azure DevOps Pipelines (CI/CD)</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Landing Zone &amp; Governance Design</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Azure Key Vault &amp; Secrets Management</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Terraform (Azure Provider)</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">GitHub Actions — Security Pipeline Automation</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ══ CROSS-CUTTING ══ -->
+  <div class="section cross">
+    <div class="section-header">
+      <div>
+        <div class="section-label">Cross-Cutting Skills</div>
+        <div class="section-sub">Languages · Automation · Frameworks · Tooling</div>
+      </div>
+      <a class="compass-link" href="ms_security_compass.html" target="_blank">Compass ↗</a>
+    </div>
+    <div class="skills">
+      <div class="skill"><div><div class="skill-name">KQL (Kusto Query Language)</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">PowerShell — Security Scripting &amp; Automation</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Microsoft Graph API</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Zero Trust Framework (NIST SP 800-207)</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">MITRE ATT&amp;CK Framework</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Security Health Check &amp; Gap Assessment</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Python — Security Tooling &amp; Scripting</div><div class="status-row"><span class="stag developing">Developing</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star"></div><div class="star"></div><div class="star"></div></div></div>
+      <div class="skill"><div><div class="skill-name">Regulatory Frameworks (HIPAA · NYDFS · CMMC)</div><div class="status-row"><span class="stag current">Current</span></div></div><div class="stars"><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star on"></div><div class="star"></div></div></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Marcus Jacobson · Skills Inventory · v1</span>
+    <span>Last updated: April 2026 <!-- UPDATE THIS DATE on every push --> · <a href="https://www.linkedin.com/in/marcus-jacobson-tech/">linkedin ↗</a> · <a href="https://github.com/marcusjacobson/portfolio">github ↗</a></span>
+  </div>
+
+</div>
+</body>
+</html>

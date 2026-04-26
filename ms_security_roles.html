@@ -1,518 +1,473 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Microsoft Security Roles Reference</title>
-  <style>
-    :root {
-      --ms-blue: #0078d4;
-      --ms-dark: #1b1b1b;
-      --ms-gray: #323130;
-      --ms-light: #f3f2f1;
-      --ms-white: #ffffff;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--ms-dark);
-      color: var(--ms-white);
-      min-height: 100vh;
-    }
-    header {
-      background: linear-gradient(135deg, #0a0a0a 0%, #1e2a3a 100%);
-      border-bottom: 2px solid var(--ms-blue);
-      padding: 1.5rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .logo-icon { width: 40px; height: 40px; }
-    .logo h1 { font-size: 1.4rem; font-weight: 600; }
-    .logo span { color: var(--ms-blue); }
-    nav { display: flex; gap: 1rem; flex-wrap: wrap; }
-    nav a {
-      color: #ccc;
-      text-decoration: none;
-      font-size: 0.9rem;
-      padding: 0.4rem 0.8rem;
-      border-radius: 4px;
-      transition: background 0.2s, color 0.2s;
-    }
-    nav a:hover, nav a.active {
-      background: var(--ms-blue);
-      color: var(--ms-white);
-    }
-    main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-    .page-header {
-      padding: 2rem 0 1.5rem;
-      border-bottom: 1px solid #333;
-      margin-bottom: 2rem;
-    }
-    .page-header h2 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .page-header p { color: #aaa; font-size: 1rem; max-width: 700px; }
-    .controls {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .search-box {
-      flex: 1;
-      min-width: 200px;
-      padding: 0.6rem 1rem;
-      background: #2a2a2a;
-      border: 1px solid #444;
-      border-radius: 6px;
-      color: var(--ms-white);
-      font-size: 0.95rem;
-      outline: none;
-    }
-    .search-box:focus { border-color: var(--ms-blue); }
-    .filter-btns {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .filter-btn {
-      padding: 0.5rem 1rem;
-      border: 1px solid #444;
-      border-radius: 20px;
-      background: transparent;
-      color: #ccc;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .filter-btn:hover, .filter-btn.active {
-      background: var(--ms-blue);
-      border-color: var(--ms-blue);
-      color: white;
-    }
-    .roles-table-wrap {
-      overflow-x: auto;
-      border-radius: 10px;
-      border: 1px solid #333;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-    thead {
-      background: #1e1e1e;
-    }
-    thead th {
-      padding: 0.9rem 1rem;
-      text-align: left;
-      font-weight: 600;
-      color: #aaa;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid #333;
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
-    }
-    thead th:hover { color: var(--ms-blue); }
-    thead th .sort-icon { margin-left: 0.3rem; opacity: 0.5; }
-    thead th.sorted .sort-icon { opacity: 1; color: var(--ms-blue); }
-    tbody tr {
-      border-bottom: 1px solid #2a2a2a;
-      transition: background 0.15s;
-    }
-    tbody tr:hover { background: #252525; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody td {
-      padding: 0.85rem 1rem;
-      vertical-align: top;
-    }
-    .role-name {
-      font-weight: 600;
-      color: var(--ms-white);
-      white-space: nowrap;
-    }
-    .badge {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .badge-identity { background: rgba(0,120,212,0.2); color: #5ba4f5; }
-    .badge-compliance { background: rgba(135,100,184,0.2); color: #c5aee8; }
-    .badge-threat { background: rgba(16,124,16,0.2); color: #6ec96e; }
-    .badge-siem { background: rgba(0,183,195,0.2); color: #6edfe9; }
-    .badge-cloud { background: rgba(255,185,0,0.2); color: #ffd966; }
-    .badge-governance { background: rgba(232,17,35,0.2); color: #f56b7a; }
-    .permission-list {
-      list-style: none;
-      padding: 0;
-    }
-    .permission-list li {
-      color: #bbb;
-      font-size: 0.85rem;
-      padding: 0.1rem 0;
-    }
-    .permission-list li::before {
-      content: '▸ ';
-      color: var(--ms-blue);
-    }
-    .use-case {
-      color: #999;
-      font-size: 0.85rem;
-      font-style: italic;
-    }
-    .no-results {
-      text-align: center;
-      padding: 3rem;
-      color: #666;
-      display: none;
-    }
-    .section-divider {
-      background: #222;
-      padding: 0.6rem 1rem;
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #666;
-    }
-    .cards-section {
-      margin-top: 3rem;
-    }
-    .section-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      color: var(--ms-white);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #444;
-    }
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.25rem;
-    }
-    .role-card {
-      background: #252525;
-      border: 1px solid #3a3a3a;
-      border-radius: 10px;
-      padding: 1.25rem;
-    }
-    .role-card h4 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.4rem;
-      color: var(--ms-white);
-    }
-    .role-card p { color: #999; font-size: 0.88rem; line-height: 1.5; }
-    .role-card .scope {
-      margin-top: 0.75rem;
-      font-size: 0.8rem;
-      color: var(--ms-blue);
-    }
-    footer {
-      text-align: center;
-      padding: 2rem;
-      color: #666;
-      font-size: 0.85rem;
-      border-top: 1px solid #333;
-      margin-top: 3rem;
-    }
-    footer a { color: var(--ms-blue); text-decoration: none; }
-    @media (max-width: 600px) {
-      main { padding: 1rem; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Microsoft Security — Roles &amp; Scenarios</title>
+<style>
+:root{
+  --purple:#534AB7;--purple-bg:#1A1730;--purple-mid:#3D368F;--purple-hi:#7068C8;
+  --blue:#185FA5;--blue-bg:#0D1E30;--blue-mid:#154F8E;--blue-hi:#3D7EC4;
+  --coral:#993C1D;--coral-bg:#2A1108;--coral-mid:#7A2C14;--coral-hi:#B85838;
+  --green:#3B6D11;--green-bg:#111A08;--green-mid:#1E4A08;--green-hi:#4A8022;
+  --amber:#854F0B;--amber-bg:#221508;--amber-mid:#6A3E08;--amber-hi:#A86E28;
+  --teal:#0F6E56;--teal-bg:#071A14;--teal-mid:#08503C;--teal-hi:#168860;
+  --gray-bg:#111110;--surface:#181816;--surface2:#222220;--surface3:#2A2A28;
+  --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.06);
+  --text:#E8E6E0;--text2:rgba(232,230,224,0.7);--text3:rgba(232,230,224,0.45);
+  --radius:8px;--radius-lg:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;-webkit-font-smoothing:antialiased}
+body{background:var(--gray-bg);color:var(--text);font-family:'Georgia',serif;min-height:100vh;line-height:1.6}
+.page{max-width:1100px;margin:0 auto;padding:0 1.5rem 4rem}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid var(--border);background:rgba(17,17,16,0.95);backdrop-filter:blur(8px);position:sticky;top:0;z-index:100;margin:0 -1.5rem 0}
+.nav-brand{font-family:'Georgia',serif;font-size:13px;font-weight:400;color:var(--text3);letter-spacing:.04em;text-transform:uppercase}
+.nav-link{font-size:12px;color:var(--text3);text-decoration:none;padding:5px 12px;border:1px solid var(--border);border-radius:20px;transition:color .15s,border-color .15s;font-family:monospace}
+.nav-link:hover{color:var(--text);border-color:rgba(255,255,255,0.3)}
+.nav-link::before{content:'← '}
+.hero{padding:3rem 0 2rem;border-bottom:1px solid var(--border2)}
+.hero-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:monospace;margin-bottom:.75rem}
+.hero-title{font-size:2.2rem;font-weight:400;line-height:1.2;color:var(--text);max-width:600px;margin-bottom:.75rem}
+.hero-title em{font-style:italic;color:rgba(232,230,224,0.6)}
+.hero-sub{font-size:14px;color:var(--text2);max-width:560px;line-height:1.7}
+.section{margin-top:3rem}
+.section-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);font-family:monospace;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border2)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1px;background:var(--border2);border:1px solid var(--border2);border-radius:var(--radius-lg);overflow:hidden}
+.card{background:var(--surface);padding:1.5rem;position:relative;transition:background .15s}
+.card:hover{background:var(--surface2)}
+.card.future{opacity:0.45;pointer-events:none}
+.card.future::after{content:'Future Focus';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);font-family:monospace;font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.5);padding:6px 14px;border-radius:4px;pointer-events:none;white-space:nowrap;z-index:2}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.card.purple::before{background:linear-gradient(90deg,var(--purple-hi),transparent)}
+.card.blue::before{background:linear-gradient(90deg,var(--blue-hi),transparent)}
+.card.coral::before{background:linear-gradient(90deg,var(--coral-hi),transparent)}
+.card.green::before{background:linear-gradient(90deg,var(--green-hi),transparent)}
+.card.amber::before{background:linear-gradient(90deg,var(--amber-hi),transparent)}
+.card.teal::before{background:linear-gradient(90deg,var(--teal-hi),transparent)}
+.card-role{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-family:monospace;margin-bottom:.4rem}
+.card.purple .card-role{color:var(--purple-hi)}
+.card.blue   .card-role{color:var(--blue-hi)}
+.card.coral  .card-role{color:var(--coral-hi)}
+.card.green  .card-role{color:var(--green-hi)}
+.card.amber  .card-role{color:var(--amber-hi)}
+.card.teal   .card-role{color:var(--teal-hi)}
+.card-title{font-size:1.05rem;font-weight:400;color:var(--text);margin-bottom:.1rem;line-height:1.3}
+.card-band{font-size:11px;color:var(--text3);font-family:monospace;margin-bottom:1rem}
+.card-scenario{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border2)}
+.card-section-head{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-family:monospace;margin-bottom:.5rem}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1rem}
+.chip{font-size:11px;font-family:monospace;padding:2px 9px;border-radius:4px;border:0.5px solid}
+.card.purple .chip{background:rgba(83,74,183,0.18);border-color:rgba(112,104,200,0.4);color:var(--purple-hi)}
+.card.blue   .chip{background:rgba(24,95,165,0.18);border-color:rgba(61,126,196,0.4);color:var(--blue-hi)}
+.card.coral  .chip{background:rgba(153,60,29,0.18);border-color:rgba(184,88,56,0.4);color:var(--coral-hi)}
+.card.green  .chip{background:rgba(59,109,17,0.18);border-color:rgba(74,128,34,0.4);color:var(--green-hi)}
+.card.amber  .chip{background:rgba(133,79,11,0.18);border-color:rgba(168,110,40,0.4);color:var(--amber-hi)}
+.card.teal   .chip{background:rgba(15,110,86,0.18);border-color:rgba(22,136,96,0.4);color:var(--teal-hi)}
+.certs{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+.cert{display:flex;gap:.6rem;align-items:flex-start}
+.cert-badge{font-size:10px;font-family:monospace;padding:1px 7px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:1px;border:0.5px solid}
+.cert-text{font-size:12px;color:var(--text2);line-height:1.5}
+.cert-text strong{color:var(--text);font-weight:500}
+.cert-badge.p-core{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);color:var(--text)}
+.cert-badge.p-deep{background:rgba(83,74,183,0.2);border-color:rgba(112,104,200,0.4);color:var(--purple-hi)}
+.cert-badge.p-neutral{background:rgba(59,109,17,0.2);border-color:rgba(74,128,34,0.4);color:var(--green-hi)}
+.client-value{background:var(--surface3);border-radius:var(--radius);padding:.75rem 1rem;font-size:12px;color:var(--text2);line-height:1.6}
+.client-value strong{color:var(--text);display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-family:monospace;margin-bottom:.25rem}
+.footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border2);font-size:11px;color:var(--text3);font-family:monospace;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+@media(max-width:600px){.hero-title{font-size:1.6rem}.nav{padding:.75rem 1rem}.page{padding:0 1rem 3rem}}
+</style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="19" height="19" fill="#f25022"/>
-        <rect x="21" width="19" height="19" fill="#7fba00"/>
-        <rect y="21" width="19" height="19" fill="#00a4ef"/>
-        <rect x="21" y="21" width="19" height="19" fill="#ffb900"/>
-      </svg>
-      <h1>Security <span>Compass</span></h1>
-    </div>
-    <nav>
-      <a href="index.html">Compass</a>
-      <a href="ms_security_roles.html" class="active">Roles</a>
-      <a href="ms_security_projects.html">Projects</a>
-      <a href="certification_strategy.html">Certifications</a>
-    </nav>
-  </header>
 
-  <main>
-    <div class="page-header">
-      <h2>👥 Microsoft Security Roles Reference</h2>
-      <p>A comprehensive reference for Microsoft Entra ID built-in security roles — covering permissions, scope, and typical use cases for security architects and administrators.</p>
-    </div>
+<nav class="nav">
+  <span class="nav-brand">Microsoft Security · Consultant Reference</span>
+  <div style="display:flex;gap:.5rem">
+    <a class="nav-link" href="ms_security_projects.html" style="font-size:12px;color:var(--text3);text-decoration:none;padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-family:monospace">Projects →</a>
+    <a class="nav-link" href="certification_strategy.html" style="font-size:12px;color:var(--text3);text-decoration:none;padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-family:monospace">Certifications →</a>
+    <a class="nav-link" href="ms_security_compass.html">Security Compass</a>
+  </div>
+</nav>
 
-    <div class="controls">
-      <input type="text" class="search-box" id="roleSearch" placeholder="Search roles, permissions, or use cases…" aria-label="Search roles" />
-      <div class="filter-btns">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="identity">Identity</button>
-        <button class="filter-btn" data-filter="compliance">Compliance</button>
-        <button class="filter-btn" data-filter="threat">Threat Protection</button>
-        <button class="filter-btn" data-filter="cloud">Cloud Security</button>
-        <button class="filter-btn" data-filter="governance">Governance</button>
+<div class="page">
+
+<div class="hero">
+  <p class="hero-eyebrow">Strategic Reference · v2</p>
+  <h1 class="hero-title">Roles &amp;<br><em>Scenarios</em></h1>
+  <p class="hero-sub">Common engagement patterns for security architects and consultants working across the Microsoft ecosystem — with the client value each role unlocks.</p>
+</div>
+
+<section class="section">
+  <p class="section-label">Strategic Role Scenarios — ordered by seniority</p>
+  <div class="cards">
+
+    <!-- 1. M365 Security Senior Consultant -->
+    <div class="card blue">
+      <p class="card-role">M365 Security · Implementation</p>
+      <h2 class="card-title">M365 Security Senior Consultant</h2>
+      <p class="card-band">Senior Consultant · 4–6 yrs exp</p>
+      <p class="card-scenario">A mid-size enterprise on Microsoft E5 licensing has deployed the suite but not activated its security value — Defender for Endpoint is running in audit mode, Purview labels are unconfigured, and Sentinel has no analytic rules. You perform a health check across the M365 security stack, deliver a prioritized configuration backlog, and lead the deployment sprint across Entra ID, Purview, Defender XDR, and Sentinel. You are the technical delivery lead, not a project manager.</p>
+
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">Defender XDR</span>
+        <span class="chip">Purview</span>
+        <span class="chip">Entra ID</span>
+        <span class="chip">Sentinel</span>
+        <span class="chip">Intune</span>
+        <span class="chip">Security Copilot</span>
+      </div>
+
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>3–5 years in IT security consulting</strong> with direct client delivery accountability — not internal IT. Billable engagement experience expected.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Hands-on deployment across the M365 security stack</strong> — Defender for Endpoint, Defender XDR, Entra Conditional Access, and Purview DLP all configured in production environments, not just lab.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Health-check and gap assessment delivery</strong> — able to read a tenant configuration, identify what's inactive or misconfigured, and translate findings into a prioritized remediation backlog for a non-technical sponsor.</span>
+        </div>
+      </div>
+
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        Most E5 clients are paying for capabilities they haven't activated. This role recovers that investment and turns a license cost into a measurable security improvement — typically the highest ROI engagement type in the Microsoft security practice.
       </div>
     </div>
 
-    <div class="roles-table-wrap">
-      <table id="rolesTable">
-        <thead>
-          <tr>
-            <th onclick="sortTable(0)">Role Name <span class="sort-icon">↕</span></th>
-            <th onclick="sortTable(1)">Category <span class="sort-icon">↕</span></th>
-            <th>Key Permissions</th>
-            <th>Typical Use Case</th>
-          </tr>
-        </thead>
-        <tbody id="rolesBody">
-          <tr data-category="identity">
-            <td class="role-name">Security Administrator</td>
-            <td><span class="badge badge-identity">Identity</span></td>
-            <td><ul class="permission-list"><li>Manage security policies</li><li>View security alerts</li><li>Configure MFA settings</li><li>Manage Conditional Access</li></ul></td>
-            <td class="use-case">Day-to-day security operations, policy configuration, and alert triage across M365 and Entra ID.</td>
-          </tr>
-          <tr data-category="identity">
-            <td class="role-name">Security Reader</td>
-            <td><span class="badge badge-identity">Identity</span></td>
-            <td><ul class="permission-list"><li>Read-only security settings</li><li>View security alerts &amp; reports</li><li>Read Secure Score</li></ul></td>
-            <td class="use-case">Auditors, compliance reviewers, and stakeholders who need visibility without change authority.</td>
-          </tr>
-          <tr data-category="identity">
-            <td class="role-name">Global Administrator</td>
-            <td><span class="badge badge-identity">Identity</span></td>
-            <td><ul class="permission-list"><li>Full tenant control</li><li>Manage all admin roles</li><li>Access all resources</li><li>Reset any password</li></ul></td>
-            <td class="use-case">Break-glass accounts and tenant bootstrapping. Should be heavily restricted and monitored via PIM.</td>
-          </tr>
-          <tr data-category="identity">
-            <td class="role-name">Privileged Role Administrator</td>
-            <td><span class="badge badge-identity">Identity</span></td>
-            <td><ul class="permission-list"><li>Manage PIM assignments</li><li>Configure role settings</li><li>Approve activation requests</li></ul></td>
-            <td class="use-case">Managing who has access to privileged roles, enforcing just-in-time access controls.</td>
-          </tr>
-          <tr data-category="identity">
-            <td class="role-name">Privileged Authentication Administrator</td>
-            <td><span class="badge badge-identity">Identity</span></td>
-            <td><ul class="permission-list"><li>Reset MFA for all users</li><li>Manage authentication methods</li><li>Register/deregister devices</li></ul></td>
-            <td class="use-case">Authentication hygiene — managing MFA registrations, SSPR, and authentication method policies.</td>
-          </tr>
-          <tr data-category="identity">
-            <td class="role-name">Conditional Access Administrator</td>
-            <td><span class="badge badge-identity">Identity</span></td>
-            <td><ul class="permission-list"><li>Create/edit CA policies</li><li>Manage named locations</li><li>Configure sign-in risk policies</li></ul></td>
-            <td class="use-case">Designing and maintaining conditional access policies to enforce contextual access controls.</td>
-          </tr>
-          <tr data-category="compliance">
-            <td class="role-name">Compliance Administrator</td>
-            <td><span class="badge badge-compliance">Compliance</span></td>
-            <td><ul class="permission-list"><li>Manage compliance policies</li><li>Access compliance portal</li><li>Manage DLP policies</li><li>View audit logs</li></ul></td>
-            <td class="use-case">Data protection officers and compliance teams managing regulatory requirements (GDPR, HIPAA, ISO).</td>
-          </tr>
-          <tr data-category="compliance">
-            <td class="role-name">Compliance Data Administrator</td>
-            <td><span class="badge badge-compliance">Compliance</span></td>
-            <td><ul class="permission-list"><li>Manage sensitivity labels</li><li>Configure information protection</li><li>Manage retention policies</li></ul></td>
-            <td class="use-case">Information protection specialists managing Purview data classification and labeling frameworks.</td>
-          </tr>
-          <tr data-category="compliance">
-            <td class="role-name">eDiscovery Administrator</td>
-            <td><span class="badge badge-compliance">Compliance</span></td>
-            <td><ul class="permission-list"><li>Create &amp; manage eDiscovery cases</li><li>Access all content searches</li><li>Manage legal holds</li></ul></td>
-            <td class="use-case">Legal and compliance teams conducting investigations, litigation holds, and content searches.</td>
-          </tr>
-          <tr data-category="threat">
-            <td class="role-name">Security Operator</td>
-            <td><span class="badge badge-threat">Threat Protection</span></td>
-            <td><ul class="permission-list"><li>Manage security alerts</li><li>Run investigations</li><li>View security info</li><li>Limited remediation</li></ul></td>
-            <td class="use-case">SOC Tier 1/2 analysts who investigate and respond to alerts in Microsoft Defender XDR.</td>
-          </tr>
-          <tr data-category="threat">
-            <td class="role-name">Attack Simulation Administrator</td>
-            <td><span class="badge badge-threat">Threat Protection</span></td>
-            <td><ul class="permission-list"><li>Create attack simulations</li><li>Manage payloads</li><li>View simulation reports</li></ul></td>
-            <td class="use-case">Security awareness teams running phishing simulations and measuring employee security posture.</td>
-          </tr>
-          <tr data-category="threat">
-            <td class="role-name">Cloud App Security Administrator</td>
-            <td><span class="badge badge-threat">Threat Protection</span></td>
-            <td><ul class="permission-list"><li>Full Defender for Cloud Apps access</li><li>Manage app connectors</li><li>Configure CASB policies</li></ul></td>
-            <td class="use-case">Governing shadow IT, cloud app risk, and data movement through Defender for Cloud Apps policies.</td>
-          </tr>
-          <tr data-category="cloud">
-            <td class="role-name">Azure Security Engineer</td>
-            <td><span class="badge badge-cloud">Cloud Security</span></td>
-            <td><ul class="permission-list"><li>Configure Defender for Cloud</li><li>Manage security baselines</li><li>Implement CSPM recommendations</li></ul></td>
-            <td class="use-case">Azure-focused security engineers hardening workloads and implementing cloud security benchmarks.</td>
-          </tr>
-          <tr data-category="cloud">
-            <td class="role-name">Key Vault Contributor</td>
-            <td><span class="badge badge-cloud">Cloud Security</span></td>
-            <td><ul class="permission-list"><li>Manage Key Vault resources</li><li>Configure access policies</li><li>Manage certificates &amp; secrets</li></ul></td>
-            <td class="use-case">Managing cryptographic material, certificates, and secrets for applications and services.</td>
-          </tr>
-          <tr data-category="governance">
-            <td class="role-name">Identity Governance Administrator</td>
-            <td><span class="badge badge-governance">Governance</span></td>
-            <td><ul class="permission-list"><li>Manage access packages</li><li>Configure access reviews</li><li>Manage entitlement policies</li></ul></td>
-            <td class="use-case">Lifecycle management of access rights — provisioning, reviews, and deprovisioning via Entitlement Management.</td>
-          </tr>
-          <tr data-category="governance">
-            <td class="role-name">User Administrator</td>
-            <td><span class="badge badge-governance">Governance</span></td>
-            <td><ul class="permission-list"><li>Create/manage users &amp; groups</li><li>Reset non-admin passwords</li><li>Manage user licenses</li></ul></td>
-            <td class="use-case">IT helpdesk and identity administrators managing the user lifecycle and group memberships.</td>
-          </tr>
-          <tr data-category="governance">
-            <td class="role-name">Directory Readers</td>
-            <td><span class="badge badge-governance">Governance</span></td>
-            <td><ul class="permission-list"><li>Read directory data</li><li>View group memberships</li><li>Read service principals</li></ul></td>
-            <td class="use-case">Applications and services that need read access to Entra ID directory data without write permissions.</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="no-results" id="noResults">No roles match your search criteria.</div>
-    </div>
+    <!-- 2. Cloud Security Posture Consultant -->
+    <div class="card teal">
+      <p class="card-role">Cloud Security · Posture Management</p>
+      <h2 class="card-title">Cloud Security Posture Consultant</h2>
+      <p class="card-band">Senior Consultant · 5–7 yrs exp</p>
+      <p class="card-scenario">A national retail chain has grown its Azure footprint rapidly through autonomous product teams, resulting in an ungoverned estate with inconsistent security baselines. You run a CSPM assessment using Defender for Cloud, rationalize Secure Score findings into a prioritized remediation backlog, design the Azure Policy guardrails that prevent misconfiguration at the landing zone level, and advise on the DevSecOps pipeline changes needed to shift security left into CI/CD. Hands-on Defender for Cloud and Sentinel deployment experience are table stakes for this engagement type.</p>
 
-    <div class="cards-section">
-      <h2 class="section-title">Role Design Principles</h2>
-      <div class="cards-grid">
-        <div class="role-card">
-          <h4>🔑 Principle of Least Privilege</h4>
-          <p>Assign the most specific role that fulfills the requirement. Avoid Global Administrator when Security Administrator will suffice. Scope to a single resource or resource group where possible.</p>
-          <div class="scope">Core Zero Trust Principle</div>
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">Defender for Cloud</span>
+        <span class="chip">Azure Policy</span>
+        <span class="chip">Defender CSPM</span>
+        <span class="chip">Sentinel</span>
+        <span class="chip">GitHub Advanced Security</span>
+      </div>
+
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>5+ years in cloud security engineering or consulting</strong>, with at least 2 years focused on Azure environments — infrastructure security, not just identity or endpoint.</span>
         </div>
-        <div class="role-card">
-          <h4>⏱️ Just-In-Time Access with PIM</h4>
-          <p>Use Privileged Identity Management (PIM) to make all privileged role assignments eligible rather than permanent. Require approval, justification, and time-bounds for activation.</p>
-          <div class="scope">Microsoft Entra PIM</div>
+        <div class="cert">
+          <span class="cert-text"><strong>Production hands-on with Defender for Cloud and Azure Policy</strong> — Secure Score remediation, initiative assignments, and policy-as-code deployments across multi-subscription landing zones.</span>
         </div>
-        <div class="role-card">
-          <h4>🔍 Continuous Access Reviews</h4>
-          <p>Schedule recurring access reviews for privileged roles using Identity Governance. Auto-remediate stale assignments and remove roles when no longer needed.</p>
-          <div class="scope">Entra Identity Governance</div>
-        </div>
-        <div class="role-card">
-          <h4>🚨 Break-Glass Accounts</h4>
-          <p>Maintain two Global Administrator break-glass accounts that are cloud-only, MFA-exempt, and monitored by high-priority alerts. Exclude from all Conditional Access policies.</p>
-          <div class="scope">Business Continuity</div>
-        </div>
-        <div class="role-card">
-          <h4>📋 Role Separation</h4>
-          <p>Separate Security Administrator and Compliance Administrator duties. A single person controlling both security posture and audit logs creates an insider threat risk.</p>
-          <div class="scope">Separation of Duties</div>
-        </div>
-        <div class="role-card">
-          <h4>🏢 Administrative Units</h4>
-          <p>Use Administrative Units to scope role assignments to specific departments, regions, or subsidiaries — preventing lateral movement through over-privileged helpdesk accounts.</p>
-          <div class="scope">Entra Administrative Units</div>
+        <div class="cert">
+          <span class="cert-text"><strong>DevSecOps pipeline experience</strong> — integrating IaC scanning (Checkov, Terrascan, MSDO) into CI/CD workflows and translating SARIF findings into actionable developer feedback.</span>
         </div>
       </div>
+
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        Ungoverned cloud estates compound risk silently. Clients benefit most when posture work connects to policy-as-code and DevSecOps, making the improvement structural rather than a one-time clean-up.
+      </div>
     </div>
-  </main>
 
-  <footer>
-    <p>Microsoft Security Architecture Portfolio &middot;
-      <a href="index.html">← Back to Compass</a> &middot;
-      <a href="https://learn.microsoft.com/entra/identity/role-based-access-control/permissions-reference" target="_blank" rel="noopener">Microsoft Docs: Role Reference</a>
-    </p>
-  </footer>
+    <!-- 3. Data Security & Purview Architect -->
+    <div class="card green">
+      <p class="card-role">Data Security · Information Protection</p>
+      <h2 class="card-title">Data Security &amp; Purview Architect</h2>
+      <p class="card-band">Senior Consultant / Manager · 5–8 yrs exp</p>
+      <p class="card-scenario">A national law firm handling client M&amp;A data needs a classification and protection scheme satisfying HIPAA Business Associate obligations, SEC data-handling requirements, and insider-risk exposure reduction. You design the Purview sensitivity label taxonomy, the DLP policy set across M365 and Teams, the insider risk management baseline, and the eDiscovery workflow aligned to US federal litigation holds. You also advise on DSPM integration to extend coverage to unmanaged data in Azure and third-party SaaS. Depth across Purview Information Protection, DLP, and eDiscovery is expected at this level.</p>
 
-  <script>
-    // Search functionality
-    const searchInput = document.getElementById('roleSearch');
-    const rolesBody = document.getElementById('rolesBody');
-    const noResults = document.getElementById('noResults');
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    let currentFilter = 'all';
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">Purview Info Protection</span>
+        <span class="chip">Purview DLP</span>
+        <span class="chip">Insider Risk Mgmt</span>
+        <span class="chip">DSPM for AI</span>
+        <span class="chip">Compliance Manager</span>
+      </div>
 
-    function applyFilters() {
-      const query = searchInput.value.toLowerCase();
-      const rows = rolesBody.querySelectorAll('tr');
-      let visible = 0;
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>5+ years in information protection or data governance consulting</strong>, with demonstrable delivery across sensitivity labeling, DLP policy design, and insider risk program buildout in M365 tenants.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>End-to-end Purview platform depth</strong> — label taxonomy design, auto-labeling policy configuration, DLP rule tuning, and eDiscovery hold/search workflows configured for real client environments.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>US regulatory fluency</strong> — able to map Purview controls to HIPAA safeguard requirements, SEC data-handling obligations, and state breach notification timelines without relying on a compliance attorney to translate.</span>
+        </div>
+      </div>
 
-      rows.forEach(row => {
-        const category = row.dataset.category || '';
-        const text = row.textContent.toLowerCase();
-        const matchesFilter = currentFilter === 'all' || category === currentFilter;
-        const matchesSearch = !query || text.includes(query);
-        if (matchesFilter && matchesSearch) {
-          row.style.display = '';
-          visible++;
-        } else {
-          row.style.display = 'none';
-        }
-      });
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        Data protection failures carry regulatory and reputational consequences that dwarf the cost of the engagement. Clients in legal, financial services, and healthcare need someone who speaks both the Purview technical language and the US regulatory risk language simultaneously.
+      </div>
+    </div>
 
-      noResults.style.display = visible === 0 ? 'block' : 'none';
-    }
+    <!-- 4. Zero Trust Program Lead -->
+    <div class="card coral">
+      <p class="card-role">Zero Trust Transformation</p>
+      <h2 class="card-title">Zero Trust Program Lead</h2>
+      <p class="card-band">Senior Consultant / Manager · 6–8 yrs exp</p>
+      <p class="card-scenario">A mid-market manufacturing company in the defense supply chain suffered a ransomware incident and the board has mandated a Zero Trust initiative to meet CMMC Level 2 obligations under the DFARS rule effective November 2025. You lead a 12-week assessment and design engagement: baseline the current identity and network posture, map lateral movement paths, design the Conditional Access policy set, and define the phased implementation plan mapped to NIST SP 800-171 controls. You own the executive readout and the implementation brief handed to the client's internal team. Hands-on Entra ID, Defender for Identity, and Intune experience are expected, along with the ability to lead architecture sessions with CISO-level stakeholders.</p>
 
-    searchInput.addEventListener('input', applyFilters);
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">Entra Conditional Access</span>
+        <span class="chip">Entra PIM</span>
+        <span class="chip">Defender for Identity</span>
+        <span class="chip">Intune</span>
+        <span class="chip">Entra ID Governance</span>
+      </div>
 
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = btn.dataset.filter;
-        applyFilters();
-      });
-    });
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>6+ years in security consulting with program delivery ownership</strong> — led engagements from scoping through executive readout, not just contributed technically. Change management experience expected.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Hands-on Entra ID Conditional Access and PIM design</strong> — built and tested CA policy sets in production, including named locations, authentication strength, sign-in risk integration, and JIT elevation workflows.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>NIST SP 800-171 / CMMC control mapping experience</strong> — able to map Zero Trust architecture decisions to specific control requirements and document the evidence a C3PAO assessor will need.</span>
+        </div>
+      </div>
 
-    // Sort functionality
-    let sortState = { col: -1, asc: true };
-    function sortTable(colIndex) {
-      const tbody = document.getElementById('rolesBody');
-      const rows = Array.from(tbody.querySelectorAll('tr'));
-      const headers = document.querySelectorAll('thead th');
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        Post-incident clients in the defense supply chain need a credible external voice to give the board confidence the remediation plan is sound — and CMMC Level 2 certification is now a hard requirement for DoD contract eligibility. This role bridges the gap between the incident debrief and the long-term program, preventing checkbox Zero Trust implementations.
+      </div>
+    </div>
 
-      if (sortState.col === colIndex) {
-        sortState.asc = !sortState.asc;
-      } else {
-        sortState.col = colIndex;
-        sortState.asc = true;
-      }
+    <!-- 5. Identity & Access Architect -->
+    <div class="card purple future">
+      <p class="card-role">Identity Architecture · IAM</p>
+      <h2 class="card-title">Identity &amp; Access Architect</h2>
+      <p class="card-band">Senior Consultant · Specialist track · 6–9 yrs exp</p>
+      <p class="card-scenario">A regional health system is consolidating three Active Directory forests after an acquisition and needs a unified identity architecture for 18,000 users across clinical and administrative roles. You design the Entra ID target state, the AD migration sequencing, the privileged access model (PIM/PAM), and the governance framework for access reviews and lifecycle management. EHR system integration (Epic, Cerner) adds significant complexity, and HIPAA minimum-necessary access requirements shape every design decision. Deep expertise across Entra ID P2, ID Governance, PIM, and Conditional Access is expected at this level.</p>
 
-      headers.forEach((th, i) => {
-        th.classList.remove('sorted');
-        const icon = th.querySelector('.sort-icon');
-        if (icon) icon.textContent = '↕';
-      });
-      headers[colIndex].classList.add('sorted');
-      const activeIcon = headers[colIndex].querySelector('.sort-icon');
-      if (activeIcon) activeIcon.textContent = sortState.asc ? '↑' : '↓';
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">Entra ID P2</span>
+        <span class="chip">Entra PIM</span>
+        <span class="chip">Entra ID Governance</span>
+        <span class="chip">AD Connect Cloud Sync</span>
+        <span class="chip">Entra Agent ID</span>
+      </div>
 
-      rows.sort((a, b) => {
-        const aText = a.cells[colIndex]?.textContent.trim() || '';
-        const bText = b.cells[colIndex]?.textContent.trim() || '';
-        return sortState.asc ? aText.localeCompare(bText) : bText.localeCompare(aText);
-      });
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>6+ years specializing in identity and access management</strong>, including at least one large-scale AD migration or forest consolidation delivered end-to-end in a consulting capacity.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Deep Entra ID P2 platform depth</strong> — entitlement management, access reviews, PIM role configuration, lifecycle workflows, and AD Connect Cloud Sync all deployed in production for enterprise-scale tenants.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Regulated-industry IAM experience</strong> — designed access models where HIPAA minimum-necessary requirements or financial services access-control frameworks shaped architecture decisions, not just technical preference.</span>
+        </div>
+      </div>
 
-      rows.forEach(row => tbody.appendChild(row));
-    }
-  </script>
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        Identity is the primary attack surface. A clean identity architecture reduces breach risk, simplifies HIPAA access audits, and enables the Zero Trust controls everything else depends on — making this one of the highest-leverage architecture investments a client can make.
+      </div>
+    </div>
+
+    <!-- 6. Security Cloud Solution Architect -->
+    <div class="card blue future">
+      <p class="card-role">Security Architecture · Customer-Facing</p>
+      <h2 class="card-title">Security Cloud Solution Architect</h2>
+      <p class="card-band">Manager / Senior Manager · 7+ yrs exp</p>
+      <p class="card-scenario">Working as a senior customer-facing architect at a Microsoft partner, you serve as the technical trusted advisor for a portfolio of enterprise accounts across financial services, healthcare, and manufacturing verticals. You lead Architectural Design Sessions, drive adoption of Sentinel and Defender for Cloud as the primary security posture investments, assess multi-cloud environments for Secure by Design compliance, and feed customer insights back to product teams. This role requires 7+ years of cybersecurity and consulting experience, hands-on Sentinel and Defender for Cloud delivery, and the ability to present to CISO and SOC leadership simultaneously.</p>
+
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">Sentinel</span>
+        <span class="chip">Defender for Cloud</span>
+        <span class="chip">Defender XDR</span>
+        <span class="chip">Entra ID</span>
+        <span class="chip">Purview</span>
+        <span class="chip">Security Copilot</span>
+      </div>
+
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>7+ years in cybersecurity consulting or customer-facing architecture</strong> — portfolio account management experience expected, not single-engagement delivery. Demonstrated CISO and SOC leadership engagement at enterprise scale.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Production hands-on with Sentinel and Defender for Cloud</strong> across multiple client environments — workspace architecture, data connector configuration, analytic rule deployment, and Secure Score remediation programs.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Architectural Design Session facilitation</strong> — led multi-stakeholder ADS engagements that produced documented reference architectures adopted by client engineering teams, not just slide decks.</span>
+        </div>
+      </div>
+
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        Enterprise clients at this scale need an architect who bridges product roadmap knowledge with implementation reality across a complex account portfolio. This role delivers strategic continuity that project-based engagements alone cannot provide.
+      </div>
+    </div>
+
+    <!-- 7. AI Security & Governance Architect -->
+    <div class="card amber future">
+      <p class="card-role">AI Security · Agent Governance</p>
+      <h2 class="card-title">AI Security &amp; Governance Architect</h2>
+      <p class="card-band">Manager / Senior Manager · 7–10 yrs exp · Emerging role</p>
+      <p class="card-scenario">A financial services firm regulated under NYDFS Part 500 has deployed Microsoft 365 Copilot to 6,000 users and is piloting Copilot Studio agents, but has no formal AI governance program. You run the DSPM for AI assessment, quantify oversharing exposure across SharePoint, design the Purview label taxonomy and DLP policies that govern Copilot processing, register all agents through Entra Agent ID, and advise on the Conditional Access policies that treat agents as governed non-human identities. NYDFS now expects covered entities to factor AI risks into their annual cybersecurity compliance reports — this engagement directly addresses that regulatory requirement.</p>
+
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">DSPM for AI</span>
+        <span class="chip">Security Copilot</span>
+        <span class="chip">Entra Agent ID</span>
+        <span class="chip">Purview DLP</span>
+        <span class="chip">Copilot Studio</span>
+        <span class="chip">M365 Copilot</span>
+      </div>
+
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>7+ years in security consulting with recent AI governance advisory</strong> — has run DSPM for AI assessments or equivalent AI data security engagements, not just general Purview deployments.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Hands-on with M365 Copilot security controls</strong> — configured DLP policies scoped to Copilot processing, audited Copilot interaction logs, and built oversharing remediation workflows in SharePoint in production environments.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Non-human identity governance experience</strong> — designed Entra Agent ID registrations and Conditional Access policies for service principals or AI agents; understands the distinction between human and workload identity risk models.</span>
+        </div>
+      </div>
+
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        AI adoption is outpacing governance in almost every enterprise. Regulators including NYDFS and the SEC are actively scrutinizing AI risk programs. This role closes that gap before regulators or a data breach force it — and is one of the fastest-growing advisory conversations in the Microsoft ecosystem as of 2025–26.
+      </div>
+    </div>
+
+    <!-- 8. SOC Transformation / Cyber Defense Senior Manager -->
+    <div class="card teal future">
+      <p class="card-role">Cyber Defense · SOC Transformation</p>
+      <h2 class="card-title">Cyber Defense &amp; SOC Transformation Lead</h2>
+      <p class="card-band">Senior Manager · 10+ yrs exp</p>
+      <p class="card-scenario">A national insurance carrier's security operations center runs on a legacy SIEM with fragmented tooling and no detection engineering practice. You lead the Sentinel migration and modernization engagement: design the workspace architecture, migrate detection rules from Splunk or QRadar, build the KQL detection engineering practice, operationalize Security Copilot for incident triage, and advise on the SOAR playbook library. CIRCIA's 72-hour incident reporting requirements and NYDFS Part 500 logging retention obligations shape both detection scope and workspace architecture decisions. At this level you carry accountability for engagement scope, commercials, and delivery across multiple concurrent workstreams.</p>
+
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">Microsoft Sentinel</span>
+        <span class="chip">Defender XDR</span>
+        <span class="chip">Security Copilot</span>
+        <span class="chip">Defender for Endpoint</span>
+        <span class="chip">Logic Apps / SOAR</span>
+      </div>
+
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>10+ years in cybersecurity with a SOC or detection engineering background</strong> — prior hands-on analyst or detection engineer experience, not just advisory. Has owned a SIEM migration from scoping through cutover.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>KQL proficiency and Sentinel architecture depth</strong> — written production analytic rules, built SOAR playbooks in Logic Apps, and designed workspace architectures across multiple client environments including data connector configuration and retention tiering.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Senior stakeholder management across technical and executive audiences</strong> — regularly presents engagement status to CISOs and boards, owns commercial scope, and manages delivery across concurrent workstreams with direct reports or subcontractors.</span>
+        </div>
+      </div>
+
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        Most enterprise SOCs are under-resourced and over-alerted. A Sentinel-native SOC with Security Copilot triage and engineered detections measurably reduces MTTR and analyst burnout — and directly supports CIRCIA 72-hour incident reporting obligations. The business case is clear and quantifiable.
+      </div>
+    </div>
+
+    <!-- 9. Cloud Compliance & Risk Advisor -->
+    <div class="card green future">
+      <p class="card-role">GRC · Compliance Architecture</p>
+      <h2 class="card-title">Cloud Compliance &amp; Risk Advisor</h2>
+      <p class="card-band">Manager / Senior Manager · GRC track · 8–12 yrs exp</p>
+      <p class="card-scenario">A federal agency migrating workloads to Azure Government must achieve a FedRAMP Moderate Authorization to Operate (ATO) within 18 months and demonstrate continuous compliance with NIST 800-53 Rev 5 and FISMA requirements. You run the control mapping exercise against Purview Compliance Manager assessments, identify gap controls, design the evidence collection workflow, and advise on which native Microsoft controls satisfy framework requirements versus where third-party tooling is needed. For defense-adjacent clients, CMMC 2.0 control mapping is an additional deliverable. Familiarity with the NIST Risk Management Framework (RMF), ATO processes, and continuous monitoring workflows is expected.</p>
+
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">Compliance Manager</span>
+        <span class="chip">Purview Audit</span>
+        <span class="chip">Azure Policy</span>
+        <span class="chip">Defender for Cloud</span>
+        <span class="chip">Secure Score</span>
+      </div>
+
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>8+ years in GRC consulting or IT audit</strong>, with at least 3 years focused on cloud compliance — has taken an organization through a FedRAMP ATO, SOC 2 Type II audit, or FISMA assessment from gap analysis through evidence package.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>NIST RMF and control framework fluency</strong> — can map NIST 800-53 controls to native Azure and Microsoft 365 configurations without a framework-to-tool translation guide; familiar with continuous monitoring workflows and POA&amp;M management.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Regulator and auditor communication experience</strong> — has presented compliance posture to federal agency IGs, FedRAMP assessors (3PAOs), or internal audit committees; can defend control design decisions under scrutiny.</span>
+        </div>
+      </div>
+
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        Federal and regulated clients cannot move at commercial pace without an advisor who knows which native Microsoft controls satisfy FedRAMP and NIST auditors and which require supplementary evidence. This role shortens ATO timelines and prevents expensive last-minute remediation before agency authorization decisions.
+      </div>
+    </div>
+
+    <!-- 10. Enterprise Security Architect (Principal / Director) -->
+    <div class="card purple future">
+      <p class="card-role">Security Architecture · Principal / Director</p>
+      <h2 class="card-title">Enterprise Security Architect</h2>
+      <p class="card-band">Principal / Director · 10–15+ yrs exp</p>
+      <p class="card-scenario">A global financial services firm headquartered in New York is migrating 40 legacy applications to Azure and needs a unified security architecture satisfying both internal risk policy and external regulatory requirements — PCI-DSS, SOC 2 Type II, and NYDFS Part 500 — with the SEC cybersecurity disclosure rule adding board-level reporting obligations. You design the end-state reference architecture, define Zero Trust controls across identity, network, and data layers, produce the gap assessment driving the three-year roadmap, and lead the executive steering committee. At this level you are expected to own the commercial relationship alongside the technical outcome, and to carry multi-cloud architecture depth alongside deep Microsoft platform knowledge.</p>
+
+      <p class="card-section-head">MS Ecosystem touchpoints</p>
+      <div class="chips">
+        <span class="chip">Entra ID P2</span>
+        <span class="chip">Defender XDR</span>
+        <span class="chip">Purview DLP</span>
+        <span class="chip">Sentinel</span>
+        <span class="chip">Defender for Cloud</span>
+        <span class="chip">Security Copilot</span>
+      </div>
+
+      <p class="card-section-head">Core Experience</p>
+      <div class="certs">
+        <div class="cert">
+          <span class="cert-text"><strong>10+ years in enterprise security with principal-level consulting delivery</strong> — owns commercial client relationships, not just technical workstreams. Has led multi-year security transformation programs with board-level steering committee accountability.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Full-stack Microsoft security architecture depth</strong> — designed end-state reference architectures spanning Entra, Defender XDR, Purview, Sentinel, and Defender for Cloud that were adopted and implemented by client engineering teams across multi-subscription Azure estates.</span>
+        </div>
+        <div class="cert">
+          <span class="cert-text"><strong>Multi-framework regulatory fluency</strong> — has simultaneously mapped architecture decisions to PCI-DSS, SOC 2 Type II, and NYDFS Part 500 requirements; can translate SEC cybersecurity disclosure obligations into board-level reporting structures without outside counsel doing the translation.</span>
+        </div>
+      </div>
+
+      <div class="client-value">
+        <strong>Why it matters to clients</strong>
+        Clients pay a premium for architects who can translate regulatory pressure — NYDFS Part 500, PCI-DSS, SEC cybersecurity disclosure rules — into a coherent multi-year platform strategy, not just a product list. This role owns the outcome, not just the design, and is the engagement type that builds long-term client relationships.
+      </div>
+    </div>
+
+  </div><!-- /cards -->
+</section>
+
+<div class="footer">
+  <span>Microsoft Security · Roles &amp; Scenarios · v2</span>
+  <div style="display:flex;gap:1rem">
+    <a href="ms_security_projects.html" style="color:inherit;text-decoration:none;opacity:.6">Projects →</a>
+    <a href="certification_strategy.html" style="color:inherit;text-decoration:none;opacity:.6">Certifications →</a>
+    <a href="ms_security_compass.html" style="color:inherit;text-decoration:none;opacity:.6">← Security Compass</a>
+  </div>
+</div>
+
+</div><!-- /page -->
 </body>
 </html>

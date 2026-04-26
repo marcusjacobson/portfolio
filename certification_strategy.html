@@ -1,717 +1,629 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Microsoft Security Certification Strategy</title>
-  <style>
-    :root {
-      --ms-blue: #0078d4;
-      --ms-dark: #1b1b1b;
-      --ms-white: #ffffff;
-      --gold: #ffb900;
-      --silver: #a0a0a0;
-      --completed: #107c10;
-      --inprogress: #ffb900;
-      --planned: #555;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--ms-dark);
-      color: var(--ms-white);
-      min-height: 100vh;
-    }
-    header {
-      background: linear-gradient(135deg, #0a0a0a 0%, #1e2a3a 100%);
-      border-bottom: 2px solid var(--ms-blue);
-      padding: 1.5rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .logo { display: flex; align-items: center; gap: 0.75rem; }
-    .logo-icon { width: 40px; height: 40px; }
-    .logo h1 { font-size: 1.4rem; font-weight: 600; }
-    .logo span { color: var(--ms-blue); }
-    nav { display: flex; gap: 1rem; flex-wrap: wrap; }
-    nav a {
-      color: #ccc;
-      text-decoration: none;
-      font-size: 0.9rem;
-      padding: 0.4rem 0.8rem;
-      border-radius: 4px;
-      transition: background 0.2s, color 0.2s;
-    }
-    nav a:hover, nav a.active { background: var(--ms-blue); color: var(--ms-white); }
-    main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-    .page-header {
-      padding: 2rem 0 1.5rem;
-      border-bottom: 1px solid #333;
-      margin-bottom: 2rem;
-    }
-    .page-header h2 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .page-header p { color: #aaa; font-size: 1rem; max-width: 700px; }
-    .legend {
-      display: flex;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.85rem;
-      color: #aaa;
-    }
-    .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-    .dot-completed { background: var(--completed); }
-    .dot-inprogress { background: var(--inprogress); }
-    .dot-planned { background: var(--planned); }
-    .section-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .section-title::after { content: ''; flex: 1; height: 1px; background: #444; }
-    /* Certification cards */
-    .certs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 3rem;
-    }
-    .cert-card {
-      background: #242424;
-      border: 1px solid #383838;
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .cert-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 28px rgba(0,0,0,0.45);
-    }
-    .cert-card::before {
-      content: '';
-      display: block;
-      height: 4px;
-    }
-    .cert-card.completed::before { background: var(--completed); }
-    .cert-card.inprogress::before { background: var(--inprogress); }
-    .cert-card.planned::before { background: var(--planned); }
-    .cert-status-ribbon {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-    }
-    .cert-card.completed .cert-status-ribbon { background: rgba(16,124,16,0.25); color: #6ec96e; }
-    .cert-card.inprogress .cert-status-ribbon { background: rgba(255,185,0,0.2); color: #ffd966; }
-    .cert-card.planned .cert-status-ribbon { background: rgba(85,85,85,0.3); color: #888; }
-    .cert-body { padding: 1.25rem; }
-    .cert-code {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--ms-blue);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.3rem;
-    }
-    .cert-name {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      padding-right: 4rem;
-      line-height: 1.35;
-    }
-    .cert-level {
-      font-size: 0.75rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      display: inline-block;
-      margin-bottom: 0.75rem;
-    }
-    .level-fundamentals { background: rgba(0,120,212,0.2); color: #5ba4f5; }
-    .level-associate { background: rgba(0,183,195,0.2); color: #6edfe9; }
-    .level-expert { background: rgba(135,100,184,0.2); color: #c5aee8; }
-    .level-specialty { background: rgba(255,185,0,0.2); color: #ffd966; }
-    .cert-desc {
-      font-size: 0.87rem;
-      color: #aaa;
-      line-height: 1.55;
-      margin-bottom: 0.9rem;
-    }
-    .cert-meta {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      font-size: 0.8rem;
-      color: #666;
-      border-top: 1px solid #333;
-      padding-top: 0.75rem;
-    }
-    .cert-meta span strong { color: #999; }
-    .cert-topics {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-top: 0.5rem;
-    }
-    .cert-topic {
-      font-size: 0.72rem;
-      padding: 0.18rem 0.5rem;
-      background: #2e2e2e;
-      border: 1px solid #3a3a3a;
-      border-radius: 4px;
-      color: #888;
-    }
-    /* Roadmap section */
-    .roadmap-section { margin-bottom: 3rem; }
-    .roadmap {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      position: relative;
-    }
-    .roadmap-phase {
-      display: grid;
-      grid-template-columns: 120px 1fr;
-      gap: 1.5rem;
-      margin-bottom: 0;
-      position: relative;
-    }
-    .roadmap-phase::before {
-      content: '';
-      position: absolute;
-      left: 56px;
-      top: 40px;
-      bottom: -24px;
-      width: 2px;
-      background: #333;
-    }
-    .roadmap-phase:last-child::before { display: none; }
-    .phase-label {
-      text-align: right;
-      padding-top: 0.5rem;
-    }
-    .phase-num {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--ms-blue);
-      font-weight: 700;
-      font-size: 1rem;
-      margin-left: auto;
-    }
-    .phase-certs {
-      padding: 0.5rem 0 2.5rem;
-    }
-    .phase-certs h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-    .phase-certs p {
-      font-size: 0.85rem;
-      color: #888;
-      margin-bottom: 0.75rem;
-    }
-    .phase-cert-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .phase-cert-pill {
-      padding: 0.35rem 0.9rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-    .pill-completed { background: rgba(16,124,16,0.2); color: #6ec96e; border: 1px solid rgba(16,124,16,0.3); }
-    .pill-inprogress { background: rgba(255,185,0,0.15); color: #ffd966; border: 1px solid rgba(255,185,0,0.25); }
-    .pill-planned { background: rgba(85,85,85,0.2); color: #888; border: 1px solid #444; }
-    /* Study strategy */
-    .strategy-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 3rem;
-    }
-    .strategy-card {
-      background: #242424;
-      border: 1px solid #383838;
-      border-radius: 10px;
-      padding: 1.25rem;
-    }
-    .strategy-card h4 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .strategy-card p { color: #999; font-size: 0.87rem; line-height: 1.55; }
-    .strategy-card .resource-list {
-      margin-top: 0.75rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-    .strategy-card .resource-list a {
-      color: var(--ms-blue);
-      font-size: 0.82rem;
-      text-decoration: none;
-    }
-    .strategy-card .resource-list a:hover { text-decoration: underline; }
-    /* Progress tracker */
-    .progress-section { margin-bottom: 3rem; }
-    .progress-bar-wrap {
-      background: #222;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 1.5rem;
-    }
-    .progress-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .progress-row:last-child { margin-bottom: 0; }
-    .progress-label {
-      width: 200px;
-      flex-shrink: 0;
-      font-size: 0.9rem;
-    }
-    .progress-label .prog-code { color: var(--ms-blue); font-weight: 600; font-size: 0.8rem; }
-    .progress-track {
-      flex: 1;
-      height: 8px;
-      background: #333;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 1s ease;
-    }
-    .fill-done { background: var(--completed); }
-    .fill-prog { background: var(--inprogress); }
-    .fill-plan { background: var(--planned); }
-    .progress-pct {
-      width: 40px;
-      text-align: right;
-      font-size: 0.85rem;
-      color: #888;
-    }
-    footer {
-      text-align: center;
-      padding: 2rem;
-      color: #666;
-      font-size: 0.85rem;
-      border-top: 1px solid #333;
-    }
-    footer a { color: var(--ms-blue); text-decoration: none; }
-    @media (max-width: 600px) {
-      main { padding: 1rem; }
-      .roadmap-phase { grid-template-columns: 50px 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Certification Strategy &amp; Roadmap</title>
+<style>
+:root{
+  --purple:#534AB7;--purple-bg:#1A1730;--purple-mid:#3D368F;--purple-hi:#7068C8;
+  --blue:#185FA5;--blue-bg:#0D1E30;--blue-mid:#154F8E;--blue-hi:#3D7EC4;
+  --coral:#993C1D;--coral-bg:#2A1108;--coral-mid:#7A2C14;--coral-hi:#B85838;
+  --green:#3B6D11;--green-bg:#111A08;--green-mid:#1E4A08;--green-hi:#4A8022;
+  --amber:#854F0B;--amber-bg:#221508;--amber-mid:#6A3E08;--amber-hi:#A86E28;
+  --teal:#0F6E56;--teal-bg:#071A14;--teal-mid:#08503C;--teal-hi:#168860;
+  --gray-bg:#111110;--surface:#181816;--surface2:#222220;--surface3:#2A2A28;
+  --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.06);
+  --text:#E8E6E0;--text2:rgba(232,230,224,0.7);--text3:rgba(232,230,224,0.45);
+  --radius:8px;--radius-lg:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;-webkit-font-smoothing:antialiased}
+body{background:var(--gray-bg);color:var(--text);font-family:'Georgia',serif;min-height:100vh;line-height:1.6}
+.page{max-width:1100px;margin:0 auto;padding:0 1.5rem 4rem}
+
+.nav{display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 1.5rem;border-bottom:1px solid var(--border);
+  background:rgba(17,17,16,0.95);backdrop-filter:blur(8px);
+  position:sticky;top:0;z-index:100;margin:0 -1.5rem 0}
+.nav-brand{font-family:'Georgia',serif;font-size:13px;font-weight:400;
+  color:var(--text3);letter-spacing:.04em;text-transform:uppercase}
+.nav-links{display:flex;gap:.5rem}
+.nav-link{font-size:12px;color:var(--text3);text-decoration:none;
+  padding:5px 12px;border:1px solid var(--border);border-radius:20px;
+  transition:color .15s,border-color .15s;font-family:monospace}
+.nav-link:hover{color:var(--text);border-color:rgba(255,255,255,0.3)}
+.nav-link.back::before{content:'← '}
+
+.hero{padding:3rem 0 2rem;border-bottom:1px solid var(--border2)}
+.hero-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);font-family:monospace;margin-bottom:.75rem}
+.hero-title{font-size:2.2rem;font-weight:400;line-height:1.2;
+  color:var(--text);max-width:640px;margin-bottom:.75rem}
+.hero-title em{font-style:italic;color:rgba(232,230,224,0.6)}
+.hero-sub{font-size:14px;color:var(--text2);max-width:580px;line-height:1.7}
+
+.section{margin-top:3rem}
+.section-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text3);font-family:monospace;margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:.75rem}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border2)}
+
+/* ── Posture summary bar ── */
+.posture{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border2);border:1px solid var(--border2);
+  border-radius:var(--radius-lg);overflow:hidden;margin-bottom:2rem}
+.posture-cell{background:var(--surface);padding:1.25rem 1.5rem}
+.posture-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  font-family:monospace;color:var(--text3);margin-bottom:.3rem}
+.posture-value{font-size:1.6rem;font-weight:400;line-height:1}
+.posture-sub{font-size:11px;color:var(--text3);margin-top:.3rem;font-family:monospace}
+.posture-cell.good .posture-value{color:var(--green-hi)}
+.posture-cell.warn .posture-value{color:var(--amber-hi)}
+.posture-cell.gap .posture-value{color:var(--coral-hi)}
+
+/* ── Comparison grid ── */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  background:var(--border2);border:1px solid var(--border2);
+  border-radius:var(--radius-lg);overflow:hidden}
+.compare-col{background:var(--surface);padding:1.5rem}
+.compare-col-head{font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  font-family:monospace;margin-bottom:1.25rem;padding-bottom:.75rem;
+  border-bottom:1px solid var(--border2)}
+.compare-col.yours .compare-col-head{color:var(--blue-hi)}
+.compare-col.market .compare-col-head{color:var(--purple-hi)}
+
+.cert-row{display:flex;align-items:flex-start;gap:.75rem;
+  padding:.6rem 0;border-bottom:1px solid var(--border2)}
+.cert-row:last-child{border-bottom:none}
+.cert-badge{font-size:10px;font-family:monospace;padding:2px 7px;
+  border-radius:3px;border:0.5px solid;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.cert-badge.held{background:rgba(59,109,17,0.2);border-color:var(--green);color:var(--green-hi)}
+.cert-badge.expiring{background:rgba(133,79,11,0.2);border-color:var(--amber);color:var(--amber-hi)}
+.cert-badge.expired{background:rgba(153,60,29,0.15);border-color:var(--coral);color:var(--coral-hi)}
+.cert-badge.prep{background:rgba(83,74,183,0.15);border-color:var(--purple);color:var(--purple-hi)}
+.cert-badge.market-req{background:rgba(24,95,165,0.15);border-color:var(--blue);color:var(--blue-hi)}
+.cert-badge.nice{background:rgba(255,255,255,0.05);border-color:var(--border);color:var(--text3)}
+.cert-info{}
+.cert-name{font-size:12px;color:var(--text);font-family:monospace;font-weight:500}
+.cert-desc{font-size:11px;color:var(--text3);line-height:1.5;margin-top:2px}
+.cert-meta{font-size:10px;font-family:monospace;margin-top:3px}
+.cert-meta.ok{color:var(--green-hi)}
+.cert-meta.warn{color:var(--amber-hi)}
+.cert-meta.bad{color:var(--coral-hi)}
+
+/* ── Gap analysis callout ── */
+.gap-box{background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius-lg);padding:1.5rem;margin-top:1px}
+.gap-box.highlight{border-color:rgba(83,74,183,0.3);background:rgba(83,74,183,0.05)}
+.gap-title{font-size:13px;font-weight:500;color:var(--text);
+  font-family:monospace;margin-bottom:.5rem;letter-spacing:.02em}
+.gap-body{font-size:13px;color:var(--text2);line-height:1.7}
+.gap-body strong{color:var(--text);font-weight:500}
+
+/* ── Roadmap timeline ── */
+.roadmap{display:flex;flex-direction:column;gap:0;
+  border:1px solid var(--border2);border-radius:var(--radius-lg);overflow:hidden}
+.phase{background:var(--surface);padding:1.5rem;position:relative;
+  border-bottom:1px solid var(--border2)}
+.phase:last-child{border-bottom:none}
+.phase:hover{background:var(--surface2)}
+.phase::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
+.phase.now::before{background:var(--green-hi)}
+.phase.next::before{background:var(--blue-hi)}
+.phase.later::before{background:var(--purple-hi)}
+.phase.optional::before{background:var(--border)}
+.phase-header{display:flex;align-items:baseline;gap:1rem;margin-bottom:.75rem;flex-wrap:wrap}
+.phase-tag{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  font-family:monospace;padding:2px 8px;border-radius:3px;border:0.5px solid;white-space:nowrap}
+.phase.now .phase-tag{background:rgba(59,109,17,0.15);border-color:var(--green);color:var(--green-hi)}
+.phase.next .phase-tag{background:rgba(24,95,165,0.15);border-color:var(--blue);color:var(--blue-hi)}
+.phase.later .phase-tag{background:rgba(83,74,183,0.15);border-color:var(--purple);color:var(--purple-hi)}
+.phase.optional .phase-tag{background:transparent;border-color:var(--border);color:var(--text3)}
+.phase-title{font-size:1rem;color:var(--text);font-weight:400}
+.phase-certs{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem}
+.phase-cert-pill{font-size:11px;font-family:monospace;padding:3px 9px;
+  border-radius:3px;border:0.5px solid}
+.phase.now .phase-cert-pill{background:rgba(59,109,17,0.1);border-color:var(--green);color:var(--green-hi)}
+.phase.next .phase-cert-pill{background:rgba(24,95,165,0.1);border-color:var(--blue);color:var(--blue-hi)}
+.phase.later .phase-cert-pill{background:rgba(83,74,183,0.1);border-color:var(--purple);color:var(--purple-hi)}
+.phase.optional .phase-cert-pill{background:transparent;border-color:var(--border);color:var(--text3)}
+.phase-body{font-size:13px;color:var(--text2);line-height:1.7}
+.phase-body strong{color:var(--text);font-weight:500}
+.phase-time{font-size:11px;font-family:monospace;color:var(--text3);margin-top:.5rem}
+
+/* ── Renewal alerts ── */
+.renewals{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1px;background:var(--border2);border:1px solid var(--border2);
+  border-radius:var(--radius-lg);overflow:hidden}
+.renewal-card{background:var(--surface);padding:1.25rem 1.5rem;transition:background .15s}
+.renewal-card:hover{background:var(--surface2)}
+.renewal-card::before{content:'';display:block;height:2px;margin:-1.25rem -1.5rem 1rem;border-radius:0}
+.renewal-card.expired::before{background:linear-gradient(90deg,var(--coral-hi),transparent)}
+.renewal-card.soon::before{background:linear-gradient(90deg,var(--amber-hi),transparent)}
+.renewal-card.ok::before{background:linear-gradient(90deg,var(--green-hi),transparent)}
+.renewal-name{font-size:12px;font-family:monospace;font-weight:500;color:var(--text);margin-bottom:.25rem}
+.renewal-date{font-size:11px;font-family:monospace}
+.renewal-card.expired .renewal-date{color:var(--coral-hi)}
+.renewal-card.soon .renewal-date{color:var(--amber-hi)}
+.renewal-card.ok .renewal-date{color:var(--green-hi)}
+.renewal-note{font-size:11px;color:var(--text3);line-height:1.5;margin-top:.4rem}
+.renewal-action{font-size:10px;font-family:monospace;margin-top:.5rem;
+  padding:2px 8px;border-radius:3px;border:0.5px solid;display:inline-block}
+.renewal-card.expired .renewal-action{background:rgba(153,60,29,0.15);border-color:var(--coral);color:var(--coral-hi)}
+.renewal-card.soon .renewal-action{background:rgba(133,79,11,0.15);border-color:var(--amber);color:var(--amber-hi)}
+.renewal-card.ok .renewal-action{background:rgba(59,109,17,0.1);border-color:var(--green);color:var(--green-hi)}
+
+/* ── Philosophy box ── */
+.philosophy{background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius-lg);padding:1.5rem 2rem}
+.philosophy p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:.75rem}
+.philosophy p:last-child{margin-bottom:0}
+.philosophy strong{color:var(--text);font-weight:500}
+.philosophy em{font-style:italic;color:rgba(232,230,224,0.55)}
+
+.footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border2);
+  font-size:11px;color:var(--text3);font-family:monospace;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+.footer a{color:inherit;text-decoration:none;opacity:.6}
+.footer a:hover{opacity:1}
+
+@media(max-width:700px){
+  .compare{grid-template-columns:1fr}
+  .posture{grid-template-columns:1fr 1fr}
+  .hero-title{font-size:1.6rem}
+  .page{padding:0 1rem 3rem}
+  .nav-brand{display:none}
+}
+@media(max-width:420px){
+  .posture{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="19" height="19" fill="#f25022"/>
-        <rect x="21" width="19" height="19" fill="#7fba00"/>
-        <rect y="21" width="19" height="19" fill="#00a4ef"/>
-        <rect x="21" y="21" width="19" height="19" fill="#ffb900"/>
-      </svg>
-      <h1>Security <span>Compass</span></h1>
+
+<nav class="nav">
+  <span class="nav-brand">Security &amp; Cloud · Certification Strategy</span>
+  <div class="nav-links">
+    <a class="nav-link" href="ms_security_roles.html">Roles →</a>
+    <a class="nav-link" href="ms_security_projects.html">Projects →</a>
+    <a class="nav-link back" href="ms_security_compass.html">Security Compass</a>
+  </div>
+</nav>
+
+<div class="page">
+
+<div class="hero">
+  <p class="hero-eyebrow">Portfolio · Certification Strategy · v1 · Apr 2026</p>
+  <h1 class="hero-title">Credentials Held &amp;<br><em>Certification Roadmap</em></h1>
+  <p class="hero-sub">Active credentials across cloud infrastructure, Microsoft security, and AI — alongside a deliberate certification strategy for the Microsoft security stack. Certifications are one signal among many; the roadmap reflects targeted investment, not accumulation.</p>
+</div>
+
+<!-- ══ POSTURE SUMMARY ══ -->
+<section class="section">
+  <p class="section-label">Credential Snapshot</p>
+  <div class="posture">
+    <div class="posture-cell good">
+      <p class="posture-label">Active credentials</p>
+      <p class="posture-value">11</p>
+      <p class="posture-sub">industry certs, not badges</p>
     </div>
-    <nav>
-      <a href="index.html">Compass</a>
-      <a href="ms_security_roles.html">Roles</a>
-      <a href="ms_security_projects.html">Projects</a>
-      <a href="certification_strategy.html" class="active">Certifications</a>
-    </nav>
-  </header>
-
-  <main>
-    <div class="page-header">
-      <h2>🎓 Microsoft Security Certification Strategy</h2>
-      <p>A structured roadmap for Microsoft security certifications — from foundational concepts to expert-level credentials — with study strategies and resource recommendations.</p>
+    <div class="posture-cell warn">
+      <p class="posture-label">Lapsed / superseded</p>
+      <p class="posture-value">3</p>
+      <p class="posture-sub">AWS CCP, CSCP, CSIS</p>
     </div>
-
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot dot-completed"></div> Completed</div>
-      <div class="legend-item"><div class="legend-dot dot-inprogress"></div> In Progress</div>
-      <div class="legend-item"><div class="legend-dot dot-planned"></div> Planned</div>
+    <div class="posture-cell gap">
+      <p class="posture-label">Next targets</p>
+      <p class="posture-value">SC-300</p>
+      <p class="posture-sub">SC-401 · SC-500</p>
     </div>
+  </div>
 
-    <h2 class="section-title">Certification Portfolio</h2>
-    <div class="certs-grid">
+  <div class="gap-box highlight">
+    <p class="gap-title">Strategic position</p>
+    <p class="gap-body">A strong infrastructure-and-cloud foundation — <strong>AZ-500 + AZ-104 + AZ-400 + Security+</strong> — provides platform depth that most MS security consultants don't hold at this breadth. The next phase of credentialing targets the Microsoft security stack specifically: SC-300 for identity and Zero Trust, <strong>SC-401 for Purview and data governance</strong> (a core practice area), and SC-500 to replace the retiring AZ-500. These three exams over 12–18 months sharpen the profile without turning certification into the narrative.</p>
+  </div>
+</section>
 
-      <div class="cert-card completed">
-        <div class="cert-status-ribbon">✓ Completed</div>
-        <div class="cert-body">
-          <div class="cert-code">SC-900</div>
-          <div class="cert-name">Microsoft Security, Compliance, and Identity Fundamentals</div>
-          <span class="cert-level level-fundamentals">Fundamentals</span>
-          <p class="cert-desc">Foundational knowledge of Microsoft security, compliance, and identity concepts — the entry point for the security certification path.</p>
-          <div class="cert-topics">
-            <span class="cert-topic">Zero Trust</span>
-            <span class="cert-topic">Entra ID</span>
-            <span class="cert-topic">Purview basics</span>
-            <span class="cert-topic">Compliance concepts</span>
-          </div>
-          <div class="cert-meta">
-            <span><strong>Exam:</strong> SC-900</span>
-            <span><strong>Duration:</strong> ~1 month study</span>
-          </div>
+<!-- ══ COMPARISON ══ -->
+<section class="section">
+  <p class="section-label">Credentials Held vs. Market Benchmark</p>
+  <div class="compare">
+
+    <div class="compare-col yours">
+      <p class="compare-col-head">Currently held</p>
+
+      <div class="cert-row">
+        <span class="cert-badge held">AZ-500</span>
+        <div class="cert-info">
+          <p class="cert-name">Azure Security Engineer Associate</p>
+          <p class="cert-desc">Core MS cloud security credential. Covers Defender for Cloud, Key Vault, NSGs, Azure Policy — maps directly to CSPM and cloud posture advisory work. Retiring Aug 2026; SC-500 is the planned replacement.</p>
+          <p class="cert-meta ok">Active · Expires Mar 2027</p>
         </div>
       </div>
 
-      <div class="cert-card completed">
-        <div class="cert-status-ribbon">✓ Completed</div>
-        <div class="cert-body">
-          <div class="cert-code">SC-300</div>
-          <div class="cert-name">Microsoft Identity and Access Administrator</div>
-          <span class="cert-level level-associate">Associate</span>
-          <p class="cert-desc">Designing and implementing identity and access management solutions using Microsoft Entra ID, including SSO, MFA, PIM, and conditional access.</p>
-          <div class="cert-topics">
-            <span class="cert-topic">Entra ID</span>
-            <span class="cert-topic">Conditional Access</span>
-            <span class="cert-topic">PIM</span>
-            <span class="cert-topic">B2B/B2C</span>
-            <span class="cert-topic">Hybrid Identity</span>
-          </div>
-          <div class="cert-meta">
-            <span><strong>Exam:</strong> SC-300</span>
-            <span><strong>Duration:</strong> ~2 months study</span>
-          </div>
+      <div class="cert-row">
+        <span class="cert-badge held">AZ-104</span>
+        <div class="cert-info">
+          <p class="cert-name">Azure Administrator Associate</p>
+          <p class="cert-desc">Infrastructure platform baseline. Provides the Azure administration depth that pure security certs often assume but don't test.</p>
+          <p class="cert-meta ok">Active · Expires Jul 2027</p>
         </div>
       </div>
 
-      <div class="cert-card completed">
-        <div class="cert-status-ribbon">✓ Completed</div>
-        <div class="cert-body">
-          <div class="cert-code">SC-200</div>
-          <div class="cert-name">Microsoft Security Operations Analyst</div>
-          <span class="cert-level level-associate">Associate</span>
-          <p class="cert-desc">Mitigating threats using Microsoft Sentinel, Defender XDR, and Defender for Cloud — focused on SOC operations, threat hunting, and incident response.</p>
-          <div class="cert-topics">
-            <span class="cert-topic">Microsoft Sentinel</span>
-            <span class="cert-topic">Defender XDR</span>
-            <span class="cert-topic">KQL</span>
-            <span class="cert-topic">SOAR</span>
-            <span class="cert-topic">Threat Hunting</span>
-          </div>
-          <div class="cert-meta">
-            <span><strong>Exam:</strong> SC-200</span>
-            <span><strong>Duration:</strong> ~2 months study</span>
-          </div>
+      <div class="cert-row">
+        <span class="cert-badge held">AZ-400</span>
+        <div class="cert-info">
+          <p class="cert-name">DevOps Engineer Expert</p>
+          <p class="cert-desc">Differentiator for DevSecOps and pipeline security conversations. Rare in pure-security consulting profiles.</p>
+          <p class="cert-meta ok">Active · Expires Jan 2027</p>
         </div>
       </div>
 
-      <div class="cert-card completed">
-        <div class="cert-status-ribbon">✓ Completed</div>
-        <div class="cert-body">
-          <div class="cert-code">SC-400</div>
-          <div class="cert-name">Microsoft Information Protection and Compliance Administrator</div>
-          <span class="cert-level level-associate">Associate</span>
-          <p class="cert-desc">Implementing information protection and compliance solutions using Microsoft Purview — DLP, sensitivity labels, retention, and insider risk.</p>
-          <div class="cert-topics">
-            <span class="cert-topic">Sensitivity Labels</span>
-            <span class="cert-topic">DLP</span>
-            <span class="cert-topic">Retention</span>
-            <span class="cert-topic">Insider Risk</span>
-            <span class="cert-topic">eDiscovery</span>
-          </div>
-          <div class="cert-meta">
-            <span><strong>Exam:</strong> SC-400</span>
-            <span><strong>Duration:</strong> ~2 months study</span>
-          </div>
+      <div class="cert-row">
+        <span class="cert-badge held">AZ-900</span>
+        <div class="cert-info">
+          <p class="cert-name">Azure Fundamentals</p>
+          <p class="cert-desc">Foundation level — no expiry. Validates platform literacy for stakeholders less familiar with the deeper credential stack.</p>
+          <p class="cert-meta ok">Active · No expiry</p>
         </div>
       </div>
 
-      <div class="cert-card completed">
-        <div class="cert-status-ribbon">✓ Completed</div>
-        <div class="cert-body">
-          <div class="cert-code">AZ-500</div>
-          <div class="cert-name">Microsoft Azure Security Engineer</div>
-          <span class="cert-level level-associate">Associate</span>
-          <p class="cert-desc">Implementing security controls, maintaining security posture, and identifying and remediating vulnerabilities in Azure environments.</p>
-          <div class="cert-topics">
-            <span class="cert-topic">Azure Networking</span>
-            <span class="cert-topic">Key Vault</span>
-            <span class="cert-topic">Defender for Cloud</span>
-            <span class="cert-topic">Azure Policy</span>
-            <span class="cert-topic">Container Security</span>
-          </div>
-          <div class="cert-meta">
-            <span><strong>Exam:</strong> AZ-500</span>
-            <span><strong>Duration:</strong> ~2 months study</span>
-          </div>
+      <div class="cert-row">
+        <span class="cert-badge held">Security+</span>
+        <div class="cert-info">
+          <p class="cert-name">CompTIA Security+</p>
+          <p class="cert-desc">Vendor-neutral security baseline. DoD 8570 compliant — satisfies federal-adjacent requirements. Provides the vendor-neutral framing that underpins the broader stack.</p>
+          <p class="cert-meta ok">Active · Expires Oct 2027</p>
         </div>
       </div>
 
-      <div class="cert-card inprogress">
-        <div class="cert-status-ribbon">In Progress</div>
-        <div class="cert-body">
-          <div class="cert-code">MS-500</div>
-          <div class="cert-name">Microsoft 365 Security Administrator</div>
-          <span class="cert-level level-associate">Associate</span>
-          <p class="cert-desc">Implementing, managing, and monitoring security and compliance solutions for Microsoft 365 environments.</p>
-          <div class="cert-topics">
-            <span class="cert-topic">M365 Defender</span>
-            <span class="cert-topic">Exchange Protection</span>
-            <span class="cert-topic">SharePoint Security</span>
-            <span class="cert-topic">Teams Security</span>
-          </div>
-          <div class="cert-meta">
-            <span><strong>Exam:</strong> MS-500</span>
-            <span><strong>Target:</strong> Q3 2025</span>
-          </div>
+      <div class="cert-row">
+        <span class="cert-badge held">Network+</span>
+        <div class="cert-info">
+          <p class="cert-name">CompTIA Network+</p>
+          <p class="cert-desc">Network architecture depth that informs Zero Trust segmentation and lateral movement design conversations.</p>
+          <p class="cert-meta ok">Active · Expires Oct 2027</p>
         </div>
       </div>
 
-      <div class="cert-card planned">
-        <div class="cert-status-ribbon">Planned</div>
-        <div class="cert-body">
-          <div class="cert-code">SC-100</div>
-          <div class="cert-name">Microsoft Cybersecurity Architect</div>
-          <span class="cert-level level-expert">Expert</span>
-          <p class="cert-desc">The pinnacle Microsoft security certification — designing end-to-end cybersecurity solutions across Zero Trust, GRC, security operations, and data/application security.</p>
-          <div class="cert-topics">
-            <span class="cert-topic">Zero Trust Design</span>
-            <span class="cert-topic">GRC</span>
-            <span class="cert-topic">Security Operations</span>
-            <span class="cert-topic">Hybrid Architecture</span>
-          </div>
-          <div class="cert-meta">
-            <span><strong>Exam:</strong> SC-100</span>
-            <span><strong>Target:</strong> Q1 2026</span>
-          </div>
+      <div class="cert-row">
+        <span class="cert-badge held">Cloud+</span>
+        <div class="cert-info">
+          <p class="cert-name">CompTIA Cloud+</p>
+          <p class="cert-desc">Multi-cloud architecture baseline. Supports cloud posture conversations across platforms; CCSP is the planned upgrade in this lane.</p>
+          <p class="cert-meta ok">Active · Expires Oct 2027</p>
         </div>
       </div>
 
-      <div class="cert-card planned">
-        <div class="cert-status-ribbon">Planned</div>
-        <div class="cert-body">
-          <div class="cert-code">AZ-700</div>
-          <div class="cert-name">Azure Network Engineer Associate</div>
-          <span class="cert-level level-associate">Associate</span>
-          <p class="cert-desc">Designing and implementing Azure network infrastructure to support Zero Trust network access and secure hybrid connectivity patterns.</p>
-          <div class="cert-topics">
-            <span class="cert-topic">Azure Networking</span>
-            <span class="cert-topic">Azure Firewall</span>
-            <span class="cert-topic">Private Endpoints</span>
-            <span class="cert-topic">ExpressRoute</span>
-          </div>
-          <div class="cert-meta">
-            <span><strong>Exam:</strong> AZ-700</span>
-            <span><strong>Target:</strong> Q2 2026</span>
-          </div>
+      <div class="cert-row">
+        <span class="cert-badge held">A+</span>
+        <div class="cert-info">
+          <p class="cert-name">CompTIA A+</p>
+          <p class="cert-desc">Foundation credential from earlier in the career arc. Maintained as part of the CompTIA CE bundle alongside Network+.</p>
+          <p class="cert-meta ok">Active · Expires Oct 2027</p>
         </div>
       </div>
 
-    </div>
-
-    <!-- Progress bars -->
-    <div class="progress-section">
-      <h2 class="section-title">Study Progress</h2>
-      <div class="progress-bar-wrap">
-        <div class="progress-row">
-          <div class="progress-label"><div class="prog-code">SC-900</div>Security Fundamentals</div>
-          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
-          <div class="progress-pct">100%</div>
-        </div>
-        <div class="progress-row">
-          <div class="progress-label"><div class="prog-code">SC-300</div>Identity Admin</div>
-          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
-          <div class="progress-pct">100%</div>
-        </div>
-        <div class="progress-row">
-          <div class="progress-label"><div class="prog-code">SC-200</div>Security Operations</div>
-          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
-          <div class="progress-pct">100%</div>
-        </div>
-        <div class="progress-row">
-          <div class="progress-label"><div class="prog-code">SC-400</div>Info Protection</div>
-          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
-          <div class="progress-pct">100%</div>
-        </div>
-        <div class="progress-row">
-          <div class="progress-label"><div class="prog-code">AZ-500</div>Azure Security</div>
-          <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
-          <div class="progress-pct">100%</div>
-        </div>
-        <div class="progress-row">
-          <div class="progress-label"><div class="prog-code">MS-500</div>M365 Security</div>
-          <div class="progress-track"><div class="progress-fill fill-prog" style="width:60%"></div></div>
-          <div class="progress-pct">60%</div>
-        </div>
-        <div class="progress-row">
-          <div class="progress-label"><div class="prog-code">SC-100</div>Cybersecurity Architect</div>
-          <div class="progress-track"><div class="progress-fill fill-plan" style="width:10%"></div></div>
-          <div class="progress-pct">10%</div>
-        </div>
-        <div class="progress-row">
-          <div class="progress-label"><div class="prog-code">AZ-700</div>Network Engineer</div>
-          <div class="progress-track"><div class="progress-fill fill-plan" style="width:0%"></div></div>
-          <div class="progress-pct">0%</div>
+      <div class="cert-row">
+        <span class="cert-badge held">ITIL Foundation</span>
+        <div class="cert-info">
+          <p class="cert-name">ITIL 4 Foundation</p>
+          <p class="cert-desc">Service management framing — useful for change management and SecOps process conversations. No expiry, no renewal needed.</p>
+          <p class="cert-meta ok">Active · No expiry</p>
         </div>
       </div>
-    </div>
 
-    <!-- Roadmap -->
-    <div class="roadmap-section">
-      <h2 class="section-title">Recommended Certification Roadmap</h2>
-      <div class="roadmap">
-        <div class="roadmap-phase">
-          <div class="phase-label">
-            <div class="phase-num">1</div>
-          </div>
-          <div class="phase-certs">
-            <h3>Foundation</h3>
-            <p>Establish core security concepts across Microsoft's cloud and compliance pillars.</p>
-            <div class="phase-cert-list">
-              <span class="phase-cert-pill pill-completed">✓ SC-900 — Security Fundamentals</span>
-            </div>
-          </div>
-        </div>
-        <div class="roadmap-phase">
-          <div class="phase-label">
-            <div class="phase-num">2</div>
-          </div>
-          <div class="phase-certs">
-            <h3>Identity &amp; Access Specialization</h3>
-            <p>Deep dive into Entra ID, conditional access, PIM, and hybrid identity patterns.</p>
-            <div class="phase-cert-list">
-              <span class="phase-cert-pill pill-completed">✓ SC-300 — Identity Admin</span>
-            </div>
-          </div>
-        </div>
-        <div class="roadmap-phase">
-          <div class="phase-label">
-            <div class="phase-num">3</div>
-          </div>
-          <div class="phase-certs">
-            <h3>Security Operations &amp; Compliance</h3>
-            <p>Build SOC skills with Sentinel/Defender XDR and governance skills with Purview.</p>
-            <div class="phase-cert-list">
-              <span class="phase-cert-pill pill-completed">✓ SC-200 — Security Operations</span>
-              <span class="phase-cert-pill pill-completed">✓ SC-400 — Info Protection</span>
-            </div>
-          </div>
-        </div>
-        <div class="roadmap-phase">
-          <div class="phase-label">
-            <div class="phase-num">4</div>
-          </div>
-          <div class="phase-certs">
-            <h3>Azure &amp; M365 Platform Security</h3>
-            <p>Broaden to platform-level security across Azure infrastructure and Microsoft 365.</p>
-            <div class="phase-cert-list">
-              <span class="phase-cert-pill pill-completed">✓ AZ-500 — Azure Security Engineer</span>
-              <span class="phase-cert-pill pill-inprogress">⟳ MS-500 — M365 Security Admin</span>
-            </div>
-          </div>
-        </div>
-        <div class="roadmap-phase">
-          <div class="phase-label">
-            <div class="phase-num">5</div>
-          </div>
-          <div class="phase-certs">
-            <h3>Expert Architecture</h3>
-            <p>Synthesize all domains into end-to-end security architecture design at the expert level.</p>
-            <div class="phase-cert-list">
-              <span class="phase-cert-pill pill-planned">SC-100 — Cybersecurity Architect</span>
-              <span class="phase-cert-pill pill-planned">AZ-700 — Network Engineer</span>
-            </div>
-          </div>
+      <div class="cert-row">
+        <span class="cert-badge held">AB-730</span>
+        <div class="cert-info">
+          <p class="cert-name">Microsoft Certified: AI Business Professional</p>
+          <p class="cert-desc">Business-tier credential (exam AB-730) covering practical use of Microsoft 365 Copilot — prompting, agents, responsible AI, and privacy basics. Not a technical security cert, but signals AI platform literacy and supports Copilot deployment and governance conversations with non-technical stakeholders.</p>
+          <p class="cert-meta ok">Active · Issued Mar 2026 · 1-year renewal</p>
         </div>
       </div>
+
+      <div class="cert-row">
+        <span class="cert-badge held">AB-731</span>
+        <div class="cert-info">
+          <p class="cert-name">Microsoft Certified: AI Transformation Leader</p>
+          <p class="cert-desc">Strategy-tier credential (exam AB-731) covering AI governance, adoption operating models, risk management, and aligning AI investments to business outcomes. Pairs with AB-730 to round out an AI advisory baseline — directly relevant to Security Copilot program design and DSPM for AI conversations with leadership audiences.</p>
+          <p class="cert-meta ok">Active · Issued Mar 2026 · 1-year renewal</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge prep">SC-300 prep</span>
+        <div class="cert-info">
+          <p class="cert-name">Identity &amp; Access Admin Associate (in progress)</p>
+          <p class="cert-desc">Prep course completed Nov 2025 via Microsoft Press. Exam scheduled as the immediate next step — identity and Zero Trust advisory work is underway and the credential formalises that depth.</p>
+          <p class="cert-meta warn">In progress · Exam targeted Q2 2026</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge expired">AWS CCP</span>
+        <div class="cert-info">
+          <p class="cert-name">AWS Certified Cloud Practitioner</p>
+          <p class="cert-desc">Lapsed Feb 2025. Foundation level — not being renewed. The multi-cloud narrative is carried by Cloud+ and the broader Azure stack.</p>
+          <p class="cert-meta bad">Expired · Feb 2025</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge expired">CSCP / CSIS</span>
+        <div class="cert-info">
+          <p class="cert-name">CompTIA stackable credentials</p>
+          <p class="cert-desc">Composite stackable designations that lapsed Oct 2024. The underlying Security+ and Cloud+ remain active — no action planned on the stackables.</p>
+          <p class="cert-meta bad">Expired · Oct 2024 · Low priority to renew</p>
+        </div>
+      </div>
+
+    </div><!-- /yours -->
+
+    <div class="compare-col market">
+      <p class="compare-col-head">Senior Consultant market benchmark</p>
+
+      <div class="cert-row">
+        <span class="cert-badge market-req">SC-401</span>
+        <div class="cert-info">
+          <p class="cert-name">Information Security Administrator Associate</p>
+          <p class="cert-desc">Replaced SC-400 (retired May 2025). Covers Purview sensitivity labels, DLP, and information protection — the platform foundation for data security advisory. Note: compliance/governance content from SC-400 moved to Applied Skills credentials, not a single exam.</p>
+          <p class="cert-meta warn">Targeting · SC-401 exam planned Q3 2026</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge market-req">SC-300</span>
+        <div class="cert-info">
+          <p class="cert-name">Identity &amp; Access Administrator Associate</p>
+          <p class="cert-desc">Most common requirement for Zero Trust and identity advisory roles. Entra ID, Conditional Access, PIM, governance. Prep course completed; exam is the immediate next step.</p>
+          <p class="cert-meta warn">In progress · Exam targeted Q2 2026</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge market-req">SC-200</span>
+        <div class="cert-info">
+          <p class="cert-name">Security Operations Analyst Associate</p>
+          <p class="cert-desc">Expected for Sentinel advisory and XDR design work. KQL, playbooks, investigation workflows. Kusto Detective I–III rankings reflect active KQL practice; SC-200 formalises that depth.</p>
+          <p class="cert-meta warn">Targeting · Planned Q3–Q4 2026</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge market-req">AZ-500</span>
+        <div class="cert-info">
+          <p class="cert-name">Azure Security Engineer Associate</p>
+          <p class="cert-desc">Cloud posture and infrastructure security. Defender for Cloud, Azure Policy. Core for CSPM-adjacent work. Currently held; SC-500 targeted as the replacement before Aug 2026 retirement.</p>
+          <p class="cert-meta ok">Held · Transitioning to SC-500</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge market-req">SC-100</span>
+        <div class="cert-info">
+          <p class="cert-name">Microsoft Cybersecurity Architect Expert</p>
+          <p class="cert-desc">Expert-level capstone for architecture lead roles. Requires an associate pre-req — SC-300 will satisfy this once earned. A 2027 horizon target once architecture-led engagements are the primary delivery model.</p>
+          <p class="cert-meta warn">Targeting · 2027 horizon</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge nice">CCSP</span>
+        <div class="cert-info">
+          <p class="cert-name">Certified Cloud Security Professional</p>
+          <p class="cert-desc">Vendor-neutral cloud security architecture credential from ISC2. Covers cloud governance, data security, legal/compliance, and multi-platform risk — the cross-provider layer your Azure-specific certs don't address. Your Azure engineering background maps directly to CCSP's six domains, making it the most accessible entry point in this tier. CCSP also qualifies as an ISC2-approved credential that waives one year of CISSP's experience requirement — earning it now slightly accelerates CISSP eligibility. Once CISSP is later earned, the full CCSP experience requirement is automatically waived. Note: exam outline updates Aug 1, 2026.</p>
+          <p class="cert-meta">Pursue before CISSP · Highest-earning cert pairing in cloud security when combined</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge nice">CISSP</span>
+        <div class="cert-info">
+          <p class="cert-name">Certified Information Systems Security Professional</p>
+          <p class="cert-desc">Vendor-neutral senior credential. Gold standard for CISO-level advisory and security leadership roles. Requires 5 years verified experience — worth planning timing. Not blocking near-term engagements, and CCSP waives one year of that experience requirement if held first.</p>
+          <p class="cert-meta">Aspirational · Plan timing around experience · CCSP accelerates eligibility</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge nice">CISM</span>
+        <div class="cert-info">
+          <p class="cert-name">Certified Information Security Manager</p>
+          <p class="cert-desc">Preferred in GRC-heavy engagements and public sector procurement. Adds governance credibility that MS platform certs don't cover. 4-year experience requirement.</p>
+          <p class="cert-meta">Nice-to-have · GRC track differentiation</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge nice">CIPM or CIPP/E</span>
+        <div class="cert-info">
+          <p class="cert-name">IAPP Privacy Certifications</p>
+          <p class="cert-desc">CIPM (privacy program management) or CIPP/E (European privacy law) add the regulatory layer Purview platform certs can't cover. CIPM is the more practice-agnostic choice for US-focused work; CIPP/E only if EU/UK clients become a significant part of the mix.</p>
+          <p class="cert-meta">Nice-to-have · Purview + privacy program depth is a rare combination</p>
+        </div>
+      </div>
+
+      <div class="cert-row">
+        <span class="cert-badge nice">Security+</span>
+        <div class="cert-info">
+          <p class="cert-name">CompTIA Security+</p>
+          <p class="cert-desc">Sometimes required for federal-adjacent or DoD 8570 roles. Not a differentiator at Senior Consultant level in commercial MS advisory work.</p>
+          <p class="cert-meta ok">Held · Active to Oct 2027</p>
+        </div>
+      </div>
+
+    </div><!-- /market -->
+  </div>
+</section>
+
+<!-- ══ ROADMAP ══ -->
+<section class="section">
+  <p class="section-label">Practical Path Forward</p>
+  <div class="roadmap">
+
+    <div class="phase now">
+      <div class="phase-header">
+        <span class="phase-tag">Now · Q2 2026</span>
+        <span class="phase-title">SC-300 — converting prep work into the credential</span>
+      </div>
+      <div class="phase-certs">
+        <span class="phase-cert-pill">SC-300</span>
+      </div>
+      <p class="phase-body">The Microsoft Press SC-300 prep course is complete. <strong>Exam scheduled for Q2 2026</strong> — this closes the most visible gap for identity and Zero Trust advisory engagements and satisfies the associate pre-req for SC-100 later. AZ-104 expires Jul 2027 — renewal assessment scheduled for Jan 2027, no urgency.</p>
+      <p class="phase-time">SC-300 exam: targeted Q2 2026 · AZ-104 renewal: free online assessment, due Jan 2027</p>
     </div>
 
-    <!-- Study strategy -->
-    <h2 class="section-title">Study Strategy</h2>
-    <div class="strategy-grid">
-      <div class="strategy-card">
-        <h4>📚 Official Microsoft Learn</h4>
-        <p>Microsoft Learn provides free, structured learning paths aligned to each exam. Complete the full learning path before scheduling the exam.</p>
-        <div class="resource-list">
-          <a href="https://learn.microsoft.com/certifications/browse/?type=role-based&levels=intermediate" target="_blank" rel="noopener">Browse Certification Paths</a>
-          <a href="https://learn.microsoft.com/certifications/practice-assessments-for-microsoft-certifications" target="_blank" rel="noopener">Practice Assessments</a>
-        </div>
+    <div class="phase next">
+      <div class="phase-header">
+        <span class="phase-tag">Next · Q3–Q4 2026</span>
+        <span class="phase-title">SC-200 — formalising Sentinel and SecOps depth</span>
       </div>
-      <div class="strategy-card">
-        <h4>🧪 Hands-On Labs</h4>
-        <p>Theory alone is insufficient. Configure a dev tenant, use Microsoft Learn sandbox labs, and replicate real-world scenarios hands-on before exam day.</p>
-        <div class="resource-list">
-          <a href="https://developer.microsoft.com/microsoft-365/dev-program" target="_blank" rel="noopener">M365 Developer Tenant</a>
-          <a href="https://learn.microsoft.com/training/" target="_blank" rel="noopener">Azure Sandbox Labs</a>
-        </div>
+      <div class="phase-certs">
+        <span class="phase-cert-pill">SC-200</span>
       </div>
-      <div class="strategy-card">
-        <h4>📝 Practice Exams</h4>
-        <p>Use Microsoft's official practice assessments plus third-party question banks to identify knowledge gaps. Target 85%+ on practice tests before scheduling.</p>
-        <div class="resource-list">
-          <a href="https://learn.microsoft.com/certifications/practice-assessments-for-microsoft-certifications" target="_blank" rel="noopener">Official Practice Assessments</a>
-        </div>
-      </div>
-      <div class="strategy-card">
-        <h4>🎯 John Savill's Study Crams</h4>
-        <p>John Savill's YouTube exam cram sessions provide high-quality, whiteboard-style reviews of each certification. Watch 1-2 weeks before your exam.</p>
-        <div class="resource-list">
-          <a href="https://www.youtube.com/@NTFAQGuy" target="_blank" rel="noopener">YouTube: John Savill Technical Training</a>
-        </div>
-      </div>
-      <div class="strategy-card">
-        <h4>📅 Study Scheduling</h4>
-        <p>Schedule the exam before you feel fully ready — a booked exam date creates urgency. Study 1-2 hours daily for 6-8 weeks per Associate-level exam.</p>
-      </div>
-      <div class="strategy-card">
-        <h4>🔄 Renewal Strategy</h4>
-        <p>Microsoft certifications renew annually for free via an online renewal assessment on Microsoft Learn. Set a calendar reminder 6 months before expiry to avoid re-exams.</p>
-        <div class="resource-list">
-          <a href="https://learn.microsoft.com/certifications/renew-your-microsoft-certification" target="_blank" rel="noopener">Certification Renewal Guide</a>
-        </div>
-      </div>
+      <p class="phase-body">SC-200 maps directly to Sentinel advisory work and validates the KQL and detection engineering depth evidenced by Kusto Detective I–III. The most commonly expected credential for SOC transformation and XDR design engagements — the scenario type that appears most in the roles portfolio. <strong>With AZ-500 held, SC-200 completes the core Azure security profile</strong> without duplication. Planned to run in parallel with or immediately after SC-401.</p>
+      <p class="phase-time">6–8 weeks study · $165 exam fee · 1-year renewal cycle</p>
     </div>
-  </main>
 
-  <footer>
-    <p>Microsoft Security Architecture Portfolio &middot;
-      <a href="index.html">← Back to Compass</a> &middot;
-      <a href="https://learn.microsoft.com/certifications/browse/?type=role-based&levels=intermediate" target="_blank" rel="noopener">Microsoft Certifications</a>
-    </p>
-  </footer>
+    <div class="phase next">
+      <div class="phase-header">
+        <span class="phase-tag">Parallel · Q3–Q4 2026</span>
+        <span class="phase-title">SC-401 — the Purview platform credential</span>
+      </div>
+      <div class="phase-certs">
+        <span class="phase-cert-pill">SC-401</span>
+        <span class="phase-cert-pill">Applied Skills: Purview</span>
+      </div>
+      <p class="phase-body">SC-401 (which replaced SC-400 in May 2025) is the only exam that validates Purview information protection depth — sensitivity label taxonomy, DLP policy design, insider risk management, and data lifecycle. <strong>Given that Purview is a core practice pillar, this is co-equal priority with SC-200.</strong> Sequencing will be driven by near-term engagement type. Pairing SC-401 with <strong>Microsoft Applied Skills credentials</strong> (free, scenario-based assessments on Microsoft Learn) covers the compliance and governance content that moved out of the exam — specifically "Implement information protection and data loss prevention" and "Implement retention, eDiscovery, and Communication compliance."</p>
+      <p class="phase-time">6–8 weeks study · $165 exam fee · Applied Skills: free, ~4 hrs each</p>
+    </div>
+
+    <div class="phase next">
+      <div class="phase-header">
+        <span class="phase-tag">Urgent · Before Aug 31, 2026</span>
+        <span class="phase-title">SC-500 — replacing the retiring AZ-500</span>
+      </div>
+      <div class="phase-certs">
+        <span class="phase-cert-pill">SC-500</span>
+      </div>
+      <p class="phase-body">AZ-500 retires August 31, 2026 — after that date it cannot be renewed or re-earned. <strong>There is no automatic conversion to SC-500.</strong> SC-500 (Cloud and AI Security Engineer Associate) enters beta May 15, 2026, covering the core AZ-500 Azure security content plus AI system security — securing AI pipelines, generative AI deployments, and AI-adjacent cloud infrastructure. The AB-730 and AB-731 credentials already establish the AI strategy foundation; SC-500 adds the technical security layer. <strong>Plan:</strong> sit the beta exam (free) in May 2026, or target GA once it exits beta (~Aug 2026), before AZ-500 moves to historical status.</p>
+      <p class="phase-time">SC-500 beta: May 15, 2026 (free) · GA est. Aug 2026 · AZ-500 retires Aug 31, 2026</p>
+    </div>
+
+    <div class="phase later">
+      <div class="phase-header">
+        <span class="phase-tag">Later · 2027</span>
+        <span class="phase-title">SC-100 — architect-level capstone</span>
+      </div>
+      <div class="phase-certs">
+        <span class="phase-cert-pill">SC-100</span>
+      </div>
+      <p class="phase-body">SC-100 is the expert capstone for cross-domain security architecture — most valuable when architectural design sessions and security program leadership are the primary delivery mode. SC-300 (earned in 2026) satisfies the associate pre-req. <strong>Targeted for 2027</strong> once 12+ months of architecture-led delivery has accumulated behind it. The credential is most credible when the work already reflects the seniority level it signals.</p>
+      <p class="phase-time">8–12 weeks study · Requires associate pre-req · Expert level renewal</p>
+    </div>
+
+    <div class="phase optional">
+      <div class="phase-header">
+        <span class="phase-tag">Horizon · Experience-gated</span>
+        <span class="phase-title">CCSP → CISSP — the vendor-neutral senior stack</span>
+      </div>
+      <div class="phase-certs">
+        <span class="phase-cert-pill">CCSP</span>
+        <span class="phase-cert-pill">CISSP</span>
+        <span class="phase-cert-pill">CISM</span>
+      </div>
+      <p class="phase-body">CISSP is the gold standard for CISO-level advisory and senior security leadership — widely recognised in procurement and required for most security leadership roles. It requires 5 years of verified experience across two domains. <strong>CCSP is the intended first step:</strong> the Azure engineering background maps directly to CCSP's six domains, and CCSP qualifies as an ISC2-approved credential that waives one year of CISSP's experience requirement. Once CISSP is earned, the full CCSP experience requirement is automatically waived — making the pair easier to collect in that order. The CISSP + CCSP combination is the highest-earning credential pairing in cloud security. Note: CCSP exam outline updates August 1, 2026. CISM is a separate consideration for GRC program ownership and public sector procurement contexts — not a sequencing dependency.</p>
+      <p class="phase-time">CCSP: $599 · 5 yr IT exp req (waived with CISSP) · CISSP: $749 · 5 yr exp req · CISM: $575–$760 · 4 yr mgmt exp req</p>
+    </div>
+
+    <div class="phase optional">
+      <div class="phase-header">
+        <span class="phase-tag">Horizon · Data &amp; Privacy specialist track</span>
+        <span class="phase-title">CIPM or CIPP/E — if privacy program depth becomes a practice differentiator</span>
+      </div>
+      <div class="phase-certs">
+        <span class="phase-cert-pill">CIPM</span>
+        <span class="phase-cert-pill">CIPP/E</span>
+      </div>
+      <p class="phase-body">IAPP certifications add the legal and regulatory layer no Microsoft platform cert covers. <strong>CIPM</strong> (privacy program management) is the more practice-agnostic choice — structures and operating a privacy program regardless of jurisdiction, mapping well to Purview advisory across US clients. <strong>CIPP/E</strong> adds GDPR-specific depth if EU or UK client work becomes a significant part of the mix. The SC-401 + CIPM combination is uncommon — most Purview practitioners know the tooling without the program management layer. That gap is where differentiated advisory sits.</p>
+      <p class="phase-time">CIPM: $550 · CIPP/E: $550 · No experience pre-req · Annual renewal · 8–12 weeks study each</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ RENEWAL ALERTS ══ -->
+<section class="section">
+  <p class="section-label">Renewal &amp; Expiry Watch</p>
+  <div class="renewals">
+
+    <div class="renewal-card expired">
+      <p class="renewal-name">AWS Certified Cloud Practitioner</p>
+      <p class="renewal-date">Lapsed Feb 2025</p>
+      <p class="renewal-note">Foundation level. Not being renewed — the multi-cloud narrative is covered by Cloud+ and the broader Azure stack.</p>
+      <span class="renewal-action">No action planned</span>
+    </div>
+
+    <div class="renewal-card expired">
+      <p class="renewal-name">CompTIA CSCP &amp; CSIS</p>
+      <p class="renewal-date">Lapsed Oct 2024</p>
+      <p class="renewal-note">Composite stackable designations — underlying Security+ and Cloud+ remain active. No action planned on the stackables.</p>
+      <span class="renewal-action">No action planned</span>
+    </div>
+
+    <div class="renewal-card ok">
+      <p class="renewal-name">AZ-104 — Azure Administrator Associate</p>
+      <p class="renewal-date">Expires Jul 2027 · ~15 months out</p>
+      <p class="renewal-note">Free renewal assessment on Microsoft Learn, ~2 hours. Comfortable timeline — reminder set for Jan 2027 to complete well ahead of expiry.</p>
+      <span class="renewal-action">Reminder: Jan 2027</span>
+    </div>
+
+    <div class="renewal-card expired">
+      <p class="renewal-name">AZ-500 — Azure Security Engineer Associate</p>
+      <p class="renewal-date">Exam retires Aug 31, 2026 · Cert expires Mar 2027</p>
+      <p class="renewal-note"><strong>Not a standard renewal.</strong> Microsoft is retiring AZ-500 on Aug 31, 2026 — it cannot be renewed or re-earned after that date. The replacement is <strong>SC-500 (Cloud and AI Security Engineer Associate)</strong>, entering beta May 15, 2026. No automatic conversion; SC-500 requires a new exam. AZ-500 remains on transcript but moves to historical once expired. SC-500 beta or GA exam is planned before expiry.</p>
+      <span class="renewal-action">SC-500 targeted · beta May 2026</span>
+    </div>
+
+    <div class="renewal-card ok">
+      <p class="renewal-name">AZ-400 — DevOps Engineer Expert</p>
+      <p class="renewal-date">Expires Jan 2027 · ~9 months out</p>
+      <p class="renewal-note">Free renewal assessment on Microsoft Learn. Reminder set for Jul 2026 to complete ahead of expiry.</p>
+      <span class="renewal-action">Reminder: Jul 2026</span>
+    </div>
+
+    <div class="renewal-card ok">
+      <p class="renewal-name">Security+, Network+, A+, Cloud+</p>
+      <p class="renewal-date">All expire Oct 2027 · 18 months out</p>
+      <p class="renewal-note">CompTIA CE credits being logged on an ongoing basis via CertMaster CE and qualifying activities — renewal will not require a concentrated study effort.</p>
+      <span class="renewal-action">CPE logged ongoing</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ PHILOSOPHY ══ -->
+<section class="section">
+  <p class="section-label">On Certs as One Signal</p>
+  <div class="philosophy">
+    <p>Certifications answer a narrow question: <strong>can this person demonstrate baseline competency on a vendor's platform?</strong> They don't answer whether an engagement can be led, a CISO advised, or an architecture designed that actually holds up in a complex environment. At Senior Consultant level, <em>platform competency is assumed</em> — what clients are evaluating is judgment, communication, and whether the experience maps to their problem.</p>
+    <p>The certification strategy here isn't accumulation — it's filling the specific gaps that matter for the Microsoft security stack (SC-300, SC-401, SC-500), then pursuing SC-100 when the work already reflects the seniority level it signals. <strong>CCSP and CISSP are horizon credentials tied to client type and seniority, not checkboxes.</strong></p>
+    <p>The AZ-500 + AZ-400 combination is unusual in security consulting profiles — most security practitioners don't hold DevOps Engineer Expert. That combination signals platform depth that goes beyond advisory. Note that AZ-500 retires Aug 31, 2026 — SC-500 is a replacement exam, not a renewal, and is planned accordingly.</p>
+  </div>
+</section>
+
+<div class="footer">
+  <span>Certification Strategy &amp; Roadmap · v1 · Apr 2026</span>
+  <div style="display:flex;gap:1.5rem">
+    <a href="ms_security_roles.html">Roles →</a>
+    <a href="ms_security_projects.html">Projects →</a>
+    <a href="ms_security_compass.html">← Security Compass</a>
+  </div>
+</div>
+
+</div><!-- /page -->
 </body>
 </html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Marcus Jacobson — Microsoft Security Compass</title>
+
+<!-- Standalone-browser support: viewport + base resets (no-op inside Claude.ai iframe) -->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+/* Standalone page resets — only active when rendered as a full document */
+html,body{margin:0;padding:0;min-height:100%;box-sizing:border-box;
+  background:#111110;color:#e8e6e0;font-family:system-ui,sans-serif}
+/* Ensure fixed-position modal covers the actual viewport at any zoom */
+body{position:relative}
+</style>
+</head>
+<body>
+<h2 class="sr-only">Microsoft Ecosystem — Security Consultant Scope</h2>
+<style>
+.wrap{padding:.5rem 0 0;max-width:100%;overflow-x:hidden}
+.hint{font-size:12px;color:var(--color-text-tertiary,#888);text-align:center;margin:0 0 6px}
+/* SVG fills available width, scales proportionally, dark canvas */
+svg{display:block;width:100%;height:auto;max-width:950px;margin:0 auto;background:#1C1C1A;border-radius:8px}
+/* Modal backdrop — fixed to visual viewport, zoom-safe */
+.modal-backdrop{display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.55);z-index:1000;
+  align-items:center;justify-content:center;padding:1rem;
+  /* Prevent layout zoom from misaligning the overlay */
+  width:100vw;height:100vh;box-sizing:border-box}
+.modal-backdrop.on{display:flex}
+/* Modal box */
+.modal{background:#1e1e1c;border-radius:var(--border-radius-lg);width:min(680px,92vw);max-height:82vh;overflow-y:auto;padding:1.25rem 1.25rem 1rem;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.7)}
+/* Close button */
+.modal-close{position:sticky;top:0;float:right;margin:-0.1rem -0.1rem 0.25rem 0.5rem;background:rgba(255,255,255,0.12);border:0.5px solid rgba(255,255,255,0.2);border-radius:50%;width:26px;height:26px;font-size:15px;line-height:26px;text-align:center;cursor:pointer;color:rgba(255,255,255,0.7);z-index:1}
+.modal-close:hover{background:rgba(255,255,255,0.22)}
+.ph{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
+.bdg{font-size:11px;font-weight:500;padding:2px 10px;border-radius:20px}
+.ltag{font-size:10px;padding:1px 7px;border-radius:20px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:0.5px solid rgba(255,255,255,0.2)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-top:.4rem}
+.col{background:rgba(0,0,0,0.25);border-radius:var(--border-radius-md);padding:.6rem .85rem}
+.col h4{font-size:10px;font-weight:500;color:rgba(255,255,255,0.55);margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em}
+.col ul{margin:0;padding:0 0 0 1rem;font-size:12px;line-height:1.6;color:rgba(255,255,255,0.9)}
+button.db{font-size:12px;margin-top:.65rem;cursor:pointer}
+/* SVG node text — applied to all non-Venn nodes */
+.th{font-size:12px;font-weight:600}
+.ts{font-size:11px;font-weight:400}
+/* Node base — cursor + white text for all inline fills */
+.node{cursor:pointer}
+.node text{fill:#FFFFFF !important}
+/* Per-pillar node fills */
+.node.c-purple rect{fill:#3D368F;stroke:#7068C8;stroke-width:0.5}
+.node.c-blue   rect{fill:#154F8E;stroke:#3D7EC4;stroke-width:0.5}
+.node.c-coral  rect{fill:#7A2C14;stroke:#B85838;stroke-width:0.5}
+.node.c-green  rect{fill:#1E4A08;stroke:#4A8022;stroke-width:0.5}
+.node.c-amber  rect{fill:#6A3E08;stroke:#A86E28;stroke-width:0.5}
+.node.c-teal   rect{fill:#08503C;stroke:#168860;stroke-width:0.5}
+.node.c-gray   rect{fill:#323230;stroke:#585856;stroke-width:0.5}
+</style>
+<div style="max-width:720px;margin:1.5rem auto .25rem;padding:0 1rem;text-align:center">
+  <p style="font-size:13px;color:rgba(232,230,224,0.55);font-family:system-ui,sans-serif;line-height:1.75;margin-bottom:.5rem">
+    Built by <a href="index.html" style="color:rgba(232,230,224,0.75);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.2)">Marcus Jacobson</a> — Senior Microsoft Cybersecurity Consultant.
+    This compass maps the Microsoft security stack as I work across it: the products, data flows, overlap zones, and real-world scenarios that define the scope of my practice.
+  </p>
+  <a href="index.html" style="font-size:11px;font-family:monospace;color:rgba(232,230,224,0.4);text-decoration:none;letter-spacing:.06em">← Back to portfolio</a>
+</div>
+<div class="wrap">
+<div style="display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;padding:.25rem 0 .5rem">
+<p class="hint" style="margin:0">Click any circle, overlap zone, or node to explore</p>
+<div style="display:flex;gap:.4rem">
+  <a href="index.html" style="font-size:11px;font-family:monospace;text-decoration:none;padding:4px 12px;border:1px solid rgba(255,255,255,0.18);border-radius:20px;color:rgba(232,230,224,0.75);background:rgba(255,255,255,0.06);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">← Home</a>
+  <a href="ms_security_projects.html" style="font-size:11px;font-family:monospace;text-decoration:none;padding:4px 12px;border:1px solid rgba(255,255,255,0.18);border-radius:20px;color:rgba(232,230,224,0.75);background:rgba(255,255,255,0.06);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">Projects ↗</a>
+  <a href="ms_security_roles.html" style="font-size:11px;font-family:monospace;text-decoration:none;padding:4px 12px;border:1px solid rgba(255,255,255,0.18);border-radius:20px;color:rgba(232,230,224,0.75);background:rgba(255,255,255,0.06);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">Roles &amp; Scenarios ↗</a>
+  <a href="certification_strategy.html" style="font-size:11px;font-family:monospace;text-decoration:none;padding:4px 12px;border:1px solid rgba(255,255,255,0.18);border-radius:20px;color:rgba(232,230,224,0.75);background:rgba(255,255,255,0.06);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">Certifications ↗</a>
+</div>
+</div>
+<svg viewBox="0 0 950 890" role="img">
+<title>Microsoft Ecosystem — Security Consultant Scope</title>
+<desc>Interactive map of the Microsoft security ecosystem framed as a security consultant's advisory scope. Purview, Defender XDR, and Entra at the centre, with data sources, compliance, AI agents, and DevSecOps context.</desc>
+<defs>
+  <!--
+  LAYOUT GRID — v13
+  ═══════════════════════════════════════════════
+  Main content columns: x=12..668
+    North label:       y=18
+    Service nodes:     y=28..80    h=52
+    3rd-party banner:  y=90..134   h=44
+    Data Map + DSPM:   y=144..196  h=52
+    [Security Copilot removed from here → right sidebar]
+    Section labels:    y=262
+    Inputs/Outputs:    y=270..560  6×h=40 gap=10
+    Venn:              cx=248/432/340 cy=375/375/455 r=105
+    Compliance:        y=572..632  h=52
+    AI agents:         y=646..706  h=52
+    Entra Agent ID:    y=716..750  h=34
+    Dependencies:      y=766..838  h=64
+    SFI band:          y=852..898  h=46
+    Legend:            y=916..920
+
+  RIGHT SIDEBARS:
+    Security Copilot:  x=660 width=120  y=28..838  (full height)
+    IaC sidebar:       x=792 width=110  y=28..834
+    Labels:            rotated at x=654 and x=936
+  ═══════════════════════════════════════════════
+  -->
+  <clipPath id="cp-pu"><circle cx="378" cy="325" r="105"/></clipPath>
+  <clipPath id="cp-de"><circle cx="562" cy="325" r="105"/></clipPath>
+  <clipPath id="cp-en"><circle cx="470" cy="405" r="105"/></clipPath>
+</defs>
+
+<!-- ══ SECURITY COPILOT SIDEBAR  x=8..128  full height y=28..838 ══ -->
+<g class="node c-gray" onclick="show('sec-copilot')">
+  <rect x="8" y="28" width="120" height="760" rx="6" stroke-dasharray="5 3" stroke-width="1"/>
+  <text class="th" x="68" y="365" text-anchor="middle" dominant-baseline="central" fill="#888885">Security</text>
+  <text class="th" x="68" y="385" text-anchor="middle" dominant-baseline="central" fill="#888885">Copilot</text>
+  <text class="ts" x="68" y="405" text-anchor="middle" dominant-baseline="central" fill="#666663">AI · XDR · Sentinel</text>
+  <text class="ts" x="68" y="422" text-anchor="middle" dominant-baseline="central" fill="#666663">DSPM · Purview</text>
+</g>
+
+<!-- ══ NORTH LABEL ══ -->
+<text class="ts" x="470" y="18" text-anchor="middle" fill="#AAAAAA">Data sources — governed by Purview</text>
+
+<!-- ══ ROW 1 — SERVICE NODES h=52 ══ -->
+<g class="node c-purple" onclick="show('svc-fabric')">
+  <rect x="162" y="28" width="92" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="208" y="46" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Microsoft</text>
+  <text class="th" x="208" y="64" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Fabric</text>
+</g>
+<g class="node c-purple" onclick="show('svc-synapse')">
+  <rect x="262" y="28" width="92" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="308" y="46" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Azure</text>
+  <text class="th" x="308" y="64" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Synapse</text>
+</g>
+<g class="node c-purple" onclick="show('svc-azuresql')">
+  <rect x="362" y="28" width="110" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="417" y="46" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Azure SQL</text>
+  <text class="th" x="417" y="64" text-anchor="middle" dominant-baseline="central" fill="#3C3489">/ Cosmos DB</text>
+</g>
+<g class="node c-purple" onclick="show('svc-databricks')">
+  <rect x="480" y="28" width="104" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="532" y="46" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Azure</text>
+  <text class="th" x="532" y="64" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Databricks</text>
+</g>
+<g class="node c-purple" onclick="show('svc-powerplatform')">
+  <rect x="592" y="28" width="92" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="638" y="46" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Power</text>
+  <text class="th" x="638" y="64" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Platform</text>
+</g>
+<g class="node c-purple" onclick="show('svc-azurestorage')">
+  <rect x="692" y="28" width="82" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="733" y="46" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Azure</text>
+  <text class="th" x="733" y="64" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Storage</text>
+</g>
+
+<!-- ══ THIRD-PARTY BANNER h=44 ══ -->
+<g class="node c-amber" onclick="show('tp-signals')">
+  <rect x="162" y="90" width="612" height="44" rx="6" stroke-width="0.5"/>
+  <text class="th" x="468" y="105" text-anchor="middle" dominant-baseline="central" fill="#633806">Third-party &amp; multi-cloud signals</text>
+  <text class="ts" x="468" y="123" text-anchor="middle" dominant-baseline="central" fill="#854F0B">Snowflake · S3/GCP · Varonis · BigID · Cyera · OneTrust · SASE · Sentinel partner solutions</text>
+</g>
+
+<!-- ══ DATA MAP + DSPM h=52 ══ -->
+<g class="node c-purple" onclick="show('hub-data-map')">
+  <rect x="162" y="144" width="300" height="52" rx="7" stroke-width="0.7"/>
+  <text class="th" x="312" y="162" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Purview Data Map</text>
+  <text class="ts" x="312" y="180" text-anchor="middle" dominant-baseline="central" fill="#534AB7">Catalog · labels · lineage · policies</text>
+</g>
+<g class="node c-purple" onclick="show('dspm-hub')">
+  <rect x="470" y="144" width="304" height="52" rx="7" stroke-width="0.7"/>
+  <text class="th" x="622" y="162" text-anchor="middle" dominant-baseline="central" fill="#3C3489">DSPM for AI</text>
+  <text class="ts" x="622" y="180" text-anchor="middle" dominant-baseline="central" fill="#534AB7">AI Observability · posture · assessments</text>
+</g>
+
+<!-- ══ SECTION LABELS ══ -->
+<text class="ts" x="204" y="212" text-anchor="middle" fill="#AAAAAA">Inputs</text>
+<text class="ts" x="736" y="212" text-anchor="middle" fill="#AAAAAA">Outputs</text>
+
+<!-- ══════════════════════════════════
+     INPUTS — 6 nodes, ALL h=40, gap=10
+     y: 270, 320, 370, 420, 470, 520
+     All text centred at node midpoint (y+20)
+     Two-line nodes use y+12 and y+28
+══════════════════════════════════ -->
+<g class="node c-purple" onclick="show('in-m365')">
+  <rect x="142" y="220" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="204" y="240" text-anchor="middle" dominant-baseline="central" fill="#3C3489">M365 content</text>
+</g>
+<g class="node c-purple" onclick="show('in-endpoint')">
+  <rect x="142" y="270" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="204" y="290" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Endpoint files</text>
+</g>
+<g class="node c-blue" onclick="show('in-email')">
+  <rect x="142" y="320" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="204" y="340" text-anchor="middle" dominant-baseline="central" fill="#0C447C">Email / MDO</text>
+</g>
+<g class="node c-blue" onclick="show('in-cloudworkload')">
+  <rect x="142" y="370" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="204" y="390" text-anchor="middle" dominant-baseline="central" fill="#0C447C">Cloud alerts</text>
+</g>
+<g class="node c-coral" onclick="show('in-signin')">
+  <rect x="142" y="420" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="204" y="440" text-anchor="middle" dominant-baseline="central" fill="#712B13">Sign-in signals</text>
+</g>
+<!-- PIM: two lines within h=40 -->
+<g class="node c-coral" onclick="show('in-pim')">
+  <rect x="142" y="470" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="204" y="483" text-anchor="middle" dominant-baseline="central" fill="#712B13">PIM</text>
+  <text class="th" x="204" y="500" text-anchor="middle" dominant-baseline="central" fill="#712B13">activations</text>
+</g>
+
+<!-- ══════════════════════════════════
+     OUTPUTS — 6 nodes, ALL h=40, gap=10
+     y: 270, 320, 370, 420, 470, 520
+     Two-line nodes (Sensitivity, Threat hunting, Access decisions)
+     use y+12 and y+28
+══════════════════════════════════ -->
+<!-- Sensitivity labels — two lines -->
+<g class="node c-purple" onclick="show('out-labels')">
+  <rect x="674" y="220" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="736" y="233" text-anchor="middle" dominant-baseline="central" fill="#3C3489">Sensitivity</text>
+  <text class="th" x="736" y="250" text-anchor="middle" dominant-baseline="central" fill="#3C3489">labels</text>
+</g>
+<g class="node c-purple" onclick="show('out-dlpalert')">
+  <rect x="674" y="270" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="736" y="290" text-anchor="middle" dominant-baseline="central" fill="#3C3489">DLP alerts</text>
+</g>
+<g class="node c-blue" onclick="show('out-incident')">
+  <rect x="674" y="320" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="736" y="340" text-anchor="middle" dominant-baseline="central" fill="#0C447C">Incidents</text>
+</g>
+<!-- Threat hunting — two lines -->
+<g class="node c-blue" onclick="show('out-hunting')">
+  <rect x="674" y="370" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="736" y="383" text-anchor="middle" dominant-baseline="central" fill="#0C447C">Threat</text>
+  <text class="th" x="736" y="400" text-anchor="middle" dominant-baseline="central" fill="#0C447C">hunting</text>
+</g>
+<!-- Access decisions — two lines -->
+<g class="node c-coral" onclick="show('out-access')">
+  <rect x="674" y="420" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="736" y="433" text-anchor="middle" dominant-baseline="central" fill="#712B13">Access</text>
+  <text class="th" x="736" y="450" text-anchor="middle" dominant-baseline="central" fill="#712B13">decisions</text>
+</g>
+<g class="node c-coral" onclick="show('out-risksig')">
+  <rect x="674" y="470" width="124" height="40" rx="6" stroke-width="0.5"/>
+  <text class="th" x="736" y="490" text-anchor="middle" dominant-baseline="central" fill="#712B13">Risk signals</text>
+</g>
+
+<!-- ══════════════════════════════════
+     VENN CIRCLES (unchanged from v11)
+     Purview  cx=248 cy=375 r=105
+     Defender cx=432 cy=375 r=105
+     Entra    cx=340 cy=455 r=105
+══════════════════════════════════ -->
+<circle cx="378" cy="325" r="105" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5" opacity="0.9"/>
+<circle cx="562" cy="325" r="105" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5" opacity="0.9"/>
+<circle cx="470" cy="405" r="105" fill="#FAECE7" stroke="#993C1D" stroke-width="1.5" opacity="0.9"/>
+<circle cx="378" cy="325" r="105" fill="#AFA9EC" opacity="0.28" clip-path="url(#cp-de)"/>
+<circle cx="562" cy="325" r="105" fill="#85B7EB" opacity="0.28" clip-path="url(#cp-en)"/>
+<circle cx="470" cy="405" r="105" fill="#F0997B" opacity="0.28" clip-path="url(#cp-pu)"/>
+
+<!-- ══ PILLAR LABELS (unchanged) ══ -->
+<g class="node" onclick="show('ov-pu')">
+  <rect x="277" y="290" width="96" height="34" rx="6" fill="#534AB7"/>
+  <text x="325" y="300" text-anchor="middle" dominant-baseline="central" fill="#EEEDFE" font-size="12" font-weight="500">Microsoft</text>
+  <text x="325" y="316" text-anchor="middle" dominant-baseline="central" fill="#CECBF6" font-size="12" font-weight="500">Purview</text>
+</g>
+<g class="node" onclick="show('ov-de-solo')">
+  <rect x="571" y="290" width="96" height="34" rx="6" fill="#185FA5"/>
+  <text x="619" y="300" text-anchor="middle" dominant-baseline="central" fill="#E6F1FB" font-size="12" font-weight="500">Defender</text>
+  <text x="619" y="316" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="12" font-weight="500">XDR</text>
+</g>
+<g class="node" onclick="show('ov-en-solo')">
+  <rect x="406" y="444" width="128" height="34" rx="6" fill="#993C1D"/>
+  <text x="470" y="461" text-anchor="middle" dominant-baseline="central" fill="#FAECE7" font-size="12" font-weight="500">Microsoft Entra</text>
+</g>
+
+<!-- ══ OVERLAP PILLS ══ -->
+<g class="node" onclick="show('ov-pd')">
+  <rect x="414" y="252" width="112" height="28" rx="6" fill="#26215C"/>
+  <text x="470" y="266" text-anchor="middle" dominant-baseline="central" fill="#EEEDFE" font-size="11" font-weight="500">Insider risk · DLP</text>
+</g>
+<g class="node" onclick="show('ov-all')">
+  <rect x="425" y="322" width="90" height="26" rx="6" fill="#2C2C2A"/>
+  <text x="470" y="335" text-anchor="middle" dominant-baseline="central" fill="#F1EFE8" font-size="11" font-weight="500">Zero Trust</text>
+</g>
+<g class="node" onclick="show('ov-pe')">
+  <rect x="341" y="356" width="118" height="28" rx="6" fill="#4A1B0C"/>
+  <text x="400" y="370" text-anchor="middle" dominant-baseline="central" fill="#FAECE7" font-size="11" font-weight="500">Label-aware access</text>
+</g>
+<g class="node" onclick="show('ov-de')">
+  <rect x="485" y="356" width="110" height="28" rx="6" fill="#042C53"/>
+  <text x="540" y="370" text-anchor="middle" dominant-baseline="central" fill="#E6F1FB" font-size="11" font-weight="500">Identity-driven</text>
+</g>
+
+<!-- ══ COMPLIANCE  y=572..624 ══ -->
+<text class="ts" x="470" y="522" text-anchor="middle" fill="#3B6D11">Compliance pillar</text>
+<g class="node c-green" onclick="show('comp-ediscovery')">
+  <rect x="146" y="530" width="116" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="204" y="548" text-anchor="middle" dominant-baseline="central" fill="#27500A">eDiscovery</text>
+  <text class="ts" x="204" y="566" text-anchor="middle" dominant-baseline="central" fill="#3B6D11">Legal hold · search</text>
+</g>
+<g class="node c-green" onclick="show('comp-records')">
+  <rect x="270" y="530" width="116" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="328" y="548" text-anchor="middle" dominant-baseline="central" fill="#27500A">Records Mgmt</text>
+  <text class="ts" x="328" y="566" text-anchor="middle" dominant-baseline="central" fill="#3B6D11">Retention · labels</text>
+</g>
+<g class="node c-green" onclick="show('comp-commcomp')">
+  <rect x="394" y="530" width="136" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="462" y="544" text-anchor="middle" dominant-baseline="central" fill="#27500A">Comm</text>
+  <text class="th" x="462" y="560" text-anchor="middle" dominant-baseline="central" fill="#27500A">Compliance</text>
+</g>
+<g class="node c-green" onclick="show('comp-audit')">
+  <rect x="538" y="530" width="116" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="596" y="548" text-anchor="middle" dominant-baseline="central" fill="#27500A">Audit + DLM</text>
+  <text class="ts" x="596" y="566" text-anchor="middle" dominant-baseline="central" fill="#3B6D11">Unified log</text>
+</g>
+<g class="node c-green" onclick="show('comp-manager')">
+  <rect x="662" y="530" width="132" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="728" y="548" text-anchor="middle" dominant-baseline="central" fill="#27500A">Compliance Mgr</text>
+  <text class="ts" x="728" y="566" text-anchor="middle" dominant-baseline="central" fill="#3B6D11">GDPR · HIPAA · NIS2</text>
+</g>
+
+<!-- ══ AI AGENTS  y=646..698 ══ -->
+<text class="ts" x="470" y="596" text-anchor="middle" fill="#993C1D">AI agents + M365 Copilot</text>
+<g class="node c-coral" onclick="show('agent-studio')">
+  <rect x="146" y="604" width="150" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="221" y="622" text-anchor="middle" dominant-baseline="central" fill="#712B13">Copilot Studio</text>
+  <text class="ts" x="221" y="640" text-anchor="middle" dominant-baseline="central" fill="#993C1D">Low-code agents</text>
+</g>
+<g class="node c-coral" onclick="show('agent-foundry')">
+  <rect x="304" y="604" width="150" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="379" y="618" text-anchor="middle" dominant-baseline="central" fill="#712B13">Azure AI</text>
+  <text class="th" x="379" y="634" text-anchor="middle" dominant-baseline="central" fill="#712B13">Foundry</text>
+</g>
+<g class="node c-coral" onclick="show('agent-365')">
+  <rect x="462" y="604" width="152" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="538" y="618" text-anchor="middle" dominant-baseline="central" fill="#712B13">Agent 365</text>
+  <text class="ts" x="538" y="636" text-anchor="middle" dominant-baseline="central" fill="#993C1D">Treated as user in IRM</text>
+</g>
+<g class="node c-purple" onclick="show('m365-copilot')">
+  <rect x="622" y="604" width="172" height="52" rx="6" stroke-width="0.5"/>
+  <text class="th" x="708" y="618" text-anchor="middle" dominant-baseline="central" fill="#3C3489">M365 Copilot</text>
+  <text class="ts" x="708" y="636" text-anchor="middle" dominant-baseline="central" fill="#534AB7">Audit · DLP · IRM · eDisc</text>
+</g>
+<!-- Entra Agent ID: 10px below AI row (698+10=708) -->
+<g class="node c-coral" onclick="show('entra-agentid')">
+  <rect x="146" y="666" width="150" height="34" rx="6" stroke-width="0.5"/>
+  <text class="th" x="221" y="683" text-anchor="middle" dominant-baseline="central" fill="#712B13">Entra Agent ID</text>
+</g>
+
+<!-- ══ DEPENDENCIES  y=768..832  h=64 ══ -->
+<text class="ts" x="470" y="712" text-anchor="middle" fill="#AAAAAA">Dependencies</text>
+<g class="node c-teal" onclick="show('dep-sentinel')">
+  <rect x="153" y="720" width="118" height="64" rx="7" stroke-width="0.5"/>
+  <text class="th" x="212" y="738" text-anchor="middle" dominant-baseline="central" fill="#085041">Sentinel</text>
+  <text class="ts" x="212" y="756" text-anchor="middle" dominant-baseline="central" fill="#0F6E56">SIEM · SOAR</text>
+  <text class="ts" x="212" y="772" text-anchor="middle" dominant-baseline="central" fill="#0F6E56">Partner hub</text>
+</g>
+<g class="node c-amber" onclick="show('dep-azure')">
+  <rect x="281" y="720" width="110" height="64" rx="7" stroke-width="0.5"/>
+  <text class="th" x="336" y="738" text-anchor="middle" dominant-baseline="central" fill="#633806">Azure</text>
+  <text class="ts" x="336" y="756" text-anchor="middle" dominant-baseline="central" fill="#854F0B">Monitor ·</text>
+  <text class="ts" x="336" y="772" text-anchor="middle" dominant-baseline="central" fill="#854F0B">Logic Apps</text>
+</g>
+<g class="node c-blue" onclick="show('dep-mde')">
+  <rect x="401" y="720" width="130" height="64" rx="7" stroke-width="0.5"/>
+  <text class="th" x="466" y="734" text-anchor="middle" dominant-baseline="central" fill="#0C447C">Defender for</text>
+  <text class="th" x="466" y="750" text-anchor="middle" dominant-baseline="central" fill="#0C447C">Endpoint</text>
+  <text class="ts" x="466" y="768" text-anchor="middle" dominant-baseline="central" fill="#185FA5">EDR · DLP agent</text>
+</g>
+<g class="node c-green" onclick="show('dep-dfc')">
+  <rect x="541" y="720" width="118" height="64" rx="7" stroke-width="0.5"/>
+  <text class="th" x="600" y="734" text-anchor="middle" dominant-baseline="central" fill="#27500A">Defender</text>
+  <text class="th" x="600" y="750" text-anchor="middle" dominant-baseline="central" fill="#27500A">for Cloud</text>
+  <text class="ts" x="600" y="768" text-anchor="middle" dominant-baseline="central" fill="#3B6D11">CSPM · CWPP</text>
+</g>
+<g class="node c-coral" onclick="show('dep-intune')">
+  <rect x="669" y="720" width="118" height="64" rx="7" stroke-width="0.5"/>
+  <text class="th" x="728" y="734" text-anchor="middle" dominant-baseline="central" fill="#712B13">Intune</text>
+  <text class="ts" x="728" y="752" text-anchor="middle" dominant-baseline="central" fill="#993C1D">Device</text>
+  <text class="ts" x="728" y="768" text-anchor="middle" dominant-baseline="central" fill="#993C1D">compliance</text>
+</g>
+
+<!-- ══ SFI FOOTER BAND  y=852..898 ══ -->
+<g class="node" onclick="show('sfi-frame')">
+  <rect x="8" y="802" width="912" height="46" rx="7" fill="#085041" stroke="#0F6E56" stroke-width="0.7"/>
+  <text x="464" y="820" text-anchor="middle" dominant-baseline="central" fill="#E1F5EE" font-size="12" font-weight="500">Secure by Design · Secure by Default · Secure Operations</text>
+  <text x="464" y="838" text-anchor="middle" dominant-baseline="central" fill="#7DC4AF" font-size="11">Microsoft Secure Future Initiative — the overarching frame for everything above</text>
+</g>
+
+<!-- ══ IaC / DEVSECOPS SIDEBAR  x=810..920
+     6 nodes peer-aligned, width=110, gap=8
+     Title only — no subtitle line
+     Text centre x=847
+══ -->
+<text x="954" y="381" text-anchor="middle" fill="#0F6E56" font-size="11" font-weight="500"
+  transform="rotate(-90,954,407)">Infrastructure as Code · DevSecOps</text>
+
+<!-- 1 — IaC Foundations  y=28 h=118 -->
+<g class="node c-teal" onclick="show('iac-foundations')">
+  <rect x="810" y="28" width="110" height="118" rx="6" stroke-width="0.5"/>
+  <text class="th" x="865" y="78" text-anchor="middle" dominant-baseline="central" fill="#085041">IaC</text>
+  <text class="th" x="865" y="96" text-anchor="middle" dominant-baseline="central" fill="#085041">Foundations</text>
+</g>
+
+<!-- 2 — Purview as Code  y=156 h=118 -->
+<g class="node c-teal" onclick="show('iac-purview')">
+  <rect x="810" y="156" width="110" height="118" rx="6" stroke-width="0.5"/>
+  <text class="th" x="865" y="206" text-anchor="middle" dominant-baseline="central" fill="#085041">Purview</text>
+  <text class="th" x="865" y="224" text-anchor="middle" dominant-baseline="central" fill="#085041">as Code</text>
+</g>
+
+<!-- 3 — Entra as Code  y=284 h=118 -->
+<g class="node c-teal" onclick="show('iac-entra')">
+  <rect x="810" y="284" width="110" height="118" rx="6" stroke-width="0.5"/>
+  <text class="th" x="865" y="334" text-anchor="middle" dominant-baseline="central" fill="#085041">Entra</text>
+  <text class="th" x="865" y="352" text-anchor="middle" dominant-baseline="central" fill="#085041">as Code</text>
+</g>
+
+<!-- 4 — Sentinel as Code  y=412 h=118 -->
+<g class="node c-teal" onclick="show('iac-sentinel')">
+  <rect x="810" y="412" width="110" height="118" rx="6" stroke-width="0.5"/>
+  <text class="th" x="865" y="462" text-anchor="middle" dominant-baseline="central" fill="#085041">Sentinel</text>
+  <text class="th" x="865" y="480" text-anchor="middle" dominant-baseline="central" fill="#085041">as Code</text>
+</g>
+
+<!-- 5 — Pipeline Security  y=540 h=118 -->
+<g class="node c-teal" onclick="show('iac-pipeline')">
+  <rect x="810" y="540" width="110" height="118" rx="6" stroke-width="0.5"/>
+  <text class="th" x="865" y="590" text-anchor="middle" dominant-baseline="central" fill="#085041">Pipeline</text>
+  <text class="th" x="865" y="608" text-anchor="middle" dominant-baseline="central" fill="#085041">Security</text>
+</g>
+
+<!-- 6 — Defender for Cloud as Code  y=668 h=118 -->
+<g class="node c-teal" onclick="show('iac-dfc')">
+  <rect x="810" y="668" width="110" height="118" rx="6" stroke-width="0.5"/>
+  <text class="th" x="865" y="710" text-anchor="middle" dominant-baseline="central" fill="#085041">Defender</text>
+  <text class="th" x="865" y="727" text-anchor="middle" dominant-baseline="central" fill="#085041">for Cloud</text>
+  <text class="th" x="865" y="744" text-anchor="middle" dominant-baseline="central" fill="#085041">as Code</text>
+</g>
+<!-- ══ LEGEND  y=916 — single row ══ -->
+<line x1="18" y1="866" x2="38" y2="866" stroke="#534AB7" stroke-width="1.5" stroke-opacity="0.7"/>
+<text class="ts" x="44" y="870" fill="#AAAAAA">Purview / governance</text>
+<line x1="186" y1="866" x2="206" y2="866" stroke="#185FA5" stroke-width="1.5" stroke-opacity="0.7"/>
+<text class="ts" x="212" y="870" fill="#AAAAAA">Defender / SOC</text>
+<line x1="334" y1="866" x2="354" y2="866" stroke="#993C1D" stroke-width="1.5" stroke-opacity="0.7"/>
+<text class="ts" x="360" y="870" fill="#AAAAAA">Entra / identity</text>
+<line x1="474" y1="866" x2="494" y2="866" stroke="#3B6D11" stroke-width="1.5" stroke-opacity="0.7"/>
+<text class="ts" x="500" y="870" fill="#AAAAAA">Compliance</text>
+<line x1="590" y1="866" x2="610" y2="866" stroke="#854F0B" stroke-width="1.5" stroke-opacity="0.7"/>
+<text class="ts" x="616" y="870" fill="#AAAAAA">Third-party / infra</text>
+<line x1="748" y1="866" x2="768" y2="866" stroke="#585856" stroke-width="1.5" stroke-dasharray="4 3" stroke-opacity="0.9"/>
+<text class="ts" x="774" y="870" fill="#AAAAAA">Security Copilot</text>
+</svg>
+<div id="modal-backdrop" class="modal-backdrop" onclick="handleBackdropClick(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">&#x2715;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+</div>
+
+<script>
+const D={
+  'ov-pu':{label:'Microsoft Purview',layer:'Venn pillar',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['I advise on classification, sensitivity labelling, and DLP across the full M365 + data estate','Insider risk management — helping clients detect, scope, and respond to internal threats','Data governance via the Data Map — catalog, lineage, protection policies for regulated industries','Extending Purview to AI: governing Copilot, Studio, and Foundry agent outputs under the same label taxonomy'],
+    why:['Purview is the connective tissue of the whole stack — every pillar gets smarter when data has context','Clients underestimate it; my role is to show how labels flow into CA, SOC, and compliance simultaneously'],
+    flows:['Labels → Entra CA policy enforcement downstream','DLP alerts → optional escalation into Defender XDR incidents','Insider risk signals → Defender XDR user entity enrichment','Audit log → Sentinel for long-term SIEM correlation']},
+
+  'ov-de-solo':{label:'Defender XDR',layer:'Venn pillar',color:'#E6F1FB',border:'#185FA5',text:'#0C447C',
+    what:['I advise SOC teams on unifying alerts from endpoint, email, identity, cloud, and data into one queue','Advanced hunting — helping analysts write KQL across all workloads including insider risk tables (preview)','Automated investigation and response (AIR) — reducing manual triage burden in high-volume environments','Security Copilot integration — advising on AI-assisted incident investigation and summary workflows'],
+    why:['Clients running siloed tools miss cross-workload attack chains — XDR correlation is the primary fix','My advisory focus: incident quality over alert volume, and proving ROI against point products'],
+    flows:['Cross-workload alerts → correlated XDR incident queue','Incidents synced to Sentinel for long-term retention','Advanced Hunting — insider risk + endpoint + AI usage in one KQL surface']},
+
+  'ov-en-solo':{label:'Microsoft Entra',layer:'Venn pillar',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['Conditional Access design — translating client risk appetite into signal → decision → enforcement policy','Identity Protection — real-time user and sign-in risk scoring feeding CA and XDR','PIM — eliminating standing privilege through JIT elevation, approvals, and audit trails','Entra Agent ID — extending identity governance to AI agents, not just human users (2025)'],
+    why:['Identity is still the primary attack surface — most breaches I investigate start here','Clients need CA policies that actually work: not too strict to block productivity, not too loose to miss risk'],
+    flows:['High-risk sign-in → CA block or step-up MFA','Risk signals → Defender XDR identity alerts for SOC action','PIM audit events → Sentinel for long-term privileged access review']},
+
+  'ov-pd':{label:'Purview ∩ Defender XDR',layer:'Venn overlap',color:'#EDE9F8',border:'#534AB7',text:'#26215C',
+    what:['DLP violations escalated from Purview as first-class Defender XDR incidents','Insider risk alerts surfaced in Defender XDR user entity timeline (preview Dec 2024)','Insider risk signals queryable in Advanced Hunting KQL tables (preview)','DSPM for AI risk signals integrated into XDR — AI usage context for SOC analysts'],
+    why:['This integration is underused by clients — I help SOC teams activate it and tune alert thresholds','Data context turns an alert from "something happened" into "this file was touched by this user"'],
+    flows:['DLP policy match → XDR incident with data context enrichment','Insider risk alert → XDR user entity page enrichment','DSPM AI oversharing risk → XDR incident queue']},
+
+  'ov-all':{label:'Zero Trust — all three pillars',layer:'Venn core',color:'#EEE9F5',border:'#534AB7',text:'#26215C',
+    what:['I advise on integrating all three pillars: verify identity (Entra) + classify data (Purview) + detect threats (Defender)','AI agent governance now part of the Zero Trust story: Entra Agent ID + DSPM + Purview labels','Continuous access evaluation — real-time revocation across identity, data, endpoint, and AI layers'],
+    why:['Zero Trust is a business conversation as much as a technical one — I translate it for exec audiences','Agents are now first-class governed entities; clients need a coherent story before regulators ask for one'],
+    flows:['Label + identity risk + device compliance + agent risk → CA decision in real time','All pillar signals → Sentinel for cross-domain correlation and detection engineering']},
+
+  'ov-pe':{label:'Purview ∩ Entra',layer:'Venn overlap',color:'#F0EAE4',border:'#993C1D',text:'#712B13',
+    what:['Sensitivity label on data drives Conditional Access policy — data classification informs access in real time','Unmanaged device blocked from downloading Confidential-labelled Fabric items','Purview protection policies auto-enforce Fabric access without manual CA rule authoring (GA Sept 2025)'],
+    why:['Most clients have labels and CA separately — I show how to connect them for automated enforcement','This integration closes the loop: classify once, enforce everywhere, no manual policy per dataset'],
+    flows:['Fabric item labelled Confidential → CA policy evaluated on access request','Protection policy applied → access blocked for out-of-scope users automatically']},
+
+  'ov-de':{label:'Defender XDR ∩ Entra',layer:'Venn overlap',color:'#E8F0FA',border:'#185FA5',text:'#0C447C',
+    what:['Risky sign-in feeds Defender XDR alert, which can trigger CA block — a closed-loop response','PIM abuse patterns detected in XDR incident investigation alongside endpoint and email signals','User entity timeline spans identity + endpoint + email + data + AI usage — full attacker footprint'],
+    why:['Identity-driven threat detection catches lateral movement before it reaches data — I help clients activate this','Combining Entra risk with XDR correlation dramatically reduces mean time to contain'],
+    flows:['Entra risk signal → XDR identity alert → SOC investigation','Suspicious PIM elevation → XDR incident correlated with endpoint activity','CA block event → Sentinel log → SOC review and playbook trigger']},
+
+  'svc-fabric':{label:'Microsoft Fabric',layer:'Data services',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['I advise on Fabric as the primary governed analytics platform for Microsoft-first clients','OneLake is the unified storage layer — Purview is the built-in governance engine, not an add-on','Copilot in Fabric interactions are audited by DSPM for AI — AI usage is visible to security teams'],
+    why:['Fabric collapses multiple data platforms into one — governance scope is vast if not scoped carefully','Clients adopt Fabric fast; my role is to ensure Purview labels and protection policies keep pace'],
+    flows:['Fabric asset metadata → Purview Unified Catalog for classification and lineage','Label on Fabric item → access auto-enforced via protection policies (GA Sept 2025)','Copilot in Fabric risky usage → DSPM alert → Defender XDR']},
+
+  'svc-synapse':{label:'Azure Synapse',layer:'Data services',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['Advisory scope: SQL Pools, Spark Pools, Synapse Pipelines as governed data pipeline infrastructure','Sensitivity labels on Synapse assets now GA (Nov 2025) — classify structured data at pipeline level','Spark connector enables pipeline lineage tracking visible in Purview Data Map'],
+    why:['Synapse is commonly ungoverned in client estates — I help scope it into the Purview scanning remit','SQL threat detection via Defender for Cloud brings Synapse into the XDR alert feed'],
+    flows:['Synapse scan → Purview classifies and labels tables in the Unified Catalog','SQL anomaly alert → Defender for Cloud → XDR incident']},
+
+  'svc-azuresql':{label:'Azure SQL / Cosmos DB',layer:'Data services',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['Advisory scope: Azure SQL DB, SQL MI, Cosmos DB, MySQL, PostgreSQL — all scannable by Purview','Column-level sensitivity labels now GA (Nov 2025) — classify PII and regulated data at field level','Column classification feeds DLP policies and CA enforcement downstream'],
+    why:['Column-level classification is the right granularity for GDPR and HIPAA controls — I help clients get there','Defender for SQL alerts close the loop between database anomalies and the XDR incident queue'],
+    flows:['Column classification → sensitivity label applied → DLP policy scope expanded','Defender for SQL anomaly alert → XDR incident with data asset context']},
+
+  'svc-databricks':{label:'Azure Databricks',layer:'Data services',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['Unity Catalog is the governance metastore — I advise on connecting it to Purview Unified Catalog','Sensitivity labels for Unity Catalog now GA (Nov 2025) — Databricks assets under the same label taxonomy','Scanning requires SHIR — Managed VNet not yet supported; key deployment constraint to communicate to clients'],
+    why:['Databricks is common in data-heavy clients but typically outside governance scope — I bring it in','SHIR deployment is a recurring sticking point; setting expectations early avoids project delays'],
+    flows:['Unity Catalog scan via SHIR → Purview Unified Catalog → labels applied','Access anomaly → Sentinel partner solution → XDR correlation']},
+
+  'svc-powerplatform':{label:'Power Platform / Dataverse',layer:'Data services',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['Dataverse column-level sensitivity labels now GA (Nov 2025) — governs low-code data at field granularity','DLP for Power Platform — connector policies govern data movement between services in flows and apps','Power Automate flows classified and audited in the Unified Audit Log — shadow workflow visibility','Purview Data Map scans Dataverse tables and canvas app data sources for classification'],
+    why:['Power Platform is a major shadow-IT surface in most enterprises — I help clients bring it under governance','Citizen developers create data-handling flows without IT visibility; Purview is the control plane fix'],
+    flows:['Dataverse scan → Purview Unified Catalog with column-level classifications','DLP policy match on a connector → alert in Purview compliance portal','Audit events from Power Automate flows → Sentinel for SIEM correlation']},
+
+  'svc-azurestorage':{label:'Azure Storage (Blob / ADLS)',layer:'Data services',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['Blob Storage and ADLS Gen2 — sensitivity labels supported (GA Nov 2025); scan containers for classified assets','ADLS Gen2 lineage tracked through Fabric and Synapse pipelines — data lake lineage in Purview Data Map','Defender for Storage detects malware uploads and anomalous access — security over the data lake layer'],
+    why:['ADLS Gen2 is the default landing zone for Fabric OneLake and Synapse — governing it governs everything upstream','Clients treat storage as infrastructure; I reframe it as a data governance surface that needs classification'],
+    flows:['Storage container scan → Purview Unified Catalog → labels applied to assets','Defender for Storage alert → XDR incident with data sensitivity context','Lineage: ADLS → Synapse pipeline → Fabric → Purview Data Map']},
+
+  'tp-signals':{label:'Third-party & multi-cloud signals',layer:'Data services',color:'#FAEEDA',border:'#854F0B',text:'#633806',
+    what:['Snowflake — Polaris Catalog connected to Purview Unified Catalog; sensitivity labels GA Nov 2025','AWS S3 — Purview connector for label scanning; GCP data events via Sentinel partner solutions','Varonis, BigID, Cyera — data discovery findings feed the DSPM posture dashboard as third-party signals','SASE/SSE and OneTrust — network DLP and privacy posture signals extending into DSPM'],
+    why:['Most clients are multi-cloud — I help them extend Purview governance and Sentinel SIEM beyond Azure','Third-party signals plug gaps Microsoft native connectors do not yet cover; selection depends on client maturity'],
+    flows:['Snowflake Polaris / S3 scan → Purview Unified Catalog → sensitivity classification','Varonis/BigID discovery findings → DSPM posture dashboard score','GCP/Snowflake events → Sentinel partner solution → SIEM correlation and detection']},
+
+  'hub-data-map':{label:'Purview Data Map',layer:'Governance hub',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['I advise on building the Unified Catalog as the authoritative inventory of all registered data assets','Sensitivity labels applied at asset, table, or column level across 11 new sources (GA Nov 2025)','Data lineage end-to-end: source → transform → consumption — critical for regulated industries','Protection policies auto-enforce Fabric access based on label — no manual CA rule per dataset (GA Sept 2025)'],
+    why:['The Data Map is the metadata backbone everything else depends on — I treat it as a first-week priority','Without a populated catalog, DLP policies are blind and CA enforcement is incomplete'],
+    flows:['Labels from Data Map → Entra CA enforcement and Fabric access control','DLP alerts from Data Map policies → optional escalation to XDR incidents','Audit log from Data Map actions → Sentinel for SIEM correlation']},
+
+  'dspm-hub':{label:'DSPM for AI',layer:'Governance hub',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['I advise on AI Observability — giving clients a full inventory of Copilot, Studio, Foundry, and third-party agents','Posture dashboard shows key metrics and 30-day trends — I use this to frame risk conversations with clients','Weekly auto risk assessment across top 100 SharePoint sites — quantifies oversharing exposure quickly','Security Copilot agents: Data Security Posture agent and Triage agent reduce manual alert burden at scale'],
+    why:['AI adoption is outpacing governance in almost every client I work with — DSPM is the fastest way to close the gap','I use the posture dashboard to make the risk tangible: number of agents, overshared sites, sensitive data touched'],
+    flows:['AI interaction events → DSPM alerts surfaced in the posture dashboard','Oversharing risk signals → Defender XDR for SOC action','DSPM audit events → Sentinel for long-term log retention and correlation']},
+
+  'sec-copilot':{label:'Security Copilot',layer:'AI reasoning layer — cross-ecosystem',color:'#F1EFE8',border:'#5F5E5A',text:'#444441',
+    what:['I advise on Security Copilot as the horizontal AI layer across Defender XDR, Sentinel, Purview DSPM, and Entra','Data Security Posture agent — auto-triages DSPM oversharing alerts and recommends remediation actions','Data Security Triage agent — automates DLP and IRM alert categorisation at scale for stretched SOC teams','Embedded in XDR, Sentinel, and DSPM portal — I position it as an operator multiplier, not a standalone product'],
+    why:['It is the only control that cuts across all three pillars simultaneously — I use this to anchor the integration story','Clients ask where to start with AI in security — Security Copilot is the right first answer for most'],
+    flows:['XDR incident → Copilot generates plain-language summary and guided remediation steps','DSPM oversharing alert → Triage agent prioritises and auto-categorises at scale','Sentinel KQL authoring → Copilot assists query construction and explains results in plain language']},
+
+  'in-m365':{label:'M365 content',layer:'Input',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['Exchange Online, SharePoint, OneDrive, and Teams — the primary Purview DLP surface for most clients','This is also the primary knowledge base for M365 Copilot — oversharing here is the top AI risk I advise on'],
+    why:['Every client has M365 — it is always in scope and usually the first place I look for classification gaps'],
+    flows:['Content policy match → DLP alert in Purview compliance portal','Sensitivity label applied → travels with document across services','Audit event → Sentinel for SIEM correlation']},
+
+  'in-endpoint':{label:'Endpoint file activity',layer:'Input',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['File copy to USB, browser upload, print, and screenshot capture — all monitored by Purview Endpoint DLP','MDE agent is the enforcement mechanism — no separate agent required if Defender for Endpoint is already deployed'],
+    why:['Endpoint DLP closes the gap between cloud controls and the device — critical for regulated data exfiltration scenarios'],
+    flows:['Endpoint DLP policy match → alert in Purview compliance portal','Endpoint signal shared with XDR for cross-workload correlation']},
+
+  'in-email':{label:'Email / MDO',layer:'Input',color:'#E6F1FB',border:'#185FA5',text:'#0C447C',
+    what:['Phishing, BEC, malicious attachments, URL detonation, and impersonation detection via MDO','Every message analysed — verdict fed to Defender XDR as an alert for SOC correlation'],
+    why:['Email remains the primary initial access vector — MDO is the first line and I ensure it is feeding XDR properly'],
+    flows:['MDO verdict → alert in XDR incident queue','Automated investigation triggered on high-confidence verdicts','Email remediation actioned from XDR — soft delete or hard delete across mailboxes']},
+
+  'in-cloudworkload':{label:'Cloud workload alerts',layer:'Input',color:'#E6F1FB',border:'#185FA5',text:'#0C447C',
+    what:['VM anomaly, container escape, Kubernetes API abuse, and storage anomaly from Defender for Cloud','Cloud workload alerts flow to XDR via connector — I advise on connector configuration and tuning'],
+    why:['Cloud infrastructure alerts without identity and data context are hard to prioritise — XDR correlation fixes this'],
+    flows:['Defender for Cloud alert → XDR incident with cloud context','Optional sync to Sentinel for long-term retention','Correlated with endpoint and identity signals for full attacker path']},
+
+  'in-signin':{label:'Sign-in signals',layer:'Input',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['Login location, IP reputation, user behaviour deviation, and legacy auth attempts analysed by Entra ID Protection','Real-time risk score assigned — I advise on tuning thresholds to balance security and user friction'],
+    why:['Most breaches I investigate show a high-risk sign-in that was ignored — activating ID Protection is a quick win'],
+    flows:['High-risk sign-in → CA policy triggers MFA or block','Risk signal feeds Defender XDR identity alert queue','Identity alert → Sentinel for SIEM long-term log retention']},
+
+  'in-pim':{label:'PIM activations',layer:'Input',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['JIT role elevation requests, approval workflows, and time-bound activation audit trail via Entra PIM','I advise on PIM scope: which roles need JIT, who approves, and how long activations should last'],
+    why:['Standing privilege is the single biggest identity hygiene issue I find in client estates — PIM fixes it'],
+    flows:['Approved elevation → time-bound role grant with audit event','Audit log → Sentinel for privileged access monitoring','Suspicious elevation pattern → XDR alert for SOC investigation']},
+
+  'out-labels':{label:'Sensitivity labels',layer:'Output',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['Visual markings and protection metadata applied to files, emails, Fabric items, DB columns, and agent outputs','Labels travel with data — enforced consistently across M365, Fabric, Databricks, Snowflake, and agent-generated content'],
+    why:['Labels are the most durable control I advise on — they persist outside the Microsoft boundary into third-party apps'],
+    flows:['Label → Entra CA policy evaluation on access request','Label context → XDR incident enrichment for SOC analysts','Label coverage report → Compliance Manager improvement actions']},
+
+  'out-dlpalert':{label:'DLP policy alerts',layer:'Output',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['Policy match notification surfaced in Purview compliance portal as an incident for review','Now includes AI prompt and response violations from M365 Copilot — AI-aware DLP is in scope'],
+    why:['DLP alert quality is a common client complaint — I help tune policies to reduce false positives before escalation'],
+    flows:['DLP match → Purview compliance portal incident for compliance team','High-severity alert → optional escalation to Defender XDR incident queue','Alert event → Sentinel ingestion for SIEM correlation and trend analysis']},
+
+  'out-incident':{label:'Correlated incidents',layer:'Output',color:'#E6F1FB',border:'#185FA5',text:'#0C447C',
+    what:['Aggregated alerts across endpoint, email, identity, cloud, data services, and AI usage in one XDR incident','Data sensitivity and AI interaction context from Purview enriches incidents — analysts see what was touched'],
+    why:['Incident quality is what I optimise for with SOC clients — fewer, richer incidents beat high alert volumes'],
+    flows:['SOC analyst investigates enriched incident with full signal context','Incident synced to Sentinel for long-term retention and custom detection rules','Security Copilot generates plain-language incident summary on demand']},
+
+  'out-hunting':{label:'Threat hunting',layer:'Output',color:'#E6F1FB',border:'#185FA5',text:'#0C447C',
+    what:['Advanced Hunting in Defender portal — KQL across endpoint, email, identity, cloud, and data','Insider risk signals in Advanced Hunting tables (preview) — brings IRM signals into the hunter workspace','Sentinel workspace tables queryable when connected — unified hunting across SIEM and XDR'],
+    why:['I advise hunting teams on custom detection rules that span identity, data, and endpoint in one query','This surface is where proactive detection happens — not waiting for alerts to fire'],
+    flows:['Custom detection rules → findings promoted to incidents automatically','Hunting queries → Security Copilot assists authoring and explains results','Sentinel-connected hunting → cross-domain KQL across all retained logs']},
+
+  'out-access':{label:'Access decisions',layer:'Output',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['Allow / block / MFA enforcement at login; session controls like download block and read-only in-app','Continuous Access Evaluation — real-time token revocation without waiting for token expiry','Agent access governed by Entra Agent ID and CA policies — non-human identities in scope'],
+    why:['CA is the Zero Trust enforcement point — I advise on policy design before clients lock themselves out'],
+    flows:['Access granted or blocked → session controls applied in the target application','CA decision event → Sentinel for access audit trail','Agent access decision → logged to DSPM and Entra audit']},
+
+  'out-risksig':{label:'Risk signals → XDR',layer:'Output',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['User risk score, sign-in risk events, and Entra ID Protection alerts flowing to XDR','Now includes AI usage risk from DSPM and risky agent behaviour from AI Observability — AI risk in XDR'],
+    why:['Identity + AI risk together give SOC teams the full picture — I help clients wire these feeds correctly'],
+    flows:['XDR identity alert created from Entra risk signal → SOC investigates','Cross-workload investigation: endpoints + email + data + AI usage in one incident view','Containment actions: disable account, revoke sessions, block agent access']},
+
+  'comp-ediscovery':{label:'eDiscovery',layer:'Compliance pillar',color:'#EAF3DE',border:'#3B6D11',text:'#27500A',
+    what:['Legal hold on custodian mailboxes, SharePoint, and Teams — including Copilot prompt/response history','Content search spans M365 Copilot and Agent 365 interactions — AI history is discoverable','I advise legal and compliance teams on scoping holds to cover AI-generated content correctly'],
+    why:['Copilot history stored in user mailboxes is discoverable — most legal teams do not know this yet','Getting ahead of eDiscovery for AI content is a key advisory conversation with regulated clients'],
+    flows:['XDR incident triggers legal hold on involved custodians — automated via playbook','Copilot/agent interaction history → review set exported for legal team']},
+
+  'comp-records':{label:'Records Management',layer:'Compliance pillar',color:'#EAF3DE',border:'#3B6D11',text:'#27500A',
+    what:['Retention labels — manual or auto-applied across M365, now including Copilot/AI prompt-response pairs','Event-based retention and disposition review — defensible deletion posture for regulators','I advise on retention policy design that covers both human and AI-generated content'],
+    why:['FINRA, GDPR, and HIPAA require defensible retention — AI content is now in scope and often overlooked'],
+    flows:['Content labelled as record → immutable for the defined retention period','Copilot interaction retained under policy → preserved for required regulatory duration']},
+
+  'comp-commcomp':{label:'Comm Compliance',layer:'Compliance pillar',color:'#EAF3DE',border:'#3B6D11',text:'#27500A',
+    what:['Detects policy violations in email, Teams, and Copilot prompts/responses — AI communications in scope','FINRA, harassment, sensitive info sharing, and prompt injection detection — covers financial services clients','Privacy by default — usernames pseudonymised until reviewer escalates, protecting employee privacy'],
+    why:['Financial services clients need Comm Compliance for FINRA — AI communications are a new gap I help close','IRM signals from Comm Compliance flow to XDR user entity page — connects compliance to SOC workflow'],
+    flows:['Policy match in Copilot prompt → Comm Compliance alert for compliance reviewer','Risky AI usage → IRM signal → Defender XDR user entity enrichment for SOC context']},
+
+  'comp-audit':{label:'Audit + DLM',layer:'Compliance pillar',color:'#EAF3DE',border:'#3B6D11',text:'#27500A',
+    what:['Unified Audit Log — all M365 activity, Copilot prompts/responses, and agent interactions retained','Audit Premium — up to 10-year retention; I advise on licensing and retention tier decisions for clients','Collection policies — fine-tune which signals flow to IRM, DSPM, and eDiscovery to reduce noise'],
+    why:['The audit log is the forensic foundation of the whole stack — I treat its configuration as non-negotiable'],
+    flows:['Audit events → Sentinel long-term retention for SIEM correlation and detection rules','Collection policy scopes signals to the right Purview solutions — reduces false positive volume']},
+
+  'comp-manager':{label:'Compliance Manager',layer:'Compliance pillar',color:'#EAF3DE',border:'#3B6D11',text:'#27500A',
+    what:['Regulatory assessments across GDPR, HIPAA, ISO 27001, SOC 2, FINRA, NIS2, and 300+ more frameworks','Agent 365 automatically included in AI regulation assessments — AI compliance posture built in','Compliance score aggregates posture across all active assessments — I use this to report to client boards'],
+    why:['I use Compliance Manager to anchor regulatory conversations — it maps technical controls to requirements','Bridging DSPM posture scores with regulatory assessment scores is a key advisory output for CISOs'],
+    flows:['Purview DLP and label controls → Compliance Manager improvement actions with implementation guidance','DSPM AI posture metrics → mapped to relevant AI regulatory assessment scores']},
+
+  'agent-studio':{label:'Copilot Studio agents',layer:'AI layer',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['Low-code/no-code agents drawing from SharePoint, Fabric, and connectors — citizen developer surface','Purview label inheritance: source data labels inherited by agent outputs — protection travels through the agent','DLP policies enforced on agent-generated content — same rules as human-created content'],
+    why:['Copilot Studio is where shadow AI is built — I help clients ensure governance is automated, not manual','Citizen developers will not configure security themselves; Purview must enforce it transparently'],
+    flows:['Agent accesses labelled Fabric/SharePoint source → label inherited by agent output','Sensitive data in agent output → DSPM alert → IRM trigger → XDR signal for SOC']},
+
+  'agent-foundry':{label:'Azure AI Foundry agents',layer:'AI layer',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['Enterprise-grade agents on Azure AI Foundry — including RAG pipelines via AI Search','Visible in DSPM AI Observability with insider risk level assigned per agent — gives security teams agent inventory','RAG apps honour sensitivity labels on indexed content (Nov 2025) — labels respected at retrieval time'],
+    why:['Foundry agents are the most powerful AI surface in the Microsoft stack — and the least governed by default','I use DSPM AI Observability to show clients which agents are touching sensitive data they did not know about'],
+    flows:['Agent activity → DSPM AI Observability → insider risk level assigned to each agent','Risky agent behaviour → DSPM alert → recommended remediation action surfaced to security team']},
+
+  'agent-365':{label:'Microsoft Agent 365',layer:'AI layer',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['Preview — agents treated as user entities in Purview, not just service principals','Auto-enabled for Audit, sensitive data detection, and Compliance Manager AI assessments out of the box','Supported across DLP, IRM, eDiscovery, Comm Compliance, and Data Lifecycle Management — broadest Purview coverage'],
+    why:['Agent 365 has the most comprehensive Purview integration of any agent platform to date — I highlight this','Clients piloting Agent 365 need to understand its compliance posture before broad rollout'],
+    flows:['Agent interaction → Unified Audit Log for forensic and eDiscovery retention','Sensitive data exposure → DSPM alert → Defender XDR incident','Agent in IRM policy → risky usage alert → XDR user entity enrichment for SOC']},
+
+  'm365-copilot':{label:'Microsoft 365 Copilot',layer:'AI layer',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    what:['Every prompt/response in Unified Audit Log — user, timestamp, sensitivity label, file referenced','DLP policy blocks Copilot from processing items bearing specified sensitivity labels — prevents data leakage','IRM: risky AI usage policy detects prompt injection and access to protected materials','eDiscovery: Copilot history searchable via IPM.SkypeTeams.Message.Copilot.* item class'],
+    why:['Copilot is the top AI risk conversation I have with clients — oversharing is the primary concern','Purview is the control plane for Copilot safety; without it, Copilot inherits every oversharing problem already present'],
+    flows:['Copilot audit events → Sentinel and DSPM Activity Explorer for usage monitoring','IRM risky AI usage signal → XDR user entity enrichment for SOC','DLP match → Copilot blocked from processing the labelled item']},
+
+  'entra-agentid':{label:'Entra Agent ID',layer:'AI layer / Identity',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['New Entra product (2025) — identity and access management for AI agents, not just human users','Agents registered through Entra — visible in DSPM AI Observability and subject to CA policies','I advise on registering all client AI agents through Entra Agent ID before CA policies are applied'],
+    why:['Non-human identities were the biggest governance gap in the stack — Entra Agent ID closes it','Connecting AI agents to Zero Trust is the most important architectural shift I advise on right now'],
+    flows:['Agent registered in Entra → CA policies apply to agent access requests','Suspicious agent behaviour → Entra risk signal → Defender XDR alert for SOC']},
+
+  'dep-sentinel':{label:'Microsoft Sentinel',layer:'Dependencies',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
+    what:['SIEM — long-term log retention and KQL analytics rules across all ingested sources','SOAR — automation rules and Logic App playbooks for incident response at scale','Partner solutions hub — extends Purview and Defender coverage to Snowflake, GCP, and Databricks','Security Copilot integration — incident summary and guided response directly in the Sentinel workspace'],
+    why:['Sentinel is where I anchor the single pane of glass conversation — it aggregates all pillars into one workspace','Clients with legacy SIEMs need a migration story; I help scope what to retain versus retire'],
+    flows:['Receives: Purview audit log, Entra sign-in, XDR incidents, DSPM alerts, Defender for Cloud events','Outputs: custom detections, playbook automations, workbooks, and long-term forensic retention']},
+
+  'dep-azure':{label:'Azure',layer:'Dependencies',color:'#FAEEDA',border:'#854F0B',text:'#633806',
+    what:['Azure Monitor and Log Analytics — the data store and query engine behind Sentinel','Logic Apps — the SOAR automation execution engine for Sentinel playbooks','SHIR — enables Purview to reach on-premises data sources and Databricks (key deployment dependency)'],
+    why:['Sentinel is Azure-native — I help clients understand the Azure Monitor dependency before they size capacity'],
+    flows:['Platform logs → Log Analytics → Sentinel analytics rules and workbooks','Logic Apps execute playbook responses triggered by Sentinel automation rules','SHIR connects Purview to Databricks and on-prem SQL — prerequisite for complete scanning coverage']},
+
+  'dep-mde':{label:'Defender for Endpoint',layer:'Dependencies',color:'#E6F1FB',border:'#185FA5',text:'#0C447C',
+    what:['EDR agent on Windows, macOS, Linux, and mobile — threat detection and XDR signal source','Dual role: endpoint threat detection for XDR and Purview Endpoint DLP enforcement on the same agent','Device health and compliance state reported to Entra CA — device posture is a CA signal'],
+    why:['One agent for EDR and endpoint DLP is a key efficiency argument I make — reduces agent sprawl on endpoints','If MDE is already deployed, Endpoint DLP is almost free to enable — I highlight this to clients with Defender E5'],
+    flows:['Endpoint alerts → XDR incident queue with device context','File operation events → Purview Endpoint DLP for exfiltration detection','Device compliance state → Entra CA evaluation for access decisions']},
+
+  'dep-dfc':{label:'Defender for Cloud',layer:'Dependencies',color:'#EAF3DE',border:'#3B6D11',text:'#27500A',
+    what:['CSPM — cloud security posture management covering misconfigurations and Secure Score across subscriptions','CWPP — workload protection for VMs, containers, databases, and Synapse Analytics','Purview integration — Defender for Cloud alerts include asset sensitivity labels from the Data Map'],
+    why:['I use Defender for Cloud Secure Score as an executive-level posture metric — easy to track over time','The Purview integration means cloud alerts now carry data context — which asset, how sensitive, who owns it'],
+    flows:['Cloud workload alert → XDR incident → optional Sentinel sync for long-term retention','Sensitive cloud asset → flagged in Defender for Cloud inventory with Purview label visible']},
+
+  'dep-intune':{label:'Microsoft Intune',layer:'Dependencies',color:'#FAECE7',border:'#993C1D',text:'#712B13',
+    what:['Device management (MDM/MAM) for Windows, macOS, iOS, and Android — the device compliance authority','Compliance policy: encryption, patch level, Defender health — all evaluated before access is granted','Compliance state reported to Entra CA — device posture is a primary CA enforcement signal'],
+    why:['Intune compliance is a key CA input alongside identity risk and label sensitivity — I advise on all three together','Clients often have Intune without CA policies referencing it — this is a common gap I close'],
+    flows:['Device compliance state → Entra CA signal — compliant device required for sensitive resource access','Non-compliant device → CA blocks or limits session — download block, read-only enforced','App protection policy → prevents sensitive data leaking from managed to unmanaged apps']},
+
+  'sfi-frame':{label:'Secure Future Initiative',layer:'Overarching frame',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
+    what:['Secure by Design, Secure by Default, Secure Operations — the three principles I reference in every engagement','Six engineering pillars: Identities & Secrets · Tenants & Isolation · Networks · Engineering Systems · Threat Detection · Security Response','Progress reports (Sept 2024, Apr 2025, Nov 2025) — I cite these to show clients Microsoft accountability posture'],
+    why:['SFI gives me a credible framework to position Microsoft security investment as strategic, not just tactical','It maps cleanly to my advisory scope: Entra → Identities · XDR → Threat Detection · Sentinel → Response · Purview → all six'],
+    flows:['SFI patterns published as customer-facing guidance — I use these in architecture reviews','SFI standards operationalised inside Microsoft product teams — visible as product defaults that benefit clients']},
+
+  'iac-foundations':{label:'IaC Foundations',layer:'IaC / DevSecOps',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
+    // github: [{label:'Project name',url:'https://github.com/...'}]
+    github:[],
+    what:['I advise on Bicep and ARM as native Azure IaC — version-controlled, peer-reviewed, drift-detectable','Terraform via AzureRM and AzureAD/Entra providers — preferred for multi-cloud and complex Entra scenarios','GitOps pattern — Git as single source of truth; PRs gate every infrastructure change before it reaches production','Policy as Code — Azure Policy definitions in the same repo as infra templates, tested in CI before apply'],
+    why:['IaC is the prerequisite for auditable security controls — I will not deliver controls that were click-ops configured','Manual changes leave no review trail and drift silently; IaC makes security posture verifiable'],
+    flows:['IaC PR → MSDO/GHAS scan → SARIF findings published to Defender for Cloud','Merged template → Azure Resource Manager → Policy compliance check runs automatically','Config drift detected → GitHub Issue raised → reconciliation workflow triggered']},
+
+  'iac-sentinel':{label:'Sentinel as Code',layer:'IaC / DevSecOps',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
+    what:['Workspace deployment via Bicep/ARM — Log Analytics, data connectors, and retention settings version-controlled','Analytics rules as YAML — Scheduled and NRT KQL rules deployed via GitHub Actions or Azure Pipelines','Playbooks (Logic Apps) as ARM templates — SOAR automation reviewed and version-controlled like production code','Watchlists and workbooks stored as JSON/CSV in repo — deployed on PR merge, not manual import'],
+    why:['SOC content drift between environments is a common problem I help fix — IaC makes staging and prod identical','Rollback of a bad detection rule should take seconds, not a manual process — GitOps enables this'],
+    flows:['Rule PR → KQL syntax validation → peer review → deploy to Sentinel workspace via pipeline','Playbook ARM change → pipeline deploy → Sentinel automation rule updated automatically','Workspace Bicep → deployed by GitHub Actions → Defender for Cloud monitors compliance']},
+
+  'iac-entra':{label:'Entra as Code',layer:'IaC / DevSecOps',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
+    what:['CA policies via Microsoft Graph API + Terraform Entra provider or Bicep — every policy change peer-reviewed','PIM role settings and assignments in Terraform or Graph PowerShell — version-controlled and auditable','Named locations, authentication strength, and MFA policy declaratively managed in Git','Entra Agent ID registrations version-controlled alongside the agent workloads they govern'],
+    why:['CA policy changes are high-risk — I insist on IaC with staging-tenant testing before any production apply','Shadow CA policies created manually are a recurring finding in client security reviews; IaC prevents this'],
+    flows:['CA policy PR → tested in staging tenant → approved merge → Graph API deploys to production','PIM config change → Terraform plan reviewed → apply → audit event flows to Sentinel','Agent ID registration → IaC deploy → CA policy automatically scoped to agent identity']},
+
+  'iac-purview':{label:'Purview as Code',layer:'IaC / DevSecOps',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
+    what:['Sensitivity labels and label policies as JSON — deployed via Microsoft Graph or Compliance PowerShell in CI/CD','DLP policies exported as JSON, stored in Git, redeployed via approved pipeline change — no manual edits','Retention labels and policies managed via Graph API or Compliance PowerShell in the same pipeline','Data Map scanning rules and custom classifiers version-controlled and pipeline-deployed across environments'],
+    why:['Label and DLP policy sprawl is the most common Purview governance failure I find — IaC enforces a single taxonomy','Consistent label policies across dev, staging, and production tenants prevents classification gaps at source'],
+    flows:['Label policy PR → compliance review → Graph API deploy → propagates to M365 + Fabric + Databricks','DLP rule change → simulation mode test in staging → merge → deploy → audit event confirms activation','Scanning rule update → Purview rescans affected sources → new classifications surface in Unified Catalog']},
+
+  'iac-dfc':{label:'Defender for Cloud as Code',layer:'IaC / DevSecOps',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
+    what:['CSPM initiative assignments — NIST, PCI, CIS standards assigned via Bicep/Policy as Code across landing zones','Workflow automations — Logic App playbooks for alert response deployed as ARM templates, not click-configured','Alert suppression rules stored in Git — PR approval required before any suppression reaches production','Defender plan enablement per subscription managed via Bicep — prevents accidental plan disablement'],
+    why:['Suppression rules and plan changes are high-risk changes; I require IaC with mandatory review for both','Enterprise-Scale deployments need consistent CSPM posture across all landing zones — IaC is the only way to guarantee it'],
+    flows:['Initiative assignment PR → Azure Policy deploy → Secure Score recalculates and reflects new scope','Workflow automation ARM change → pipeline deploy → triggers on matching Defender for Cloud alert','Plan enablement Bicep → deployed into landing zone → Defender for Cloud monitors all child subscriptions']},
+
+  'iac-pipeline':{label:'Pipeline Security',layer:'IaC / DevSecOps',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
+    what:['MSDO — ADO/GitHub extension running Checkov, Terrascan, and Trivy; SARIF published to Defender for Cloud','GHAS — code scanning, secret scanning (blocks committed secrets), dependency review on every PR','Azure Policy as Code — policy definitions in repo, deployed via pipeline with What-If validation before apply','PR gates — branch protection enforces MSDO scan pass and peer approval before any IaC merge'],
+    why:['Shift-left is the argument I use with DevOps teams: misconfigs caught in PR cost nothing versus post-deployment','SARIF gives code-to-cloud traceability — I use this to show clients how a pipeline finding maps to a cloud resource'],
+    flows:['PR opened → GHAS secret scan + MSDO IaC scan → PR annotations block merge on High severity findings','SARIF uploaded → Defender for Cloud DevOps security console → correlated with cloud resource posture','Policy What-If validation → no-diff merges fast-tracked → apply → compliance state reported to Defender for Cloud']}
+};
+/* Node fill → modal bg color map */
+const nodeFill={
+  'c-purple':'#3D368F','c-blue':'#154F8E','c-coral':'#7A2C14',
+  'c-green':'#1E4A08','c-amber':'#6A3E08','c-teal':'#08503C',
+  'c-gray':'#323230'
+};
+const nodeBorder={
+  'c-purple':'#7068C8','c-blue':'#3D7EC4','c-coral':'#B85838',
+  'c-green':'#4A8022','c-amber':'#A86E28','c-teal':'#168860',
+  'c-gray':'#585856'
+};
+/* Venn pillar → bg override (lighter fill from Venn circles) */
+const vennBg={
+  'ov-pu':'#2E2870','ov-de-solo':'#0E3D6B','ov-en-solo':'#5C2410',
+  'ov-pd':'#26215C','ov-all':'#2C2C2A','ov-pe':'#4A1B0C','ov-de':'#042C53'
+};
+
+function renderGithub(k,d){
+  const projects=d.github||[];
+  const el=document.getElementById('gh-section-'+k);
+  if(!el)return;
+  if(projects.length===0)return; // already shown as greyed out
+  // Toggle expanded list
+  const existing=document.getElementById('gh-list-'+k);
+  if(existing){existing.remove();document.getElementById('gh-btn-'+k).textContent='GitHub projects ↗';return;}
+  const list=document.createElement('div');
+  list.id='gh-list-'+k;
+  list.style.cssText='margin-top:8px;display:flex;flex-direction:column;gap:6px';
+  projects.forEach(p=>{
+    const a=document.createElement('a');
+    a.href=p.url;a.target='_blank';a.rel='noopener noreferrer';
+    a.textContent='↗ '+p.label;
+    a.style.cssText='color:#fff;font-size:12px;opacity:0.85;text-decoration:underline;text-underline-offset:2px';
+    list.appendChild(a);
+  });
+  el.appendChild(list);
+  document.getElementById('gh-btn-'+k).textContent='GitHub projects ↗ (hide)';
+}
+
+function show(k){
+  // Strict whitelist: D keys are alphanumeric+hyphen. Sanitizes URL-hash input for CodeQL js/xss.
+  if(typeof k!=='string'||!/^[a-z0-9-]{1,32}$/i.test(k))return;
+  const d=D[k];if(!d)return;
+  const modal=document.getElementById('modal');
+  let bg=vennBg[k]||null;
+  let border='rgba(255,255,255,0.15)';
+  if(!bg){
+    const el=document.querySelector(`[onclick="show('${k}')"]`);
+    if(el){
+      for(const cls of Object.keys(nodeFill)){
+        if(el.classList.contains(cls)){bg=nodeFill[cls];border=nodeBorder[cls];break;}
+      }
+    }
+  }
+  modal.style.background=bg||'#1e1e1c';
+  modal.style.border=`1px solid ${border}`;
+  const projects=d.github||[];
+  const hasProjects=projects.length>0;
+  const ghBtn=hasProjects
+    ?`<button id="gh-btn-${k}" class="db" style="color:#fff;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);padding:4px 12px;border-radius:6px" onclick="renderGithub('${k}',D['${k}'])">GitHub projects ↗</button>`
+    :`<button class="db" disabled style="color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);padding:4px 12px;border-radius:6px;cursor:default">No projects linked yet</button>`;
+  document.getElementById('modal-body').innerHTML=`<div class="ph"><span class="bdg" style="background:rgba(255,255,255,0.15);color:#fff;border:0.5px solid rgba(255,255,255,0.3)">${d.label}</span><span class="ltag">${d.layer}</span></div><div class="cols"><div class="col"><h4>What I advise on</h4><ul>${d.what.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="col"><h4>Why it matters to clients</h4><ul>${d.why.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="col"><h4>How signals flow</h4><ul>${d.flows.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div id="gh-section-${k}" style="margin-top:.5rem">${ghBtn}</div>`;
+  modal.scrollTop=0;
+  document.getElementById('modal-backdrop').classList.add('on');
+}
+function closeModal(){
+  document.getElementById('modal-backdrop').classList.remove('on');
+}
+function handleBackdropClick(e){
+  if(e.target===document.getElementById('modal-backdrop'))closeModal();
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')closeModal();
+});
+
+/* Deep-link: open node panel from URL hash e.g. ms_security_compass.html#ov-pu */
+function handleHash(){
+  const id=window.location.hash.slice(1);
+  if(id&&D[id])show(id);
+}
+window.addEventListener('hashchange',handleHash);
+window.addEventListener('load',handleHash);
+</script>
+
+</body>
+</html>
