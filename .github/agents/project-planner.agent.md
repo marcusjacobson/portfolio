@@ -30,10 +30,11 @@ Accept any one of:
    - **Views:** at minimum a Board grouped by Status and a Table sorted by Priority.
 4. **Discover items.** Resolve the input into concrete issue URLs via `gh issue list --label <l> --state open --json number,url,title`. For unbacked ideas, draft issue titles + bodies and (with user OK) create them via `gh issue create --body-file <tmp>` using the pwsh body-file pattern.
 5. **Create the project.** Run `scripts/gh/create-project.ps1 -Title "<title>"`. Capture the project URL.
-6. **Apply the schema.** Use `gh project field-create` for each field that the script doesn't seed. Default fields (Title, Status, Assignees) come for free.
-7. **Seed items.** For each issue URL, run `scripts/gh/add-issue-to-project.ps1 -ProjectUrl <url> -ItemUrl <issue-url>`.
-8. **Document.** Add a short `wiki/Projects.md` entry (or update the existing one) with: title, link, scope, success criteria, and a link to the seeding command run. Open a PR for the wiki edit.
-9. **Report.**
+6. **Link to the repo.** Run `gh project link <number> --owner <owner> --repo <owner>/<repo>` so the project appears under the repo's **Projects** tab. Projects v2 are owned at the user/org level — linking is what surfaces them on the repo.
+7. **Apply the schema.** Use `gh project field-create` for each field that the script doesn't seed. Default fields (Title, Status, Assignees) come for free.
+8. **Seed items.** For each issue URL, run `scripts/gh/add-issue-to-project.ps1 -ProjectUrl <url> -ItemUrl <issue-url>`.
+9. **Document.** Add a short `wiki/Projects.md` entry (or update the existing one) with: title, link, scope, success criteria, and a link to the seeding command run. Open a PR for the wiki edit.
+10. **Report.**
 
 ## Dynamic regrouping and redundancy checks
 
