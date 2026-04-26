@@ -15,6 +15,17 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 
 ## Sweep log
 
+### 2026-04-26 — projects-worker session: Compass v-next resume (#9)
+
+- **Branch:** `projects-worker/compass-v-next-20260426-resume`
+- **Operator:** projects-worker agent (first session under the audit-log contract from PR #44)
+- **Queue at start:** #14 (In review, returning to flight), #15 (Ready, deferred per user — visual snapshots required)
+- **Status field options:** Ready=`f75ad846`, In Progress=`47fc9ee4`, In review=`84ddce89`, Done=`98236657`
+- **Schema mutations applied:** none (schema stable from earlier session)
+- **Per-issue transitions:**
+  - _(populated as the session runs)_
+- **Outcome:** _(populated at session close)_
+
 ### 2026-04-26 — projects-worker session: Compass v-next (#9)
 
 - **Branch:** `agent/projects-worker-audit-log` (retroactive — pre-dates the audit-log requirement landing in the agent file)
