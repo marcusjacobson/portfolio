@@ -13,12 +13,35 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 | [10](https://github.com/users/marcusjacobson/projects/10) | LinkedIn / Portfolio Sync | Rolling backlog for the `@linkedin-sync` agent build (#24–#30) and any gap-finding issues it generates on later runs. Schema adds **Source** (agent-build / gap-finding / best-practice). |
 | [11](https://github.com/users/marcusjacobson/projects/11) | Cloud Agent Enablement | One-shot deliverable to enable the GitHub-hosted Copilot cloud agent (Agents tab + `@copilot` assignment): `AGENTS.md`, `copilot-setup-steps.yml`, `agent-task` template, MCP allow-list, smoke test, docs. Issues #32–#40. Schema adds **Source** (config / docs / smoke-test). Complementary to project #10 via Option B manual handoff: LinkedIn-Sync emits gap issues in the `agent-task` template; humans triage and assign `@copilot`. |
 | [12](https://github.com/users/marcusjacobson/projects/12) | Bug Tracker | Rolling backlog for every issue tagged `bug`. Schema adds **Priority** (p0–p3), **Severity** (Critical/Major/Minor/Trivial), **Area** (html/css/docs/wiki/workflow), **Reported** (date). Status: Backlog → Triaged → In progress → In review → Done. Auto-seeded by the `Bug auto-add to project` workflow (`.github/workflows/bug-autoadd.yml`); the `@bug-intake` agent files the issue with the `bug` label and the workflow adds it to project #12. First item: #57 (tagline width). |
+| [13](https://github.com/users/marcusjacobson/projects/13) | Microsoft Security Portfolio Roadmap | Rolling roadmap for the 16 forward-looking labs and capstones described in `staging-inbox/ms_security_projects_roadmap_v1.html`. Schema adds **Priority** (p0–p3), **Pillar** (Capstone / Cross-pillar / Purview / Defender + Sentinel / Entra / Azure / Security Copilot), **Tier** (Capstone / Standard), **Target date**. Hybrid item strategy: 3 Active items as tracking issues (#73, #74, #75) so they show up in repo issue search; 5 capstones + 10 standard Planned items as draft items (work lives in dedicated repos, not here). |
 
 ## Secrets
 
 - **`BUG_PROJECT_TOKEN`** — **classic PAT** with the `project` scope (full control). Used by `.github/workflows/bug-autoadd.yml` to add issues to user-scope project #12. A classic token is required because fine-grained PATs do not currently support user-owned Projects v2 (only org-owned), and the default `GITHUB_TOKEN` cannot write Projects v2 at all. Include `repo` scope as well if the repo ever goes private. Rotate every 12 months or sooner; if expired, the workflow run errors (the issue itself shows no symptom). Repository secret name: `BUG_PROJECT_TOKEN`.
 
 ## Sweep log
+
+### 2026-04-26 — create Microsoft Security Portfolio Roadmap project (#13)
+
+Inputs: user request via `@project-planner` — "create me a project plan for this sample page I created for upcoming and in-progress projects" (`staging-inbox/ms_security_projects_roadmap_v1.html`). 16 forward-looking items: 5 capstones, 1 cross-pillar, 2 Purview, 4 Defender + Sentinel, 3 Entra, 2 Azure, 1 Security Copilot. 3 of those 16 are Active (Purview-as-Code Repo, Azure-as-Code Comprehensive IaC Repo, Security Copilot On-Demand Lab Toggle); the rest are Planned.
+
+Decisions:
+
+- **New project #13 "Microsoft Security Portfolio Roadmap"** — 16 items easily clears the 3-item threshold; no overlap with #2, #9, #10, #11, #12.
+- **Schema:** custom fields `Priority` (p0/p1/p2/p3), `Pillar` (Capstone / Cross-pillar / Purview / Defender + Sentinel / Entra / Azure / Security Copilot), `Tier` (Capstone / Standard), `Target date` (date). Default `Status` (Todo / In Progress / Done) kept.
+- **Hybrid item strategy (Option C):**
+  - 3 Active roadmap entries → tracking issues in `marcusjacobson/portfolio` so they're visible in repo issue search and can be linked from PRs: #73 Purview-as-Code Repo, #74 Azure-as-Code, #75 Security Copilot On-Demand Lab Toggle. All three labeled `priority:p1` and seeded into project #13 with `Status=In Progress`, `Tier=Standard`, the matching `Pillar`, and `Priority=p1`.
+  - 13 Planned/Capstone roadmap entries → draft items in project #13 only. The actual implementation lives in dedicated repos (existing or future) — no need to file a stub issue against `portfolio` for each.
+- **Field values applied to all 18 items** via `.tmp/set-fields.ps1` (built from captured field IDs and option IDs, then deleted with the rest of `.tmp/`). 5 capstones get `Tier=Capstone, Pillar=Capstone`; everything else `Tier=Standard` with the matching pillar.
+- **Views:** default `Status` board ships with the project. Custom `Pillar` table view and `Target date` roadmap view need to be added in the UI — `gh project` has no view-create command. Captured as a follow-up.
+- **Linked to repo** — appears on the Projects tab.
+
+Redundancy report (post-state):
+
+- 0 issues appear in two or more projects (#73/#74/#75 are only in #13).
+- 0 project pairs with ≥50% item overlap (project #13 is disjoint from #2, #9, #10, #11, #12).
+- 0 sunset candidates.
+- Roadmap source page `staging-inbox/ms_security_projects_roadmap_v1.html` is still in the staging inbox — promoting it to a top-level page is out of scope for this sweep.
 
 ### 2026-04-26 — create Bug Tracker project (#12)
 
