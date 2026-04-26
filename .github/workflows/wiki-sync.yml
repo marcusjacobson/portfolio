@@ -1,0 +1,42 @@
+name: Wiki Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'wiki/**'
+      - '.github/workflows/wiki-sync.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Sync wiki/ to GitHub wiki
+        env:
+          GH_TOKEN: ${{ secrets.WIKI_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          REPO="${{ github.repository }}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.wiki.git" wiki-target
+          # Mirror: replace wiki contents with repo's wiki/ folder
+          find wiki-target -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          cp -R repo/wiki/. wiki-target/
+          cd wiki-target
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Wiki already up to date."
+            exit 0
+          fi
+          git commit -m "Sync wiki from ${{ github.sha }}"
+          git push

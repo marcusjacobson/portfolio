@@ -1,0 +1,31 @@
+name: Bug report
+description: Something on the portfolio site is broken or wrong.
+labels: [bug, needs-triage]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Affected page
+      placeholder: index.html
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you saw vs. what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. ...
+  - type: input
+    id: browser
+    attributes:
+      label: Browser / OS
+      placeholder: e.g. Edge 126 on Windows 11

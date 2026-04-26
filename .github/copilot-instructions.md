@@ -1,0 +1,46 @@
+# Repo conventions for Copilot
+
+This is a static HTML portfolio site published to GitHub Pages. There is **no build step** for the site itself — every `*.html` page must be browser-runnable as-is from the repo root.
+
+## Site authoring
+
+- Pages live at the repo root: `index.html`, `ms_security_roles.html`, `ms_security_projects.html`, `certification_strategy.html`. Keep this filename scheme.
+- Inline CSS and JS are acceptable for self-contained pages; if you extract assets, place them under `assets/` and reference with relative paths.
+- Every page must have `<!DOCTYPE html>`, `<html lang="en">`, a `<title>`, and a meta viewport tag.
+- All `<img>` tags must have `alt` attributes (enforced by `htmlhint`).
+- Prefer system fonts; if you load an external font, use `rel="preconnect"` and `display=swap`.
+- Do not commit secrets, PATs, or personal data. `gitleaks` runs on every PR.
+
+## Tooling layout
+
+| Folder | Purpose |
+|--------|---------|
+| `.github/workflows/` | CI: deploy, previews, link-check, lint, visual regression, CodeQL, gitleaks, wiki sync |
+| `.github/instructions/` | Scoped Copilot guidance (auto-attaches by `applyTo`) |
+| `.github/prompts/` | Slash-command tasks (publish, secure review, staging, triage) |
+| `.github/agents/` | Specialized chat agents (publish-manager, security-reviewer, repo-ops) |
+| `scripts/` | PowerShell ops scripts (migration, branch protection, gh CLI helpers) |
+| `tests/` | Lychee config, Playwright config, visual specs and snapshots |
+| `wiki/` | Wiki-as-code source. Synced one-way to the GitHub wiki by `wiki-sync.yml` |
+| `staging-inbox/` | Gitignored drop zone for the Claude project export |
+
+## Hard rules
+
+- **Never edit `tests/visual/__snapshots__/` by hand.** Regenerate with `npm run test:visual:update`.
+- **Never commit changes to `gh-pages-previews` branch from a working tree.** It is owned by the `pr-preview.yml` workflow.
+- **Never push directly to `main`.** Open a PR; checks must be green.
+- **Pin Action versions** in `.github/workflows/*.yml`. Use major version tags (`@v4`) at minimum; SHAs preferred for third-party actions.
+- **`permissions:` is required** on every workflow. Default to `contents: read` and elevate per job only as needed.
+
+## Commit & PR style
+
+- Commit messages: imperative subject, ≤72 chars; body explains *why* if non-obvious.
+- PR title: same style as commit subject.
+- PR description must include: summary, screenshots for visual changes, link to the preview URL (auto-posted by `pr-preview.yml`), and a tested checklist.
+
+## When the user asks to publish, review, or stage
+
+- Publishing → use `/publish-update` prompt or the `@publish-manager` agent.
+- Security review → use `/secure-code-review` prompt or `@security-reviewer` agent.
+- Preview triage → use `/stage-preview`.
+- Issues / Projects / Wiki ops → use `@repo-ops` (uses `gh` CLI and the GitHub MCP server).

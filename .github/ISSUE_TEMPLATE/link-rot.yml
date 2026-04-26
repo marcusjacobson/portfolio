@@ -1,0 +1,10 @@
+name: Link rot
+description: Auto-filed by the scheduled link-check workflow when external links break.
+labels: [link-rot, automated]
+body:
+  - type: textarea
+    id: report
+    attributes:
+      label: Lychee report
+    validations:
+      required: true

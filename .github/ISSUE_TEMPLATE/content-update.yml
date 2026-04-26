@@ -1,0 +1,22 @@
+name: Content update
+description: Update or add content to an existing portfolio page.
+labels: [content-update, needs-triage]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page to update
+      placeholder: ms_security_projects.html
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What should change?
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source / reference
+      description: Link or paste the source material backing this update.

@@ -1,0 +1,108 @@
+name: PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr-content
+
+      - name: Checkout previews branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages-previews
+          path: previews
+        continue-on-error: true
+
+      - name: Initialize previews branch if missing
+        run: |
+          if [ ! -d previews/.git ]; then
+            mkdir -p previews
+            cd previews
+            git init -b gh-pages-previews
+            git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+            echo "<h1>PR Previews</h1>" > index.html
+          fi
+
+      - name: Stage preview content
+        run: |
+          PR=${{ github.event.pull_request.number }}
+          DEST="previews/pr-${PR}"
+          rm -rf "$DEST"
+          mkdir -p "$DEST"
+          rsync -a --exclude='.git' --exclude='.github' --exclude='scripts' --exclude='tests' --exclude='wiki' --exclude='staging-inbox' pr-content/ "$DEST/"
+
+      - name: Commit and push preview
+        run: |
+          cd previews
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No preview changes to push."
+            exit 0
+          fi
+          git commit -m "Preview: PR #${{ github.event.pull_request.number }} @ ${{ github.event.pull_request.head.sha }}"
+          git push "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:gh-pages-previews
+
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const url = `https://${owner}.github.io/${repo}/pr-${pr}/`;
+            const marker = '<!-- pr-preview-comment -->';
+            const body = `${marker}\n**PR Preview:** ${url}\n\nUpdated for commit \`${context.payload.pull_request.head.sha.slice(0,7)}\`.`;
+            const comments = await github.rest.issues.listComments({ owner, repo, issue_number: pr });
+            const existing = comments.data.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr, body });
+            }
+
+  cleanup-preview:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout previews branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages-previews
+          path: previews
+        continue-on-error: true
+
+      - name: Remove preview folder
+        run: |
+          PR=${{ github.event.pull_request.number }}
+          DEST="previews/pr-${PR}"
+          if [ -d "$DEST" ]; then
+            rm -rf "$DEST"
+            cd previews
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "Cleanup preview for PR #${PR}"
+            git push "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:gh-pages-previews
+          else
+            echo "No preview folder to clean."
+          fi

@@ -1,0 +1,27 @@
+# Lychee link checker config
+# https://lychee.cli.rs/usage/config/
+
+include_verbatim = true
+max_concurrency = 8
+max_retries = 2
+retry_wait_time = 2
+timeout = 20
+accept = [200, 206, 301, 302, 304, 308, 403, 429]
+exclude_path = [
+    "node_modules",
+    "playwright-report",
+    "test-results",
+    "staging-inbox",
+    ".github/instructions",
+    ".github/prompts",
+    ".github/agents",
+]
+exclude = [
+    # Local file references inside templates
+    "^file://",
+    # Localhost
+    "^https?://localhost",
+    "^https?://127\\.0\\.0\\.1",
+    # Example placeholders
+    "example\\.com",
+]
