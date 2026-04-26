@@ -18,10 +18,10 @@ You are helping the user ship a content or styling update to the portfolio site.
 4. **Commit.** Imperative subject, ≤72 chars. Body explains *why* if non-obvious.
 5. **Push & PR.** Push the branch and use `gh pr create` with:
    - Title: same as commit subject.
-   - Body: Summary, "Tested via" checklist, and a placeholder line `Preview: <auto-posted by pr-preview.yml>`.
+   - Body: Summary and "Tested via" checklist.
    - Labels: `content` (if HTML changed), `style` (if CSS changed), `chore` (otherwise).
 6. **Watch checks.** Run `gh pr checks --watch` and report the result.
-7. **Hand off.** Tell the user the preview URL (from PR comment) and what they should review before merging.
+7. **Hand off.** Tell the user what they should review locally before merging.
 
 ## Constraints
 

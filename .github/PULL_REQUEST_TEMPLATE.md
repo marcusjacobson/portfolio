@@ -7,10 +7,7 @@
 ## Tested
 - [ ] `npm run lint` passes locally
 - [ ] `npm run test:visual` passes locally (or baselines updated)
-- [ ] Manually verified affected pages in the preview URL below
-
-## Preview
-<!-- Auto-posted by pr-preview.yml -->
+- [ ] Manually verified affected pages by opening the HTML files locally
 
 ## Security review
 - [ ] No new external scripts without SRI

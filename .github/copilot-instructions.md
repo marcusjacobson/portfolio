@@ -27,7 +27,6 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 ## Hard rules
 
 - **Never edit `tests/visual/__snapshots__/` by hand.** Regenerate with `npm run test:visual:update`.
-- **Never commit changes to `gh-pages-previews` branch from a working tree.** It is owned by the `pr-preview.yml` workflow.
 - **Never push directly to `main`.** Open a PR; checks must be green.
 - **Pin Action versions** in `.github/workflows/*.yml`. Use major version tags (`@v4`) at minimum; SHAs preferred for third-party actions.
 - **`permissions:` is required** on every workflow. Default to `contents: read` and elevate per job only as needed.
@@ -36,11 +35,10 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 
 - Commit messages: imperative subject, ≤72 chars; body explains *why* if non-obvious.
 - PR title: same style as commit subject.
-- PR description must include: summary, screenshots for visual changes, link to the preview URL (auto-posted by `pr-preview.yml`), and a tested checklist.
+- PR description must include: summary, screenshots for visual changes, and a tested checklist.
 
 ## When the user asks to publish, review, or stage
 
 - Publishing → use `/publish-update` prompt or the `@publish-manager` agent.
 - Security review → use `/secure-code-review` prompt or `@security-reviewer` agent.
-- Preview triage → use `/stage-preview`.
 - Issues / Projects / Wiki ops → use `@repo-ops` (uses `gh` CLI and the GitHub MCP server).
