@@ -2,6 +2,8 @@
 
 Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy sweeps run by `@project-planner`.
 
+> Projects v2 are owned at the user level. They surface on the repo's **Projects** tab via `gh project link`. Both projects below are linked to `marcusjacobson/portfolio`.
+
 ## Active projects
 
 | # | Title | Scope |
