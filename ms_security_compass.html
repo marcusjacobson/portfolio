@@ -758,6 +758,8 @@ function renderGithub(k,d){
 }
 
 function show(k){
+  // Strict whitelist: D keys are alphanumeric+hyphen. Sanitizes URL-hash input for CodeQL js/xss.
+  if(typeof k!=='string'||!/^[a-z0-9-]{1,32}$/i.test(k))return;
   const d=D[k];if(!d)return;
   const modal=document.getElementById('modal');
   let bg=vennBg[k]||null;
