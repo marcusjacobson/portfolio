@@ -38,7 +38,7 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 1. Open the Claude "Portfolio" project, download the files into `staging-inbox/` (gitignored).
 2. Run [scripts/migrate-from-claude.ps1](scripts/migrate-from-claude.ps1) `-DryRun` to preview, then again without `-DryRun` to copy.
 3. `npm install` (one-time) so the linters and Playwright are available locally.
-4. Open a feature branch, commit, push, open a PR — the preview URL is auto-commented on the PR.
+4. Open a feature branch, commit, push, open a PR — quality checks run automatically. Open the changed HTML files locally to review.
 5. After all required checks have a green run on `main` at least once, run [scripts/apply-branch-protection.ps1](scripts/apply-branch-protection.ps1) to lock down direct pushes.
 
 ## Repo layout
@@ -46,9 +46,9 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 | Path | Purpose |
 |------|---------|
 | `*.html` | The site. Served as-is by GitHub Pages. |
-| [.github/workflows/](.github/workflows/) | CI: deploy, PR previews, link/HTML/CSS/visual checks, CodeQL, gitleaks, wiki sync, labeler. |
+| [.github/workflows/](.github/workflows/) | CI: deploy, link/HTML/CSS/visual checks, CodeQL, gitleaks, wiki sync, labeler. |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) + [.github/instructions/](.github/instructions/) | Repo-wide and scoped Copilot guidance. |
-| [.github/prompts/](.github/prompts/) | Slash-command tasks: `/publish-update`, `/secure-code-review`, `/stage-preview`, `/triage-issue`, `/groom-backlog`. |
+| [.github/prompts/](.github/prompts/) | Slash-command tasks: `/publish-update`, `/secure-code-review`, `/triage-issue`, `/groom-backlog`. |
 | [.github/agents/](.github/agents/) | Chat agents: `@publish-manager`, `@security-reviewer`, `@repo-ops`. |
 | [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/) + [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) | Templates for repeatable intake. |
 | [.github/labels.yml](.github/labels.yml) | Canonical label set. Synced via [scripts/gh/sync-labels.ps1](scripts/gh/sync-labels.ps1). |
@@ -63,7 +63,6 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | `pages-deploy.yml` | push to `main` | Builds and deploys the site via the modern Pages Actions flow. |
-| `pr-preview.yml` | PR open/sync/close | Pushes each PR to a `pr-N/` folder on the `gh-pages-previews` branch and comments the URL on the PR. |
 | `link-check.yml` | PR + weekly cron | Lychee link checker; opens a `link-rot` issue on scheduled failures. |
 | `html-css-lint.yml` | PR (paths) | `htmlhint` + `stylelint`. |
 | `visual-regression.yml` | PR (paths) | Playwright snapshots across mobile/tablet/desktop. |
@@ -72,12 +71,7 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 | `labeler.yml` | PR | Path-based auto-labeling from `.github/labeler.yml`. |
 | `wiki-sync.yml` | push to `main` (paths: `wiki/**`) | Mirrors `wiki/` to the GitHub wiki. |
 
-> **PR preview hosting note.** GitHub Pages can only serve from one source. With `pages-deploy.yml` set to "GitHub Actions" source, the `gh-pages-previews` branch is **not** auto-served. Two options:
->
-> 1. **Recommended (single repo, single host):** switch Pages source to "Deploy from a branch" (`main` root for production, plus `gh-pages-previews` for previews via a custom subpath strategy), OR
-> 2. Host previews on a second target (Cloudflare Pages, Netlify Drop, a sibling repo). The `pr-preview.yml` workflow's branch-push step can be retargeted with minor edits.
->
-> Decide before applying branch protection so the required checks list matches reality.
+> **No PR previews.** Reviewers open the changed HTML files locally (`start index.html`). Visual regression, lint, and link-check provide automated confidence; a hosted preview URL was deemed unnecessary for a small static site. To add previews later, connect the repo to Cloudflare Pages or Netlify — both auto-deploy per-PR URLs without changes here.
 
 ## Local commands
 
@@ -100,7 +94,7 @@ npm run test:visual:update   # accept new baselines
 
 In VS Code chat:
 
-- Type `/` and pick `publish-update`, `secure-code-review`, `stage-preview`, `triage-issue`, or `groom-backlog`.
+- Type `/` and pick `publish-update`, `secure-code-review`, `triage-issue`, or `groom-backlog`.
 - In the agent picker, choose `publish-manager`, `security-reviewer`, or `repo-ops`.
 - The GitHub MCP server (defined in [.vscode/mcp.json](.vscode/mcp.json)) prompts for a PAT on first use; the token is never written to disk.
 
