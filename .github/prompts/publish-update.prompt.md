@@ -1,5 +1,6 @@
 ---
 description: "Guided publish flow for portfolio updates: branch, summary, screenshot capture, label, and PR creation."
+readme-summary: "Guided publish flow: branch, summarize changes, capture screenshots, label the PR, and open it."
 argument-hint: "Brief description of the update"
 agent: "agent"
 ---

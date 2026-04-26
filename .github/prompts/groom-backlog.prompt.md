@@ -1,5 +1,6 @@
 ---
 description: "Backlog grooming pass: list open issues, identify duplicates, stale items, and unlabeled work; propose a prioritized batch for the next iteration."
+readme-summary: "Backlog grooming pass: list open issues, flag duplicates, stale items, and unlabeled work; propose a prioritized batch for the next iteration."
 agent: "agent"
 ---
 

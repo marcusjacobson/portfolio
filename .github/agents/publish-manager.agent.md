@@ -1,5 +1,6 @@
 ---
 description: "Use when orchestrating a portfolio publish: validate locally, branch, commit, push, open PR, and watch checks. Coordinates content, lint, and visual checks before staging."
+readme-summary: "Orchestrates a portfolio publish: local validation, branch, commit, push, PR, and check-watching."
 tools: [read, edit, search, execute, todo]
 ---
 

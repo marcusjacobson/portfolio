@@ -1,5 +1,6 @@
 ---
 description: "Use when reviewing PR diffs for XSS, secrets, supply-chain risks, unsafe workflow permissions, and CDN trust. Read-only."
+readme-summary: "Reviews a PR diff for XSS, secret leakage, supply-chain risk, unsafe workflow permissions, and CDN trust."
 tools: [read, search, execute]
 ---
 

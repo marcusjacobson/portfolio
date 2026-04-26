@@ -1,5 +1,6 @@
 ---
 description: "Secure code review of a PR diff: scans for XSS, secret leakage, supply-chain risk, and unsafe inline scripts; integrates CodeQL and gitleaks results."
+readme-summary: "Secure review of a PR diff: scans for XSS, secret leakage, supply-chain risk, and unsafe inline scripts; integrates CodeQL and gitleaks results."
 argument-hint: "PR number (or 'current branch')"
 agent: "agent"
 ---

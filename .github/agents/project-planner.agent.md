@@ -1,5 +1,6 @@
 ---
 description: "Use to scope and create a GitHub Project (v2) from a theme, milestone, or cluster of issues. Decides if a new project is warranted, designs fields and views, runs scripts/gh/create-project.ps1, and seeds items via add-issue-to-project.ps1."
+readme-summary: "Scopes and creates a GitHub Project (v2) from a theme or cluster of issues. Designs fields/views and seeds items via `scripts/gh/`."
 tools: [read, edit, search, execute, github/*, todo]
 ---
 

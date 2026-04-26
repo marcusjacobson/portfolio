@@ -1,6 +1,6 @@
 # Agents
 
-Specialized chat agents (`*.agent.md`) you can summon in Copilot Chat with `@<agent-name>`. Each agent owns a narrow workflow and hands off to others rather than doing everything itself. This file is the human-readable index — keep it in sync with the `description:` frontmatter of each agent file. Use [`/sync-agent-prompt-readmes`](../prompts/sync-agent-prompt-readmes.prompt.md) to regenerate the **Index** table below.
+Specialized chat agents (`*.agent.md`) you can summon in Copilot Chat with `@<agent-name>`. Each agent owns a narrow workflow and hands off to others rather than doing everything itself. This file is the human-readable index — keep it in sync with the `readme-summary:` frontmatter of each agent file (the agent runtime separately consumes `description:`). Use [`/sync-agent-prompt-readmes`](../prompts/sync-agent-prompt-readmes.prompt.md) to regenerate the **Index** table below.
 
 ## Index
 

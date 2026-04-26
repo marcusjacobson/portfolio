@@ -1,5 +1,6 @@
 ---
 description: "Use to work an entire GitHub Project (v2): pick the next eligible issue, hand it to the issue-resolver agent, update the project status, and repeat until the project is empty or the user halts."
+readme-summary: "Drains a GitHub Project (v2) by picking the next eligible item and handing each one to `@issue-resolver`, updating Status as it goes."
 tools: [read, edit, search, execute, github/*, todo]
 ---
 

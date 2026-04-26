@@ -1,12 +1,22 @@
 ---
 description: "Scans .github/agents/ and .github/prompts/ and rewrites the Index tables in both READMEs from current frontmatter. Idempotent. Does not touch hand-authored sections."
+readme-summary: "Scans `.github/agents/` and `.github/prompts/` and rewrites the Index tables in both READMEs from the current `readme-summary:` (or `description:`) frontmatter."
 argument-hint: "(no arguments)"
 agent: "agent"
 ---
 
 # Sync agent and prompt READMEs
 
-Rebuild the **Index** tables inside `.github/agents/README.md` and `.github/prompts/README.md` from the `description:` frontmatter of every `*.agent.md` / `*.prompt.md` file in those folders.
+Rebuild the **Index** tables inside `.github/agents/README.md` and `.github/prompts/README.md` from the frontmatter of every `*.agent.md` / `*.prompt.md` file in those folders.
+
+## Source of truth for the Purpose column
+
+The **Purpose** column is rendered from frontmatter using the following precedence:
+
+1. `readme-summary:` — short, repo-aware human prose tuned for these READMEs. **Use this when it exists** so the rendered table is byte-identical to what a human would hand-write.
+2. `description:` — fallback only. The agent-router selection text is keyword-rich and verbose; rendering it raw produces wordier rows than the curated style.
+
+Why two fields: `description:` is consumed by the agent/prompt router for relevance matching and is tuned for that audience. `readme-summary:` is consumed by this prompt and is tuned for human readers of the README index. They evolve independently.
 
 ## Inputs
 
@@ -18,7 +28,8 @@ None. The prompt operates on whatever is currently checked out.
 - **Idempotent.** Running this prompt twice in a row must produce zero diff.
 - **Bounded edits.** Only the regions delimited by `<!-- BEGIN: agents-index -->` / `<!-- END: agents-index -->` and `<!-- BEGIN: prompts-index -->` / `<!-- END: prompts-index -->` may change. Everything else (How they fit together, Conventions, See also, etc.) is hand-authored and must remain byte-identical.
 - **Read-only on missing markers.** If either marker pair is missing from a README, abort with an error pointing the user at the file. Do not invent the markers.
-- **Skip files without `description:`.** Warn but do not fail.
+- **Prefer `readme-summary:` over `description:`.** Fall back to `description:` only when `readme-summary:` is missing, and warn so a maintainer can add the field.
+- **Skip files without any summary field.** Warn but do not fail.
 
 ## Steps
 
@@ -36,11 +47,11 @@ foreach ($f in '.github/agents/README.md','.github/prompts/README.md') {
 
 For each `.github/agents/*.agent.md`:
 
-1. Parse YAML frontmatter; read `description:`.
-2. Skip the file if `description:` is absent (warn).
+1. Parse YAML frontmatter; read `readme-summary:` if present, otherwise `description:`. If neither is present, skip the file and warn.
+2. If only `description:` was found, emit a warning suggesting the maintainer add a `readme-summary:` field.
 3. Derive **Agent** column: `[`@<name>`](<filename>)` where `<name>` is the basename without `.agent.md`.
-4. Derive **Purpose** column: paraphrase the description into 1–2 sentences. Strip leading "Use to "/"Use when "/"Specialized " noise. Keep imperative voice.
-5. Derive **Mutates repo?** column from explicit signals in the description:
+4. Derive **Purpose** column: use the chosen summary verbatim if it came from `readme-summary:`. If it came from `description:`, paraphrase into 1–2 sentences and strip leading "Use to "/"Use when "/"Specialized " noise.
+5. Derive **Mutates repo?** column from explicit signals in the `description:` field (always read this from `description:`, never from `readme-summary:` — the description is keyword-rich and consistently includes mutation-scope signals; the readme-summary is short prose that often omits them):
    - Contains "read-only" or "Read-only by default" → `Read-only` (or `Read-only until approval` if "until approval" / "without explicit user approval" appears).
    - Contains "creates", "merges", "pushes", "opens PR", "drives the gh CLI" → `Yes`.
    - Project-creating agents → `Yes (project + items)`.
@@ -52,8 +63,8 @@ Preserve the existing row order from the README when a row already exists; appen
 
 For each `.github/prompts/*.prompt.md`:
 
-1. Parse YAML frontmatter; read `description:`.
-2. Skip the file if `description:` is absent (warn).
+1. Parse YAML frontmatter; read `readme-summary:` if present, otherwise `description:`. If neither is present, skip the file and warn.
+2. If only `description:` was found, emit a warning suggesting the maintainer add a `readme-summary:` field.
 3. Derive **Prompt** column: `[`/<name>`](<filename>)` where `<name>` is the basename without `.prompt.md`.
 4. Derive **Purpose** column the same way as for agents.
 5. **Typical follow-up** column is hand-curated — preserve whatever the existing README row says. For new prompts with no prior row, leave it as `_TBD_` and warn the user to fill it in.
