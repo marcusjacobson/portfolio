@@ -42,3 +42,16 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 - Publishing → use `/publish-update` prompt or the `@publish-manager` agent.
 - Security review → use `/secure-code-review` prompt or `@security-reviewer` agent.
 - Issues / Projects / Wiki ops → use `@repo-ops` (uses `gh` CLI and the GitHub MCP server).
+
+## Request intake (always-on)
+
+For **any new feature/bug/chore-shaped request** the user makes in this repo, before implementing, route it through the `@request-intake` agent. The intake agent classifies the request, drafts a GitHub issue, checks for duplicates, picks a project home, and waits for explicit approval before mutating anything.
+
+Skip intake when:
+
+- The user is asking a question (answer directly).
+- The user is mid-flow on an existing issue or PR (continue that flow).
+- The user explicitly says `skip intake`, `just do it`, `quick fix`, or names a target file and asks for a direct edit.
+- The change is a typo, a single-line content tweak, or a comment edit (use direct edit + branch + PR; no issue needed).
+
+When in doubt, ask once: "Track this as an issue, or handle it inline?" Default to inline if the user already named a file and an action.
