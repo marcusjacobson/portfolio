@@ -133,10 +133,13 @@ Project routing:
     No project — file unattached, link later
     Hand off to project-planner — cluster: #<a>, #<b>, plus this new issue
 
+Branch (created on approval):
+  <type>/<issue#>-<slug>   # filled in once issue# is known
+
 Duplicates checked:
   None.   |   #<n> "<title>" (similarity <%>) — <recommendation>
 
-Next handoff (after issue is filed):
+Next handoff (after issue is filed and branch is created):
   <one of>
     issue-resolver — implement now (only suggest for p0/p1)
     projects-worker — let it pick up in the next batch
@@ -153,7 +156,7 @@ Do not invoke any `gh` mutation. Acceptable approvals from the user:
 
 ### 7. Mutate (only after approval)
 
-Run, in order, echoing each command:
+These steps are **mandatory and ordered** on every confirmed intake. Do not skip step 1 or step 2 — even when the implementation looks small or the user is already at their keyboard ready to edit. Echo each command before running it.
 
 1. **Create the issue** using the pwsh body-file pattern (single-quoted here-string, never inline backtick-escaped):
    ```pwsh
@@ -164,14 +167,25 @@ Run, in order, echoing each command:
    $body | Set-Content $tmp -Encoding UTF8
    gh issue create --title "<title>" --label "<l1>,<l2>,<l3>" --body-file $tmp
    ```
-2. **Add to project** if approved:
+   Capture the returned issue number as `<issue#>` and URL as `<issue-url>`.
+2. **Create the working branch** off the latest `main`. The branch name is derived from classification + issue number + slug:
+   ```pwsh
+   git fetch origin main
+   git switch main
+   git pull --ff-only
+   git switch -c <type>/<issue#>-<slug>   # e.g., feat/42-add-contact-form, docs/47-agents-readme, chore/51-extract-card-css
+   ```
+   - `<type>` is one of `feat`, `fix`, `chore`, `docs` (matches the classification).
+   - `<slug>` is 2–5 hyphen-separated words derived from the title, lowercase, no punctuation.
+   - This step runs **even when this agent is not the implementer** — it guarantees that whoever picks up the issue (the user, `issue-resolver`, `projects-worker`) starts on a non-`main` branch.
+3. **Add to project** if approved:
    ```pwsh
    scripts/gh/add-issue-to-project.ps1 -ProjectUrl <url> -ItemUrl <issue-url>
    ```
    Or, if the script is missing, use `gh project item-add <projectNumber> --owner marcusjacobson --url <issue-url>`.
-3. **Set project fields** if known (Priority, Size). Use `gh project item-edit` with the field id captured in step 2's discovery.
-4. **Hand off** only if the user explicitly said so:
-   - `issue-resolver` — pass `<issue#>` and stop.
+4. **Set project fields** if known (Priority, Size). Use `gh project item-edit` with the field id captured in step 2's discovery.
+5. **Hand off** only if the user explicitly said so:
+   - `issue-resolver` — pass `<issue#>` and the branch name, then stop.
    - `projects-worker` — only if the user names a project to drain.
    - `project-planner` — pass the cluster of related issue numbers.
 
@@ -181,20 +195,24 @@ Final output:
 
 ```
 Filed:    #<n> — <title> — <url>
+Branch:   <type>/<n>-<slug> (checked out, 0 commits)
 Project:  <link or "unattached">
 Labels:   <labels>
 Handoff:  <agent name or "none">
 ```
 
+After this report, the implementer (the user, `@issue-resolver`, or another agent) commits work on the branch and opens a PR linked to `#<n>`. This agent does not commit code itself.
+
 ## Hard rules
 
 - **Read-only by default.** No `gh issue create`, `gh project item-add`, or label mutation without explicit user approval in the same turn the proposal was presented.
 - **One issue per request.** If the user's prompt covers multiple distinct asks, surface the split as part of the proposal (`I see 2 separable items — file as 2 issues?`) and wait.
-- **No code edits.** This agent does not modify repository files. If implementation is the obvious next step, state which agent to invoke and stop.
-- **Never push to `main`.** This agent never branches or commits — those are the implementer's job.
+- **No code edits.** This agent does not modify repository files. After filing the issue and creating the branch, hand off — do not commit.
+- **Never work directly on `main`.** Every confirmed intake produces both an issue *and* a branch (step 7.1 + 7.2). The implementer commits on that branch only.
+- **Issue first, always.** No file edits, no branches, no commits before `gh issue create` succeeds. This applies even to `.github/`, `wiki/`, README updates, and other "meta" changes — they are still tracked work.
 - **Quote the user.** The first line of the issue body's `## Context` section should paraphrase or quote the user's original request so the trail back to source is preserved.
 - **Don't invent labels.** If `.github/labels.yml` doesn't define the label you need, recommend adding it via `repo-ops` instead.
-- **Skip yourself for trivial edits.** Typo fixes, single-line tweaks, and "rename this variable" type asks should go straight to a normal direct-edit + branch + PR flow. State that decision out loud and stop.
+- **Trivial-edit carveout is narrow.** Only true one-character typo fixes and comment-only edits may skip the issue. They still require a branch and a PR — never a direct push to `main`. When in doubt, file the issue.
 
 ## Output discipline
 
