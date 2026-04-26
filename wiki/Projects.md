@@ -28,7 +28,8 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 - **Queue at start (Ready):** #85, #86, #87, #88, #89, #90, #91 (sequential, --max=7)
 - **Status field options captured:** Ready=`f75ad846`, In progress=`47fc9ee4`, In review=`2aee1b22`, Done=`98236657`
 - **Schema mutations applied:** rename Todo→Ready (id `f75ad846`), rename "In Progress"→"In progress" (id `47fc9ee4`), add new option "In review" (id `2aee1b22`). Single `updateProjectV2Field` GraphQL mutation against fieldId `PVTSSF_lAHOBvMdD84BVzd8zhRMjT0`. Approved by user message "go 1" on 2026-04-26 (handoff to `@project-planner`, executed and reported back before this session opened).
-- **Per-issue transitions:** _(none yet — awaiting user approval to start)_
+- **Per-issue transitions:**
+  - #85 Ready → In progress at 2026-04-26T15:08:36-07:00
 - **Outcome:** _(in flight)_
 
 ### 2026-04-26 — create Microsoft Security Portfolio Roadmap project (#13)
