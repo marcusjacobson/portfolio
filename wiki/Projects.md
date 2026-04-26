@@ -1,0 +1,28 @@
+# Projects audit log
+
+Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy sweeps run by `@project-planner`.
+
+## Active projects
+
+| # | Title | Scope |
+|---|---|---|
+| [2](https://github.com/users/marcusjacobson/projects/2) | Certification/Education Path | Cert pipeline (cross-repo, includes legacy `marcusjacobson_portfolio` items + repo issue #13 for the Certifications page roadmap). Schema: vendor, exam Code, status, vendor Path/Order. |
+| [9](https://github.com/users/marcusjacobson/projects/9) | Compass v-next | Coherent next-pass on `ms_security_compass.html`. Issues: #11 sendPrompt fallback, #14 GitHub link granularity, #15 mobile responsiveness. |
+
+## Sweep log
+
+### 2026-04-26 — first portfolio sweep (PR #21 follow-up)
+
+Inputs surveyed: 6 open issues (#11–#16), 2 existing projects (#2, #8).
+
+Decisions:
+- **Add #13 to project #2** — issue is about visualizing the Certifications page that the project already drives. Regrouping into existing rather than creating a new project.
+- **Create project #9 "Compass v-next"** with #11, #14, #15 — single-theme cluster (all touch the Compass HTML), threshold met (≥3 items).
+- **Sunset project #8** — empty, untitled, no activity. Deleted.
+- **Skip project for #12, #16** — single-theme but below the 3-item threshold or already a meta tracker. Recommended labels/milestone instead.
+
+Redundancy report (post-state):
+- 0 issues appear in two or more projects.
+- 0 projects with ≥50% item overlap.
+- 0 sunset candidates remaining.
+- Unattached open issues: #12, #16 (intentionally loose).
