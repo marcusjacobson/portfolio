@@ -45,7 +45,9 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 
 ## Request intake (always-on)
 
-For **any new feature/bug/chore-shaped request** the user makes in this repo, before implementing, route it through the `@request-intake` agent. The intake agent classifies the request, drafts a GitHub issue, checks for duplicates, picks a project home, and waits for explicit approval before mutating anything.
+For **any new feature/bug/chore-shaped request** the user makes in this repo, before implementing, route it through the appropriate intake agent. The intake agent classifies the request, drafts a GitHub issue, checks for duplicates, picks a project home, and waits for explicit approval before mutating anything.
+
+Bug-shaped requests (broken, regressed, or buggy behavior — "X is broken on mobile", "the modal scrolls past the viewport", a screenshot of something visibly wrong) route to `@bug-intake` first. It uses a bug-specific template (repro steps, expected/actual, environment, evidence) and routes to a dedicated bug-tracking project. All other shapes — features, chores, docs, ambiguous asks — route to `@request-intake`. If `@bug-intake` decides the request isn't actually a bug, it defers back to `@request-intake`.
 
 Skip intake when:
 
