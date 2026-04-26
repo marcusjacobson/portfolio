@@ -801,6 +801,14 @@ function handleHash(){
 }
 window.addEventListener('hashchange',handleHash);
 window.addEventListener('load',handleHash);
+
+/* Fallback: ensure sendPrompt() exists when the page is loaded standalone
+   (outside the Claude.ai iframe host that normally injects it). */
+if (typeof sendPrompt === 'undefined') {
+  window.sendPrompt = function(text) {
+    window.open('https://claude.ai/new?q=' + encodeURIComponent(text), '_blank');
+  };
+}
 </script>
 
 </body>
