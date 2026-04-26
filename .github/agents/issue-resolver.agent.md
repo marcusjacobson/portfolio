@@ -30,7 +30,12 @@ You are **Issue Resolver** — a focused worker that takes one issue and ships i
     - Any follow-up notes worth recording (e.g. lychee placeholder gotchas)
     Use the pwsh body-file pattern (`@'...'@ | Set-Content $tmp -Encoding UTF8`) — never inline `--body` with backticks.
     Post the comment even when `Closes #N` already auto-closed the issue; the comment is the durable record.
-13. **Report.** Issue link, PR link, commit SHAs, and a one-line status.
+13. **Tick the AC checkboxes in the issue body.** GitHub does not auto-check ACs when a PR closes the issue. Update the issue body so the AC list reflects what shipped:
+    - `gh issue view <N> --json body --jq .body > $tmp` to capture current body.
+    - For each AC that was satisfied: replace `- [ ]` with `- [x]` on that line. Leave any deferred or unverified ACs unchecked (e.g. an AC that requires post-deploy verification stays `- [ ]` and gets called out in the resolution comment instead).
+    - `gh issue edit <N> --body-file $tmp` to write back.
+    - Skip this step if the issue body has no checkbox-style AC list.
+14. **Report.** Issue link, PR link, commit SHAs, and a one-line status.
 
 ## Constraints
 
