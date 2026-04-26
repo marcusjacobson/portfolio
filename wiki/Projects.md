@@ -21,6 +21,16 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 
 ## Sweep log
 
+### 2026-04-26 — projects-worker session: Board Terminology Split (#14)
+
+- **Branch:** `projects-worker/board-terminology-split-20260426-1507` — PR pending
+- **Operator:** projects-worker agent
+- **Queue at start (Ready):** #85, #86, #87, #88, #89, #90, #91 (sequential, --max=7)
+- **Status field options captured:** Ready=`f75ad846`, In progress=`47fc9ee4`, In review=`2aee1b22`, Done=`98236657`
+- **Schema mutations applied:** rename Todo→Ready (id `f75ad846`), rename "In Progress"→"In progress" (id `47fc9ee4`), add new option "In review" (id `2aee1b22`). Single `updateProjectV2Field` GraphQL mutation against fieldId `PVTSSF_lAHOBvMdD84BVzd8zhRMjT0`. Approved by user message "go 1" on 2026-04-26 (handoff to `@project-planner`, executed and reported back before this session opened).
+- **Per-issue transitions:** _(none yet — awaiting user approval to start)_
+- **Outcome:** _(in flight)_
+
 ### 2026-04-26 — create Microsoft Security Portfolio Roadmap project (#13)
 
 Inputs: user request via `@project-planner` — "create me a project plan for this sample page I created for upcoming and in-progress projects" (`staging-inbox/ms_security_projects_roadmap_v1.html`). 16 forward-looking items: 5 capstones, 1 cross-pillar, 2 Purview, 4 Defender + Sentinel, 3 Entra, 2 Azure, 1 Security Copilot. 3 of those 16 are Active (Purview-as-Code Repo, Azure-as-Code Comprehensive IaC Repo, Security Copilot On-Demand Lab Toggle); the rest are Planned.
