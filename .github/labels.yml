@@ -5,6 +5,9 @@
 - name: bug
   color: d73a4a
   description: Something is broken.
+- name: Project
+  color: 5319e7
+  description: Roadmap item tracked on the Security Portfolio Roadmap project board.
 - name: content-update
   color: 0e8a16
   description: Update existing portfolio content.

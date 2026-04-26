@@ -9,6 +9,7 @@ Specialized chat agents (`*.agent.md`) you can summon in Copilot Chat with `@<ag
 |-------|---------|---------------|
 | [`@request-intake`](request-intake.agent.md) | Front door for any feature/chore/docs ask. Classifies the request, drafts an issue, proposes a project home, and waits for approval before filing. | Read-only until approval |
 | [`@bug-intake`](bug-intake.agent.md) | Bug-shaped variant of intake: gathers repro steps, environment, and evidence, then routes to a bug-tracking project. Defers back to `@request-intake` if the report isn't actually a bug. | Read-only until approval |
+| [`@project-intake`](project-intake.agent.md) | Roadmap-shaped variant of intake: drafts a project/roadmap item with Pillar, Tier, Goal, and Next steps; labels it `Project` so the auto-add workflow places it on project #13; then sets Status=Todo. | Read-only until approval |
 | [`@issue-resolver`](issue-resolver.agent.md) | Resolves a single GitHub issue end-to-end: branch, implement, lint, commit, open PR, watch checks, merge. Requires an explicit issue number. | Yes |
 | [`@projects-worker`](projects-worker.agent.md) | Drains a GitHub Project (v2) by picking the next eligible item and handing each one to `@issue-resolver`, updating Status as it goes. | Yes |
 | [`@project-planner`](project-planner.agent.md) | Scopes and creates a GitHub Project (v2) from a theme or cluster of issues. Designs fields/views and seeds items via `scripts/gh/`. | Yes (project + items) |
