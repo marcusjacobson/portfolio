@@ -16,7 +16,7 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 
 ## Secrets
 
-- **`BUG_PROJECT_TOKEN`** — fine-grained PAT (or GitHub App installation token) with `Projects: read+write` on user `marcusjacobson`. Used by `.github/workflows/bug-autoadd.yml` to add issues to project #12. The default `GITHUB_TOKEN` cannot write user-scope Projects v2, which is why a separate token is required. Rotate every 12 months or sooner; if expired, the auto-add workflow fails silently from the issue's perspective (the workflow run itself errors). Repository secret name: `BUG_PROJECT_TOKEN`.
+- **`BUG_PROJECT_TOKEN`** — **classic PAT** with the `project` scope (full control). Used by `.github/workflows/bug-autoadd.yml` to add issues to user-scope project #12. A classic token is required because fine-grained PATs do not currently support user-owned Projects v2 (only org-owned), and the default `GITHUB_TOKEN` cannot write Projects v2 at all. Include `repo` scope as well if the repo ever goes private. Rotate every 12 months or sooner; if expired, the workflow run errors (the issue itself shows no symptom). Repository secret name: `BUG_PROJECT_TOKEN`.
 
 ## Sweep log
 
