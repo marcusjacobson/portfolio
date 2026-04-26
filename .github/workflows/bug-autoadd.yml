@@ -1,0 +1,27 @@
+name: Bug auto-add to project
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: bug-autoadd-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  add-to-project:
+    name: Add bug-labeled issue to Bug Tracker
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'bug') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'bug'))
+    steps:
+      - name: Add issue to project #12
+        uses: actions/add-to-project@244f685bbc3a0a4a9c2c993b75c156b03b350665 # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/12
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
