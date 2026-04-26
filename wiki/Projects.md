@@ -25,7 +25,10 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 - **Follow-up issues filed:** #45 "Migrate 6 project cards to dedicated repos" — rollup tracker for the 6 cards on `ms_security_projects.html` that have no dedicated repo (Fabric Purview Governance Sim, Purview Skills Ramp, Purview Discovery Methods Sim, Entra Zero Trust RBAC, SC-300 Masterclass, Sentinel-as-Code). Labeled `content-update area:html priority:p3`, seeded into project #9. Filed before #14 ships so the resolution comment can reference it.
 - **Per-issue transitions:**
   - #14 In review → In progress at 2026-04-26T19:10Z (resumed under user mapping option 1: minimal — update 2 cards, tag 4 repos, defer 6 to #45)
-- **Outcome:** _(populated at session close)_
+  - #14 In progress → Done — PR [#46](https://github.com/marcusjacobson/portfolio/pull/46), merge `bfe2fce`. Side effect: added `tests/lychee.toml` exclude for private lab repos.
+  - #15 Ready → In progress at 2026-04-26T19:30Z
+  - #15 In progress → Done — PR [#47](https://github.com/marcusjacobson/portfolio/pull/47), merge `2d70ca2`. First-time visual baseline lock approved verbatim by user: "update snapshots — lock baselines and ship #15". Scope creep documented in PR: Playwright config ESM→CJS fix and `pages.spec.ts` compass addition were necessary to make AC3 runnable at all.
+- **Outcome:** clean drain. 2/2 worked this session (#14, #15). Combined with prior session: 3/3 of original Compass v-next queue done. Project #9 has 1 open follow-up: #45 (rollup tracker for 6 cards needing dedicated repos, p3, no SLA).
 
 ### 2026-04-26 — projects-worker session: Compass v-next (#9)
 
