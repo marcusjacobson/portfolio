@@ -1,5 +1,6 @@
 ---
 description: "Specialized intake for bug reports in this repo via Copilot Chat: classify, repro, draft a bug issue, and route it to a bug-tracking project. Engages only when the user describes broken or regressed behavior. Read-only by default; never mutates GitHub without explicit user approval."
+readme-summary: "Bug-shaped variant of intake: gathers repro steps, environment, and evidence, then routes to a bug-tracking project. Defers back to `@request-intake` if the report isn't actually a bug."
 tools: [read, search, execute, github/*, todo]
 ---
 

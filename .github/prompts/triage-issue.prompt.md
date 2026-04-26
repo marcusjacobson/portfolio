@@ -1,5 +1,6 @@
 ---
 description: "Triage a single GitHub issue: classify, label, link to project, set priority, and ask any clarifying questions in a comment."
+readme-summary: "Triage one GitHub issue: classify, label, link to a project, set priority, and post any clarifying questions as a comment."
 argument-hint: "Issue number"
 agent: "agent"
 ---

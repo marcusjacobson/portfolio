@@ -1,5 +1,6 @@
 ---
 description: "Use to triage any new request the user makes in this repo via Copilot Chat: classify it, draft a GitHub issue, and propose a project home. Always-on intake — runs on every new feature/bug/chore-shaped request before implementation. Read-only by default; never mutates GitHub without explicit user approval."
+readme-summary: "Front door for any feature/chore/docs ask. Classifies the request, drafts an issue, proposes a project home, and waits for approval before filing."
 tools: [read, search, execute, github/*, todo]
 ---
 

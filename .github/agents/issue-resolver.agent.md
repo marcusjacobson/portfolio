@@ -1,5 +1,6 @@
 ---
 description: "Use to resolve a single GitHub issue end-to-end: branch, implement, lint, commit, open PR, watch checks, merge. Requires an explicit issue number."
+readme-summary: "Resolves a single GitHub issue end-to-end: branch, implement, lint, commit, open PR, watch checks, merge. Requires an explicit issue number."
 tools: [read, edit, search, execute, github/*, todo]
 ---
 

@@ -1,6 +1,6 @@
 # Prompts
 
-Slash-command prompts (`*.prompt.md`) you can invoke in Copilot Chat with `/<prompt-name>`. Prompts are single-shot workflows — they run to completion against the current context — whereas [agents](../agents/README.md) are conversational and persist across turns. This file is the human-readable index — keep it in sync with the `description:` frontmatter of each prompt file. Use [`/sync-agent-prompt-readmes`](sync-agent-prompt-readmes.prompt.md) to regenerate the **Index** table below.
+Slash-command prompts (`*.prompt.md`) you can invoke in Copilot Chat with `/<prompt-name>`. Prompts are single-shot workflows — they run to completion against the current context — whereas [agents](../agents/README.md) are conversational and persist across turns. This file is the human-readable index — keep it in sync with the `readme-summary:` frontmatter of each prompt file (the prompt runtime separately consumes `description:`). Use [`/sync-agent-prompt-readmes`](sync-agent-prompt-readmes.prompt.md) to regenerate the **Index** table below.
 
 ## Index
 
@@ -11,7 +11,7 @@ Slash-command prompts (`*.prompt.md`) you can invoke in Copilot Chat with `/<pro
 | [`/groom-backlog`](groom-backlog.prompt.md) | Backlog grooming pass: list open issues, flag duplicates, stale items, and unlabeled work; propose a prioritized batch for the next iteration. | Run `/triage-issue` on each item the groom surfaces. |
 | [`/publish-update`](publish-update.prompt.md) | Guided publish flow: branch, summarize changes, capture screenshots, label the PR, and open it. | Invoke [`@publish-manager`](../agents/publish-manager.agent.md) for end-to-end orchestration, or [`@security-reviewer`](../agents/security-reviewer.agent.md) before merge. |
 | [`/secure-code-review`](secure-code-review.prompt.md) | Secure review of a PR diff: scans for XSS, secret leakage, supply-chain risk, and unsafe inline scripts; integrates CodeQL and gitleaks results. | Pair with [`@security-reviewer`](../agents/security-reviewer.agent.md) for deeper review. |
-| [`/sync-agent-prompt-readmes`](sync-agent-prompt-readmes.prompt.md) | Scans `.github/agents/` and `.github/prompts/` and rewrites the Index tables in both READMEs from the current `description:` frontmatter. | None — runs once and reports a diff. |
+| [`/sync-agent-prompt-readmes`](sync-agent-prompt-readmes.prompt.md) | Scans `.github/agents/` and `.github/prompts/` and rewrites the Index tables in both READMEs from the current `readme-summary:` (or `description:`) frontmatter. | None — runs once and reports a diff. |
 <!-- END: prompts-index -->
 
 ## Prompts vs. agents
