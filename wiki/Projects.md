@@ -12,8 +12,25 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 | [9](https://github.com/users/marcusjacobson/projects/9) | Compass v-next | Coherent next-pass on `ms_security_compass.html`. Issues: #11 sendPrompt fallback, #14 GitHub link granularity, #15 mobile responsiveness. |
 | [10](https://github.com/users/marcusjacobson/projects/10) | LinkedIn / Portfolio Sync | Rolling backlog for the `@linkedin-sync` agent build (#24–#30) and any gap-finding issues it generates on later runs. Schema adds **Source** (agent-build / gap-finding / best-practice). |
 | [11](https://github.com/users/marcusjacobson/projects/11) | Cloud Agent Enablement | One-shot deliverable to enable the GitHub-hosted Copilot cloud agent (Agents tab + `@copilot` assignment): `AGENTS.md`, `copilot-setup-steps.yml`, `agent-task` template, MCP allow-list, smoke test, docs. Issues #32–#40. Schema adds **Source** (config / docs / smoke-test). Complementary to project #10 via Option B manual handoff: LinkedIn-Sync emits gap issues in the `agent-task` template; humans triage and assign `@copilot`. |
+| [12](https://github.com/users/marcusjacobson/projects/12) | Bug Tracker | Rolling backlog for every issue tagged `bug`. Schema adds **Priority** (p0–p3), **Severity** (Critical/Major/Minor/Trivial), **Area** (html/css/docs/wiki/workflow), **Reported** (date). Status: Backlog → Triaged → In progress → In review → Done. Seeded by `@bug-intake`; first item #57 (tagline width). |
 
 ## Sweep log
+
+### 2026-04-26 — create Bug Tracker project (#12)
+
+Inputs: user request via `@project-planner` — "I want a project to track any issues that are tagged as bugs." First bug filed under the new `@bug-intake` agent (#57) needed a project home.
+
+Decisions:
+- **New project #12 "Bug Tracker"** — rolling backlog, threshold met because the `bug` label is now part of the routine intake flow (every `@bug-intake` invocation seeds here).
+- **Schema:** custom fields `Priority` (p0/p1/p2/p3), `Severity` (Critical/Major/Minor/Trivial), `Area` (html/css/docs/wiki/workflow), `Reported` (date). Default `Status` field kept (Backlog → Triaged → In progress → In review → Done — option rename deferred to first triage pass).
+- **Linked to repo** — appears on the Projects tab.
+- **Seeded #57** (Hero tagline box width vs card grid) via `scripts/gh/add-issue-to-project.ps1`.
+- **Follow-up suggested (not filed yet):** small workflow to auto-add any newly-opened `bug`-labeled issue to project #12 so future `@bug-intake` runs don't have to seed manually.
+
+Redundancy report (post-state):
+- 0 issues in two or more projects (#57 is only in #12).
+- 0 project pairs with ≥50% overlap (Bug Tracker is disjoint from #2, #9, #10, #11).
+- 0 sunset candidates.
 
 ### 2026-04-26 — projects-worker session: Compass v-next resume (#9)
 
