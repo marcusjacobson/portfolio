@@ -216,7 +216,7 @@ Field values confirmed (Status=Todo, Pillar=<v>, Tier=<v>, Priority=<v>).
 Decide:
   1. Save for later     — leave on the roadmap as a Todo draft (default)
   2. Convert to issue   — open project #13 in the UI, click "Convert to issue" on this draft, then optionally invoke @issue-resolver against the new issue number
-  3. Cancel             — delete the draft (gh project item-delete --id <PVTI_…> --project-id PVT_kwHOBvMdD84BVzLB)
+  3. Cancel             — delete the draft (`gh project item-delete 13 --owner marcusjacobson --id <PVTI_…>`)
 ```
 
 ## Constraints
@@ -225,6 +225,10 @@ Decide:
 - **`Project` label is reserved for real issues** filed outside this agent (handled by `.github/workflows/project-autoadd.yml`). This agent's path bypasses both the label and the workflow.
 - **Status/Pillar/Tier/Priority use `gh project item-edit` with `--single-select-option-id`**, not `--text`.
 - For `gh project item-edit` calls in step 7, `--id` is the **project item id** (`PVTI_…`) returned by `gh project item-create`. If you ever need to update the draft's body later, that requires the **draft content id** (`DI_…`) which is a different value visible under `content.id` in `gh project item-list` output — do not confuse the two.
+- **`gh project` subcommand flag shapes are inconsistent** (verified gh 2.90.0, 2026-04). Memorise:
+  - `item-create <number> --owner <owner> --title --body --format` — no `--body-file`.
+  - `item-edit --id <PVTI_…> --project-id <PVT_…> --field-id ... --single-select-option-id ...` — uses the project node id.
+  - `item-delete <number> --owner <owner> --id <PVTI_…>` — uses the project number, NOT `--project-id`. Do not copy the `--project-id` shape from `item-edit` into `item-delete`; it fails with `unknown flag: --project-id`.
 - Always use a single-quoted pwsh here-string + temp file + `Get-Content -Raw` for the body. Inline `--body "..."` with backticks fails on Windows. **Note:** `gh project item-create` does not support `--body-file` (verified 2026-04 against gh 2.90.0); you must read the file content into a variable and pass it via `--body`.
 - One draft per invocation. If the user proposes multiple roadmap items, file them one at a time so the field-setting calls in step 7 stay simple.
 - Do not invoke other agents (e.g. `@issue-resolver`) without explicit user approval in the same turn.
