@@ -3,13 +3,6 @@ name: HTML & CSS Lint
 on:
   pull_request:
     branches: [main]
-    paths:
-      - '**/*.html'
-      - '**/*.css'
-      - '.htmlhintrc'
-      - '.stylelintrc.json'
-      - 'package.json'
-      - '.github/workflows/html-css-lint.yml'
   workflow_dispatch:
 
 permissions:
