@@ -1,0 +1,73 @@
+# Canonical label set for the portfolio repo.
+# Synced by scripts/gh/sync-labels.ps1.
+
+# Type
+- name: bug
+  color: d73a4a
+  description: Something is broken.
+- name: content-update
+  color: 0e8a16
+  description: Update existing portfolio content.
+- name: new-page
+  color: 1d76db
+  description: Add a new portfolio page.
+- name: chore
+  color: cfd3d7
+  description: Maintenance, tooling, refactor.
+- name: question
+  color: d876e3
+  description: Question or discussion.
+
+# Area
+- name: area:html
+  color: ededed
+- name: area:css
+  color: ededed
+- name: area:workflow
+  color: ededed
+- name: area:wiki
+  color: ededed
+- name: area:docs
+  color: ededed
+
+# Priority
+- name: priority:p0
+  color: b60205
+  description: Critical / blocking
+- name: priority:p1
+  color: d93f0b
+- name: priority:p2
+  color: fbca04
+- name: priority:p3
+  color: 0e8a16
+
+# Lifecycle
+- name: needs-triage
+  color: fef2c0
+- name: link-rot
+  color: c5def5
+  description: External link broke.
+- name: automated
+  color: ededed
+- name: dependencies
+  color: 0366d6
+- name: github-actions
+  color: 0366d6
+- name: npm
+  color: 0366d6
+
+# PR labels (auto-applied by labeler)
+- name: content
+  color: 0e8a16
+- name: style
+  color: 5319e7
+- name: workflow
+  color: 1d76db
+- name: copilot
+  color: 8a2be2
+- name: scripts
+  color: c5def5
+- name: tests
+  color: bfdadc
+- name: wiki
+  color: 5319e7

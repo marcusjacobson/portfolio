@@ -1,0 +1,27 @@
+name: New page
+description: Propose a new page to add to the portfolio.
+labels: [new-page, needs-triage]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Page title
+    validations:
+      required: true
+  - type: input
+    id: filename
+    attributes:
+      label: Proposed filename
+      placeholder: my_new_page.html
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Purpose / audience
+    validations:
+      required: true
+  - type: textarea
+    id: outline
+    attributes:
+      label: Section outline

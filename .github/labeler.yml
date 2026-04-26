@@ -1,0 +1,40 @@
+# Path-based labeler config for the labeler.yml workflow.
+# https://github.com/actions/labeler
+
+content:
+  - changed-files:
+      - any-glob-to-any-file: ['*.html']
+
+style:
+  - changed-files:
+      - any-glob-to-any-file: ['**/*.css']
+
+workflow:
+  - changed-files:
+      - any-glob-to-any-file: ['.github/workflows/**']
+
+copilot:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/copilot-instructions.md'
+          - '.github/instructions/**'
+          - '.github/prompts/**'
+          - '.github/agents/**'
+
+scripts:
+  - changed-files:
+      - any-glob-to-any-file: ['scripts/**']
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: ['tests/**']
+
+wiki:
+  - changed-files:
+      - any-glob-to-any-file: ['wiki/**']
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'package.json'
+          - 'package-lock.json'
