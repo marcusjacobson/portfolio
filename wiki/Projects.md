@@ -11,6 +11,7 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 | [2](https://github.com/users/marcusjacobson/projects/2) | Certification/Education Path | Cert pipeline (cross-repo, includes legacy `marcusjacobson_portfolio` items + repo issue #13 for the Certifications page roadmap). Schema: vendor, exam Code, status, vendor Path/Order. |
 | [9](https://github.com/users/marcusjacobson/projects/9) | Compass v-next | Coherent next-pass on `ms_security_compass.html`. Issues: #11 sendPrompt fallback, #14 GitHub link granularity, #15 mobile responsiveness. |
 | [10](https://github.com/users/marcusjacobson/projects/10) | LinkedIn / Portfolio Sync | Rolling backlog for the `@linkedin-sync` agent build (#24–#30) and any gap-finding issues it generates on later runs. Schema adds **Source** (agent-build / gap-finding / best-practice). |
+| [11](https://github.com/users/marcusjacobson/projects/11) | Cloud Agent Enablement | One-shot deliverable to enable the GitHub-hosted Copilot cloud agent (Agents tab + `@copilot` assignment): `AGENTS.md`, `copilot-setup-steps.yml`, `agent-task` template, MCP allow-list, smoke test, docs. Issues #32–#40. Schema adds **Source** (config / docs / smoke-test). Complementary to project #10 via Option B manual handoff: LinkedIn-Sync emits gap issues in the `agent-task` template; humans triage and assign `@copilot`. |
 
 ## Sweep log
 
@@ -44,4 +45,22 @@ Decisions:
 Redundancy report (post-state):
 - 0 issues in two or more projects.
 - 0 project pairs with ≥50% overlap (project #10 is disjoint from #2 and #9).
+- 0 sunset candidates.
+
+### 2026-04-26 — create Cloud Agent Enablement project (#11)
+
+Inputs: user request — populate the GitHub Agents tab and follow best practices for the hosted Copilot cloud agent on this repo.
+
+Eligibility check: `copilot-swe-agent` is in `marcusjacobson/portfolio`'s `suggestedActors(capabilities: [CAN_BE_ASSIGNED])` list — confirms a paid Copilot tier with cloud agent enabled. Premium-request budget for the smoke test (#39): ~1 request + ~5 Actions minutes, comfortably inside any paid tier's monthly allowance.
+
+Decisions:
+- **New project #11 "Cloud Agent Enablement"** — one-shot deliverable, 9 issues, passes the 3-item threshold.
+- **Drafted 9 issues** covering: `AGENTS.md` (#32), audit `.github/copilot-instructions.md` (#33), `.github/workflows/copilot-setup-steps.yml` (#34), MCP allow-list / firewall posture (#35), `agent-task` label + issue template (#36), `wiki/Agents.md` mapping (#37), `README.md` Agents section (#38), end-to-end smoke test (#39), this audit-log entry (#40).
+- **Schema extension** — added single-select `Source` (config / docs / smoke-test) so progress against the three workstreams is filterable.
+- **Linked to repo** so it surfaces on the Projects tab.
+- **LinkedIn-Sync integration: Option B (manual handoff)** — issue #36 explicitly aligns the `agent-task` template with the gap-issue format that project #10's `@linkedin-sync` agent will emit. No mutation to project #10. Humans stay in the loop on every `@copilot` assignment.
+
+Redundancy report (post-state):
+- 0 issues in two or more projects (project #11 is disjoint from #2, #9, #10).
+- 0 project pairs with ≥50% overlap.
 - 0 sunset candidates.
