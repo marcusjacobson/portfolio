@@ -4,7 +4,7 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 
 ## Site authoring
 
-- Pages live at the repo root: `index.html`, `ms_security_roles.html`, `ms_security_projects.html`, `certification_strategy.html`. Keep this filename scheme.
+- Pages live at the repo root: `index.html`, `ms_security_compass.html`, `ms_security_roles.html`, `ms_security_projects.html`, `certification_strategy.html`, `skills_inventory.html`. Keep this filename scheme (no version suffixes).
 - Inline CSS and JS are acceptable for self-contained pages; if you extract assets, place them under `assets/` and reference with relative paths.
 - Every page must have `<!DOCTYPE html>`, `<html lang="en">`, a `<title>`, and a meta viewport tag.
 - All `<img>` tags must have `alt` attributes (enforced by `htmlhint`).
