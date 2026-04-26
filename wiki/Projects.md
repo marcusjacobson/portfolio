@@ -22,8 +22,9 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 - **Queue at start:** #14 (In review, returning to flight), #15 (Ready, deferred per user — visual snapshots required)
 - **Status field options:** Ready=`f75ad846`, In Progress=`47fc9ee4`, In review=`84ddce89`, Done=`98236657`
 - **Schema mutations applied:** none (schema stable from earlier session)
+- **Follow-up issues filed:** #45 "Migrate 6 project cards to dedicated repos" — rollup tracker for the 6 cards on `ms_security_projects.html` that have no dedicated repo (Fabric Purview Governance Sim, Purview Skills Ramp, Purview Discovery Methods Sim, Entra Zero Trust RBAC, SC-300 Masterclass, Sentinel-as-Code). Labeled `content-update area:html priority:p3`, seeded into project #9. Filed before #14 ships so the resolution comment can reference it.
 - **Per-issue transitions:**
-  - _(populated as the session runs)_
+  - #14 In review → In progress at 2026-04-26T19:10Z (resumed under user mapping option 1: minimal — update 2 cards, tag 4 repos, defer 6 to #45)
 - **Outcome:** _(populated at session close)_
 
 ### 2026-04-26 — projects-worker session: Compass v-next (#9)
