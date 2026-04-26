@@ -2,7 +2,7 @@
 
 Welcome to the wiki. This is the source of truth for project notes, runbooks, and reference material backing [the portfolio site](https://marcusjacobson.github.io/portfolio/).
 
-> **Editing note:** This wiki is maintained as code in the [`wiki/` folder](https://github.com/marcusjacobson/portfolio/tree/main/wiki) of the repo. Edits made directly here on github.com **will be overwritten** on the next sync. Open a PR against the repo instead.
+> **Editing note:** This wiki is maintained as code in the `wiki/` folder of the [portfolio repo](https://github.com/marcusjacobson/portfolio). Edits made directly here on github.com **will be overwritten** on the next sync. Open a PR against the repo instead.
 
 ## Sections
 
