@@ -59,6 +59,7 @@ If `question`, exit the workflow and answer the user. Do not file anything.
 Run these in parallel before drafting:
 
 - `gh issue list --state open --search "<keywords from request>" --json number,title,labels,url --limit 20` — find duplicates or near-matches.
+- `gh label list --limit 200` — capture the **actual** label set in this repo. The labels you propose in step 3 must be a subset of this list. Do not assume conventional names like `type:feat` exist — many repos only have `area:*` and `priority:*`.
 - `gh project list --owner marcusjacobson --format json` — capture every project with `title`, `number`, `url`, `shortDescription`.
 - For the top 2–3 candidate projects by title/description match: `gh project item-list <n> --owner marcusjacobson --format json --limit 100` — inspect items to gauge fit.
 
@@ -71,7 +72,7 @@ Produce a draft using this shape — do **not** create it yet:
 ```
 Title: <imperative, ≤72 chars>
 
-Labels: <type:feat|bug|chore|docs>, area:<html|workflow|content|tests|tooling>, priority:<p0|p1|p2|p3>
+Labels: <only labels that appear in step 2's `gh label list` output>
 
 Body:
 ## Context
@@ -93,7 +94,7 @@ Acceptance criteria rules:
 - For workflow changes, name the workflow file and the check it must produce.
 - Never write ACs as "implement X" — write them as "X works under condition Y".
 
-Labels must come from `.github/labels.yml`. If the right label doesn't exist, propose adding it via `repo-ops` rather than inventing one.
+Labels must come from the live `gh label list` output captured in step 2 (which reflects `.github/labels.yml` after the last sync). If the right label doesn't exist, propose adding it via `repo-ops` rather than inventing one. **Never include a label in the proposal that wasn't in step 2's output** — `gh issue create` will reject the create if any label is missing, and the agent's read-only-by-default contract means a failed create is a contract violation, not a recoverable error.
 
 Priority defaults:
 
