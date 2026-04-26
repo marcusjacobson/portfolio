@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 
 const PAGES = [
   'index.html',
+  'ms_security_compass.html',
   'ms_security_roles.html',
   'ms_security_projects.html',
   'certification_strategy.html',
