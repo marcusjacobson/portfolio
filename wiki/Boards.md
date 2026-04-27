@@ -17,12 +17,43 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 | [12](https://github.com/users/marcusjacobson/projects/12) | Bug Tracker | Rolling backlog for every issue tagged `bug`. Schema adds **Priority** (p0–p3), **Severity** (Critical/Major/Minor/Trivial), **Area** (html/css/docs/wiki/workflow), **Reported** (date). Status: Backlog → Triaged → In progress → In review → Done. Auto-seeded by the `Bug auto-add to project` workflow (`.github/workflows/bug-autoadd.yml`); the `@bug-intake` agent files the issue with the `bug` label and the workflow adds it to board #12. First item: #57 (tagline width). |
 | [13](https://github.com/users/marcusjacobson/projects/13) | Microsoft Security Portfolio Roadmap | Rolling roadmap for the 16 forward-looking labs and capstones described in `staging-inbox/ms_security_projects_roadmap_v1.html`. Schema adds **Priority** (p0–p3), **Pillar** (Capstone / Cross-pillar / Purview / Defender + Sentinel / Entra / Azure / Security Copilot), **Tier** (Capstone / Standard), **Target date**. Hybrid item strategy: 3 Active items as tracking issues (#73, #74, #75) so they show up in repo issue search; 5 capstones + 10 standard Planned items as draft items (work lives in dedicated repos, not here). |
 | [15](https://github.com/users/marcusjacobson/projects/15) | Portfolio Maturity | Rolling backlog for repo + live-portfolio improvements surfaced against external best-practice sources (Microsoft Learn, GitHub Docs, OWASP, WCAG, repo hygiene). Schema adds **Priority** (p0–p3), **Size** (XS/S/M/L), **Source** (MS Learn / GitHub Docs / OWASP / WCAG / Repo Hygiene / Other), **Target date**. Status: Backlog → Ready → In progress → In review → Done. Seeded by the upcoming `@maturity-scout` agent (issue #110); weekly `maturity-scan.yml` workflow auto-files candidates with `needs-triage` + a `source:*` label. First item: #110 (agent build). |
+| [16](https://github.com/users/marcusjacobson/projects/16) | Wiki & Build-Docs Automation | Rolling backlog for the wiki structure that documents HOW the repo was built (agents, prompts, workflows, deployment rules) **and** the `@wiki-sync` agent that detects repo deltas and routes them through `@request-intake` + `@board-planner`. Schema adds **Priority** (p0–p3), **Size** (XS/S/M/L), **Phase** (Structure / Agent / Automation / Maintenance), **Target date**. Default Status field kept. Seeded with W1–W14 (#136–#149); rehomed #30, #37, #38, #40 from earlier wiki work. The wiki-sync agent (#143) is read-only by default and never edits `wiki/*.md` itself — every wiki update lands as its own tracked issue + branch + PR on this board. |
 
 ## Secrets
 
 - **`BUG_PROJECT_TOKEN`** — **classic PAT** with the `project` scope (full control). Used by `.github/workflows/bug-autoadd.yml` to add issues to user-scope board #12. A classic token is required because fine-grained PATs do not currently support user-owned Projects v2 (only org-owned), and the default `GITHUB_TOKEN` cannot write Projects v2 at all. Include `repo` scope as well if the repo ever goes private. Rotate every 12 months or sooner; if expired, the workflow run errors (the issue itself shows no symptom). Repository secret name: `BUG_PROJECT_TOKEN` (name retained for back-compat — do not rename).
 
 ## Sweep log
+
+### 2026-04-27 — create Wiki & Build-Docs Automation board (#16)
+
+Inputs: user request via `@request-intake` → `@board-planner` — "create a board and relevant tasks to automatically manage the Wiki for this repo... I want the wiki to cover HOW the repo was built - including the agents and prompts that are used and how they interact, the use of GitHub actions, projects (boards), defined deployment rules and the wiki itself. Once we have the wiki structure created, I want an agent I can run that will review my latest repo changes since the last run (keep track of checkin logs) and automatically update the wiki based on any changes."
+
+Mid-flight scope amendment: "ammend the wiki updater to also make sure to invoke request-intake-agent and board-planner-agent to create an action for each update and make sure all updates and PRs are tracked in the new board." → wiki-sync agent re-shaped from direct PR-opener to a detector that hands every delta to `@request-intake` and runs a `@board-planner` sweep at end-of-batch. It never edits `wiki/*.md` itself.
+
+Decisions:
+
+- **New board #16 "Wiki & Build-Docs Automation"** — 14 new + 4 rehomed = 18 items, well above the 3-item threshold. No existing board covers wiki authorship or wiki automation; closest match (#15 Portfolio Maturity) is broader hygiene and would dilute focus.
+- **Schema:** custom fields `Phase` (Structure / Agent / Automation / Maintenance), `Priority` (p0–p3), `Size` (XS/S/M/L), `Target date` (date). Default `Status` field retained.
+- **Linked to repo** — appears on the Projects tab.
+- **Label addition:** `agent:wiki-sync` created live (color `8957e5`); persistence in `.github/labels.yml` tracked by #142 (W7).
+- **Seeded W1–W14** (#136–#149) via `gh issue create --body-file` and `scripts/gh/add-issue-to-board.ps1`. Per-issue working branches pushed to origin (`feat/<n>-<slug>`, `chore/<n>-<slug>`, `docs/<n>-<slug>`) so any implementer starts off `main`.
+- **Rehomed** existing wiki-themed issues #30, #37, #38, #40 onto board #16 (no duplicates filed; each adds context worth keeping).
+- **Wiki-sync execution model (#143 W8):** read-only by default, computes diffs with `git log <last-sha>..origin/main`, classifies each delta against a routing table, hands a pre-classified draft to `@request-intake` (which files the issue + creates the branch + adds to board #16), then hands off to `@board-planner` in portfolio-sweep (read-only) mode. State-file SHA advances only on full-batch resolution; partial batches roll back. Companion agent extensions tracked by #148 (W13 — request-intake) and #149 (W14 — board-planner).
+- **Cron (#146 W11):** disabled by default until #145 (W10 implementation) ships and #147 (W12 dry-run) passes.
+
+Phases:
+
+- **Structure:** #136 Agents.md · #137 Prompts.md · #138 Workflows.md · #139 Repo-Architecture.md · #140 Deployment-Rules.md · #141 Home.md build-mechanics index. Rehomed: #30, #37, #38, #40.
+- **Agent:** #142 label sync · #143 wiki-sync agent design · #144 state file · #145 invocation prompt · #148 extend request-intake · #149 extend board-planner.
+- **Automation/Maintenance:** #146 optional cron · #147 first dry-run.
+
+Redundancy report (post-state):
+
+- 4 issues now appear on two boards by design: #30 (also on board #10 LinkedIn / Portfolio Sync), #37, #38, #40 (also on board #11 Cloud Agent Enablement). Rehomed rather than removed because each retains relevance to its origin board (agent build trail) and adds wiki-mechanics context here. Flagged for review at the next portfolio sweep.
+- 0 board pairs with ≥50% item overlap.
+- 0 sunset candidates.
+- Follow-up note: when #143 + #145 ship, the next sweep should re-run with `@board-planner` portfolio-sweep mode scoped to #15 + #16 to confirm wiki-mechanics issues stay separated from repo-hygiene issues.
 
 ### 2026-04-27 — boards-worker session: Wiki & Build-Docs Automation (#16)
 
