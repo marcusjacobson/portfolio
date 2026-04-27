@@ -14,16 +14,16 @@ concurrency:
 
 jobs:
   add-to-project:
-    name: Add source:repo-hygiene or source:github-docs issue to Portfolio Maturity board
+    name: Add source:repo-hygiene, source:github-docs, or source:wcag issue to Portfolio Maturity board
     runs-on: ubuntu-latest
-    # Trigger when the source:repo-hygiene or source:github-docs label is
-    # applied (either at open time or later). The maturity-scan workflow
-    # files issues and applies one of those labels, which fires this
-    # `labeled` event — the only reliable way to attach issues to a
-    # Projects v2 board from a non-issues trigger.
+    # Trigger when the source:repo-hygiene, source:github-docs, or
+    # source:wcag label is applied (either at open time or later). The
+    # maturity-scan workflow files issues and applies one of those
+    # labels, which fires this `labeled` event — the only reliable way
+    # to attach issues to a Projects v2 board from a non-issues trigger.
     if: >-
-      (github.event.action == 'labeled' && (github.event.label.name == 'source:repo-hygiene' || github.event.label.name == 'source:github-docs')) ||
-      (github.event.action == 'opened' && (contains(github.event.issue.labels.*.name, 'source:repo-hygiene') || contains(github.event.issue.labels.*.name, 'source:github-docs')))
+      (github.event.action == 'labeled' && (github.event.label.name == 'source:repo-hygiene' || github.event.label.name == 'source:github-docs' || github.event.label.name == 'source:wcag')) ||
+      (github.event.action == 'opened' && (contains(github.event.issue.labels.*.name, 'source:repo-hygiene') || contains(github.event.issue.labels.*.name, 'source:github-docs') || contains(github.event.issue.labels.*.name, 'source:wcag')))
     steps:
       - name: Add issue to board #15
         uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2

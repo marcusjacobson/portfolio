@@ -68,8 +68,9 @@ The `.github/workflows/maturity-scan.yml` workflow runs on:
 
 What it does:
 
-- Scope is restricted to `source:repo-hygiene` and `source:github-docs`. The other sources require LLM judgment for relevance and dedupe and stay in on-demand chat mode.
+- Scope is restricted to `source:repo-hygiene`, `source:github-docs`, and `source:wcag`. The other sources require LLM judgment for relevance and dedupe and stay in on-demand chat mode.
 - `source:github-docs` v1 covers the action SHA-pin audit only — it scans every `.github/workflows/*.yml` file and files **one consolidated issue** per run when any `uses:` ref is not pinned to a 40-character commit SHA. Other github-docs checks (CODEOWNERS shape, branch-protection doc completeness) remain on-demand under `@maturity-scout` until added in a follow-up.
+- `source:wcag` v1 covers three regex-only static checks across the six top-level `*.html` portfolio pages: `html-has-lang` (WCAG 3.1.1), `link-name` (WCAG 4.1.2), and `heading-order` (WCAG 1.3.1). Each rule files at most one consolidated issue per run, listing every page that fails. Broader DOM-aware coverage — color contrast, landmark/region rules, full WCAG 2.2 AA — is tracked in #126 (`@axe-core/cli`) and #127 (Playwright + axe-core), and stays out of this v1 scan by design.
 - Runs deterministic file-existence checks against the checkout (no live external fetches).
 - Performs the same dedupe pass against open issues and board items via `gh`.
 - Files each surviving candidate with `needs-triage`, the matching `source:*` label, and the matching `area:*` label.

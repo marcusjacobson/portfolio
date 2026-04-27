@@ -184,6 +184,7 @@ jobs:
               echo ""
               echo "Skipped: MAX cap of $MAX reached by repo-hygiene step."
             } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -228,6 +229,7 @@ jobs:
               echo ""
               echo "Filed: 0 (no unpinned action references found)"
             } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -252,6 +254,7 @@ jobs:
               echo "Suppressed (dedupe): 1"
               echo "  - action SHA-pin audit — overlaps with $MATCH"
             } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -282,9 +285,238 @@ jobs:
             echo "  - $URL — $TITLE"
           } >> "$GITHUB_STEP_SUMMARY"
 
+          NEW_TOTAL=$((FILED_SO_FAR+1))
+          echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
+
+      - name: Run WCAG static a11y checks and file gap issues
+        id: scan_wcag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX="${MAX_FILED}"
+          FILED_SO_FAR="${{ steps.scan_github_docs.outputs.filed_total }}"
+          # Fall back to the repo-hygiene tally if the github-docs step
+          # exited before writing filed_total (defensive — every exit
+          # path now writes it).
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan.outputs.filed }}"
+          fi
+          FILED_SO_FAR="${FILED_SO_FAR:-0}"
+
+          if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
+            echo "Hit MAX ($MAX) in earlier steps; skipping WCAG scan."
+            {
+              echo ""
+              echo "## Maturity Scout — WCAG checks"
+              echo ""
+              echo "Skipped: MAX cap of $MAX reached by earlier steps."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # ---- Scope: top-level *.html only (the six portfolio pages).
+          # Glob with for ... so the scan stays shell-only and does not
+          # recurse into staging-inbox/ or playwright-report/.
+          shopt -s nullglob
+          PAGES=()
+          for f in *.html; do
+            PAGES+=("$f")
+          done
+          shopt -u nullglob
+
+          if [[ "${#PAGES[@]}" -eq 0 ]]; then
+            echo "No top-level *.html pages found; skipping WCAG scan."
+            {
+              echo ""
+              echo "## Maturity Scout — WCAG checks"
+              echo ""
+              echo "Skipped: no top-level portfolio pages."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # ---- Rule 1: html-has-lang (WCAG 3.1.1)
+          # Trigger: <html tag without a lang= attribute on the same
+          # line, OR the file has no <html tag at all. htmlhint's
+          # configured rules in .htmlhintrc do not enforce this.
+          R1_FINDINGS=""
+          R1_COUNT=0
+          for f in "${PAGES[@]}"; do
+            HTML_LINE=$(grep -n -i -m1 '<html' "$f" || true)
+            if [[ -z "$HTML_LINE" ]]; then
+              R1_FINDINGS+=$'- `'"$f"$'` — no `<html>` tag found in document.\n'
+              R1_COUNT=$((R1_COUNT+1))
+              continue
+            fi
+            # Check the matched line for lang= attribute.
+            if ! echo "$HTML_LINE" | grep -qE 'lang[[:space:]]*='; then
+              SNIPPET=$(echo "$HTML_LINE" | sed -E 's/^[0-9]+://; s/^[[:space:]]+//; s/[[:space:]]+$//')
+              R1_FINDINGS+=$'- `'"$f"$'` — `'"$SNIPPET"$'`\n'
+              R1_COUNT=$((R1_COUNT+1))
+            fi
+          done
+
+          # ---- Rule 2: link-name (WCAG 4.1.2)
+          # Trigger: <a ...></a> with empty text, OR <a ...><svg|img></a>
+          # where the inner element has neither alt= nor aria-label=.
+          # htmlhint does not check link text content.
+          R2_FINDINGS=""
+          R2_COUNT=0
+          for f in "${PAGES[@]}"; do
+            FILE_HITS=0
+            FIRST_HIT=""
+            # Empty link: <a ...></a> with only whitespace inside.
+            while IFS= read -r hit; do
+              [[ -z "$hit" ]] && continue
+              FILE_HITS=$((FILE_HITS+1))
+              if [[ -z "$FIRST_HIT" ]]; then
+                FIRST_HIT=$(echo "$hit" | sed -E 's/^[0-9]+://; s/^[[:space:]]+//; s/[[:space:]]+$//')
+              fi
+            done < <(grep -nE '<a[[:space:]][^>]*>[[:space:]]*</a>' "$f" || true)
+            # Icon-only link without alt/aria-label.
+            while IFS= read -r hit; do
+              [[ -z "$hit" ]] && continue
+              # Strip line-number prefix.
+              LINE_BODY="${hit#*:}"
+              # If the inner svg/img tag has alt= or aria-label=, skip.
+              INNER=$(echo "$LINE_BODY" | grep -oE '<(svg|img)[^>]*>' | head -n1 || true)
+              if [[ -z "$INNER" ]]; then
+                continue
+              fi
+              if echo "$INNER" | grep -qE '(alt[[:space:]]*=|aria-label[[:space:]]*=)'; then
+                continue
+              fi
+              FILE_HITS=$((FILE_HITS+1))
+              if [[ -z "$FIRST_HIT" ]]; then
+                FIRST_HIT=$(echo "$hit" | sed -E 's/^[0-9]+://; s/^[[:space:]]+//; s/[[:space:]]+$//')
+              fi
+            done < <(grep -nE '<a[[:space:]][^>]*>[[:space:]]*<(svg|img)[^>]*>[[:space:]]*</a>' "$f" || true)
+            if [[ "$FILE_HITS" -gt 0 ]]; then
+              R2_FINDINGS+=$'- `'"$f"$'` — '"$FILE_HITS"$' empty-or-unlabeled link(s); first: `'"$FIRST_HIT"$'`\n'
+              R2_COUNT=$((R2_COUNT+1))
+            fi
+          done
+
+          # ---- Rule 3: heading-order (WCAG 1.3.1)
+          # Extract heading levels in document order; flag any forward
+          # jump > 1 (h1 -> h3 is bad; h3 -> h1 is OK).
+          # htmlhint does not check heading hierarchy.
+          R3_FINDINGS=""
+          R3_COUNT=0
+          for f in "${PAGES[@]}"; do
+            # Sequence of heading levels as a space-separated list.
+            LEVELS=$(grep -oiE '<h[1-6][^>]*>' "$f" | sed -E 's/^<h([1-6]).*/\1/' | tr '\n' ' ')
+            PREV=0
+            FIRST_SKIP=""
+            SKIP_COUNT=0
+            for lvl in $LEVELS; do
+              if [[ "$PREV" -gt 0 && "$lvl" -gt "$PREV" ]]; then
+                DIFF=$((lvl-PREV))
+                if [[ "$DIFF" -gt 1 ]]; then
+                  SKIP_COUNT=$((SKIP_COUNT+1))
+                  if [[ -z "$FIRST_SKIP" ]]; then
+                    FIRST_SKIP="h${PREV} -> h${lvl}"
+                  fi
+                fi
+              fi
+              PREV="$lvl"
+            done
+            if [[ "$SKIP_COUNT" -gt 0 ]]; then
+              R3_FINDINGS+=$'- `'"$f"$'` — '"$SKIP_COUNT"$' forward heading skip(s); first: `'"$FIRST_SKIP"$'`\n'
+              R3_COUNT=$((R3_COUNT+1))
+            fi
+          done
+
+          # ---- Render + file: one consolidated issue per rule that has
+          # findings. Each rule honours the shared MAX cap.
+          FILED=0
+          SUPPRESSED=0
+          SUMMARY_FILED=""
+          SUMMARY_SUPPRESSED=""
+          SUMMARY_CLEAN=""
+
+          file_rule () {
+            local rule="$1"
+            local title="$2"
+            local count="$3"
+            local findings="$4"
+
+            if [[ "$count" -eq 0 ]]; then
+              SUMMARY_CLEAN+=$'\n  - '"$rule"$': clean'
+              return 0
+            fi
+
+            if [[ $((FILED_SO_FAR + FILED)) -ge "$MAX" ]]; then
+              echo "Hit MAX ($MAX); skipping rule $rule."
+              SUMMARY_SUPPRESSED+=$'\n  - '"$rule"$' — skipped (MAX cap reached)'
+              SUPPRESSED=$((SUPPRESSED+1))
+              return 0
+            fi
+
+            # Dedupe: any open issue with this exact title and source:wcag?
+            local existing match
+            existing=$(gh issue list \
+              --state open \
+              --search "in:title \"$title\" label:source:wcag" \
+              --json number,title,url \
+              --limit 5)
+            match=$(echo "$existing" | jq -r --arg t "$title" \
+              '[.[] | select(.title == $t)] | .[0] // empty | "\(.number)|\(.url)"')
+            if [[ -n "$match" ]]; then
+              echo "Dedup suppressed ($rule): existing open issue $match"
+              SUMMARY_SUPPRESSED+=$'\n  - '"$rule"$' — overlaps with '"$match"
+              SUPPRESSED=$((SUPPRESSED+1))
+              return 0
+            fi
+
+            # Render body from template (parameter expansion only — no
+            # heredoc inside the YAML block scalar; see issue #115).
+            local template body_file
+            template=$(cat .github/workflows/templates/wcag-issue-body.md)
+            template="${template//__RULE__/$rule}"
+            template="${template//__COUNT__/$count}"
+            local trimmed="${findings%$'\n'}"
+            template="${template//__FINDINGS__/$trimmed}"
+            body_file=$(mktemp)
+            printf '%s\n' "$template" > "$body_file"
+
+            echo "Filing ($rule): $title"
+            local url
+            url=$(gh issue create \
+              --title "$title" \
+              --label "needs-triage,source:wcag,area:html" \
+              --body-file "$body_file")
+            rm -f "$body_file"
+
+            FILED=$((FILED+1))
+            SUMMARY_FILED+=$'\n  - '"$url"$' — '"$title"
+          }
+
+          file_rule "html-has-lang" "Add lang attribute to <html> on portfolio pages" "$R1_COUNT" "$R1_FINDINGS"
+          file_rule "link-name" "Fix empty or unlabeled links on portfolio pages" "$R2_COUNT" "$R2_FINDINGS"
+          file_rule "heading-order" "Fix heading-level skips on portfolio pages" "$R3_COUNT" "$R3_FINDINGS"
+
+          {
+            echo ""
+            echo "## Maturity Scout — WCAG checks"
+            echo ""
+            echo "Filed: $FILED"
+            if [[ -n "$SUMMARY_FILED" ]]; then echo "$SUMMARY_FILED"; fi
+            echo ""
+            echo "Suppressed: $SUPPRESSED"
+            if [[ -n "$SUMMARY_SUPPRESSED" ]]; then echo "$SUMMARY_SUPPRESSED"; fi
+            if [[ -n "$SUMMARY_CLEAN" ]]; then
+              echo ""
+              echo "Clean rules:"
+              echo "$SUMMARY_CLEAN"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # Note: filed issues are attached to board #15 by the sibling
       # workflow `.github/workflows/maturity-autoadd.yml`, which fires
-      # on the `labeled` event when the `source:repo-hygiene` or
-      # `source:github-docs` label is applied. `actions/add-to-project`
-      # cannot run inside this scan job because workflow_dispatch /
-      # schedule events have no issue context in the payload.
+      # on the `labeled` event when the `source:repo-hygiene`,
+      # `source:github-docs`, or `source:wcag` label is applied.
+      # `actions/add-to-project` cannot run inside this scan job because
+      # workflow_dispatch / schedule events have no issue context in
+      # the payload.
