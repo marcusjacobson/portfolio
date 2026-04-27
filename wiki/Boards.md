@@ -16,12 +16,32 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 | [11](https://github.com/users/marcusjacobson/projects/11) | Cloud Agent Enablement | One-shot deliverable to enable the GitHub-hosted Copilot cloud agent (Agents tab + `@copilot` assignment): `AGENTS.md`, `copilot-setup-steps.yml`, `agent-task` template, MCP allow-list, smoke test, docs. Issues #32–#40. Schema adds **Source** (config / docs / smoke-test). Complementary to board #10 via Option B manual handoff: LinkedIn-Sync emits gap issues in the `agent-task` template; humans triage and assign `@copilot`. |
 | [12](https://github.com/users/marcusjacobson/projects/12) | Bug Tracker | Rolling backlog for every issue tagged `bug`. Schema adds **Priority** (p0–p3), **Severity** (Critical/Major/Minor/Trivial), **Area** (html/css/docs/wiki/workflow), **Reported** (date). Status: Backlog → Triaged → In progress → In review → Done. Auto-seeded by the `Bug auto-add to project` workflow (`.github/workflows/bug-autoadd.yml`); the `@bug-intake` agent files the issue with the `bug` label and the workflow adds it to board #12. First item: #57 (tagline width). |
 | [13](https://github.com/users/marcusjacobson/projects/13) | Microsoft Security Portfolio Roadmap | Rolling roadmap for the 16 forward-looking labs and capstones described in `staging-inbox/ms_security_projects_roadmap_v1.html`. Schema adds **Priority** (p0–p3), **Pillar** (Capstone / Cross-pillar / Purview / Defender + Sentinel / Entra / Azure / Security Copilot), **Tier** (Capstone / Standard), **Target date**. Hybrid item strategy: 3 Active items as tracking issues (#73, #74, #75) so they show up in repo issue search; 5 capstones + 10 standard Planned items as draft items (work lives in dedicated repos, not here). |
+| [15](https://github.com/users/marcusjacobson/projects/15) | Portfolio Maturity | Rolling backlog for repo + live-portfolio improvements surfaced against external best-practice sources (Microsoft Learn, GitHub Docs, OWASP, WCAG, repo hygiene). Schema adds **Priority** (p0–p3), **Size** (XS/S/M/L), **Source** (MS Learn / GitHub Docs / OWASP / WCAG / Repo Hygiene / Other), **Target date**. Status: Backlog → Ready → In progress → In review → Done. Seeded by the upcoming `@maturity-scout` agent (issue #110); weekly `maturity-scan.yml` workflow auto-files candidates with `needs-triage` + a `source:*` label. First item: #110 (agent build). |
 
 ## Secrets
 
 - **`BUG_PROJECT_TOKEN`** — **classic PAT** with the `project` scope (full control). Used by `.github/workflows/bug-autoadd.yml` to add issues to user-scope board #12. A classic token is required because fine-grained PATs do not currently support user-owned Projects v2 (only org-owned), and the default `GITHUB_TOKEN` cannot write Projects v2 at all. Include `repo` scope as well if the repo ever goes private. Rotate every 12 months or sooner; if expired, the workflow run errors (the issue itself shows no symptom). Repository secret name: `BUG_PROJECT_TOKEN` (name retained for back-compat — do not rename).
 
 ## Sweep log
+
+### 2026-04-26 — create Portfolio Maturity board (#15)
+
+Inputs: user request via `@request-intake` → `@board-planner` — "create an agent that scans the repo on demand or weekly and adds issues to a board for areas I can mature the repo or live portfolio based on Microsoft Learn, GitHub docs, and other well-known best practices; dedupe against existing recommendations." Board needed up front so the agent-build issue and all future scanner output land in one place.
+
+Decisions:
+
+- **New board #15 "Portfolio Maturity"** — rolling backlog. Threshold met because the weekly scanner will continuously feed it; first explicit item is the agent-build issue (#110).
+- **Schema:** custom fields `Priority` (p0/p1/p2/p3), `Size` (XS/S/M/L), `Source` (MS Learn / GitHub Docs / OWASP / WCAG / Repo Hygiene / Other), `Target date` (date). Default `Status` field with options Backlog → Ready → In progress → In review → Done (rename of default options deferred to first triage pass).
+- **Linked to repo** — appears on the Projects tab.
+- **Label additions to `.github/labels.yml`:** `source:ms-learn`, `source:github-docs`, `source:owasp`, `source:wcag`, `source:repo-hygiene`. Synced via `scripts/gh/sync-labels.ps1`. Each scanner-filed issue gets exactly one `source:*` label plus `needs-triage` and `Board`.
+- **Seeded #110** (agent build) via `scripts/gh/add-issue-to-board.ps1`. Branch `feat/110-maturity-scout-agent` cut off latest `main` so the implementer can ship the agent file, weekly workflow, and `wiki/Maturity-Scout.md`.
+- **Follow-up (in-flight):** issue #110 implementation — `.github/agents/maturity-scout.agent.md`, `.github/workflows/maturity-scan.yml`, `wiki/Maturity-Scout.md`, and `agents/README.md` registration. Hand off to `@issue-resolver` when ready.
+
+Redundancy report (post-state):
+
+- 0 issues in two or more boards (#110 is only on #15).
+- 0 board pairs with ≥50% item overlap (board #15 is disjoint from #2, #9, #10, #11, #12, #13).
+- 0 sunset candidates.
 
 ### 2026-04-26 — boards-worker session: Board Terminology Split (#14) — continuation
 

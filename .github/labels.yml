@@ -44,6 +44,23 @@
 - name: priority:p3
   color: 0e8a16
 
+# Source (used by @maturity-scout to tag the origin of a recommendation)
+- name: source:ms-learn
+  color: 0078d4
+  description: Recommendation sourced from Microsoft Learn.
+- name: source:github-docs
+  color: 24292e
+  description: Recommendation sourced from GitHub documentation.
+- name: source:owasp
+  color: 7a1818
+  description: Recommendation sourced from OWASP (Top 10 / ASVS).
+- name: source:wcag
+  color: 1d76db
+  description: Recommendation sourced from WCAG 2.2 accessibility guidelines.
+- name: source:repo-hygiene
+  color: 5319e7
+  description: General repo hygiene best practice (CODEOWNERS, SECURITY.md, dependency review, etc).
+
 # Lifecycle
 - name: needs-triage
   color: fef2c0
