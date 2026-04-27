@@ -1,6 +1,6 @@
 # Projects audit log
 
-Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy sweeps run by `@project-planner`.
+Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy sweeps run by `@board-planner`.
 
 > Projects v2 are owned at the user level. They surface on the repo's **Projects** tab via `gh project link`. All projects below are linked to `marcusjacobson/portfolio`.
 
