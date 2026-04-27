@@ -11,6 +11,7 @@ Welcome to the wiki. This is the source of truth for project notes, runbooks, an
 - [Projects](Projects) — Portfolio showcase Projects (the live site's `ms_security_projects.html`).
 - [Boards](Boards) — GitHub Projects v2 audit log, schemas, and sweep history.
 - [Agents](Agents) — Local chat-mode agents and the hosted Copilot coding agent that build and maintain this repo.
+- [Prompts](Prompts) — Slash-command prompts under `.github/prompts/` and the agents they hand off to.
 - [Workflows](Workflows) — GitHub Actions catalog: triggers, permissions, secrets, and which checks block PR merges.
 - [Publishing-Workflow](Publishing-Workflow) — How content reaches the live site.
 - [Security-Review-Checklist](Security-Review-Checklist) — What gets verified on every PR.
