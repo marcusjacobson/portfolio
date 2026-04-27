@@ -11,8 +11,8 @@ Specialized chat agents (`*.agent.md`) you can summon in Copilot Chat with `@<ag
 | [`@bug-intake`](bug-intake.agent.md) | Bug-shaped variant of intake: gathers repro steps, environment, and evidence, then routes to a bug-tracking project. Defers back to `@request-intake` if the report isn't actually a bug. | Read-only until approval |
 | [`@project-intake`](project-intake.agent.md) | Roadmap-shaped variant of intake: drafts a project/roadmap item with Pillar, Tier, Goal, and Next steps; labels it `Project` so the auto-add workflow places it on project #13; then sets Status=Todo. | Read-only until approval |
 | [`@issue-resolver`](issue-resolver.agent.md) | Resolves a single GitHub issue end-to-end: branch, implement, lint, commit, open PR, watch checks, merge. Requires an explicit issue number. | Yes |
-| [`@projects-worker`](projects-worker.agent.md) | Drains a GitHub Project (v2) by picking the next eligible item and handing each one to `@issue-resolver`, updating Status as it goes. | Yes |
-| [`@project-planner`](project-planner.agent.md) | Scopes and creates a GitHub Project (v2) from a theme or cluster of issues. Designs fields/views and seeds items via `scripts/gh/`. | Yes (project + items) |
+| [`@boards-worker`](boards-worker.agent.md) | Drains a GitHub board (Projects v2) by picking the next eligible item and handing each one to `@issue-resolver`, updating Status as it goes. | Yes |
+| [`@board-planner`](board-planner.agent.md) | Scopes and creates a GitHub board (Projects v2) from a theme or cluster of issues. Designs fields/views and seeds items via `scripts/gh/`. | Yes (board + items) |
 | [`@publish-manager`](publish-manager.agent.md) | Orchestrates a portfolio publish: local validation, branch, commit, push, PR, and check-watching. | Yes |
 | [`@security-reviewer`](security-reviewer.agent.md) | Reviews a PR diff for XSS, secret leakage, supply-chain risk, unsafe workflow permissions, and CDN trust. | Read-only |
 | [`@repo-ops`](repo-ops.agent.md) | Generic catch-all for Issues, Projects, Labels, and Wiki ops driven by `gh` CLI and the GitHub MCP server. Use when no other agent fits. | Yes |
@@ -33,12 +33,12 @@ user request
            │ filed issue                          │
            ▼                                      ▼
    ┌──────────────────┐    cluster?     ┌──────────────────┐
-   │  single item?    │ ──────────────▶ │ @project-planner │
+   │  single item?    │ ──────────────▶ │ @board-planner   │
    └──────────┬───────┘                 └────────┬─────────┘
-              │                                  │ project created
+              │                                  │ board created
               ▼                                  ▼
-      ┌────────────────┐                ┌────────────────────┐
-      │ @issue-resolver│ ◀───────────── │  @projects-worker  │
+      ┌────────────────┐                ┌───────────────────┐
+      │ @issue-resolver│ ◀───────────── │  @boards-worker    │
       └────────┬───────┘                └────────────────────┘
                │ PR open
                ▼

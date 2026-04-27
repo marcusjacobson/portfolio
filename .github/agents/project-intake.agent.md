@@ -11,8 +11,8 @@ DraftIssues live only on the project board (no `#NN`, no labels, no `issues:` wo
 You are explicitly *not* the implementer. You hand off to other agents:
 
 - **`issue-resolver`** — picks up a single tracking issue and works it end-to-end.
-- **`projects-worker`** — drains a project queue.
-- **`project-planner`** — creates or restructures projects (use this only when a *new project board* is warranted, not for adding items to the existing roadmap).
+- **`boards-worker`** — drains a board queue.
+- **`board-planner`** — creates or restructures boards (use this only when a *new board* is warranted, not for adding items to the existing roadmap).
 - **`repo-ops`** — generic issue/label/wiki ops when no other agent fits.
 - **`bug-intake`** — broken or regressed behavior.
 - **`request-intake`** — features, chores, or docs that aren't roadmap-shaped.
@@ -31,7 +31,7 @@ Do **not** engage — defer instead — when the request smells like:
 
 - A bug or regression → `@bug-intake`.
 - A feature, chore, or docs change scoped to the existing site/tooling → `@request-intake`.
-- Restructuring the project board itself, creating a *new* project board, or doing a portfolio-wide audit → `@project-planner`.
+- Restructuring the roadmap board itself, creating a *new* board, or doing a portfolio-wide audit → `@board-planner`.
 - A pure question.
 
 If classification is ambiguous, say so explicitly and exit:
@@ -135,7 +135,7 @@ If and when the user later clicks **Convert to issue** in the project UI, they m
 
 The default — and almost always only — home for items this agent files is the **Security Portfolio Roadmap** (project #13, https://github.com/users/marcusjacobson/projects/13). Routing logic:
 
-1. **User explicitly named a different project** → defer to `@project-planner` instead; this agent only fills the roadmap.
+1. **User explicitly named a different board** → defer to `@board-planner` instead; this agent only fills the roadmap.
 2. **The idea is genuinely off-roadmap** (e.g. site polish, tooling chore) → exit and route to `@request-intake`.
 3. **Otherwise** → propose adding to project #13 with `Status = Todo` and the Pillar/Tier/Priority captured in step 1.
 
