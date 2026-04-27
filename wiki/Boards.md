@@ -17,6 +17,7 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 | [12](https://github.com/users/marcusjacobson/projects/12) | Bug Tracker | Rolling backlog for every issue tagged `bug`. Schema adds **Priority** (p0–p3), **Severity** (Critical/Major/Minor/Trivial), **Area** (html/css/docs/wiki/workflow), **Reported** (date). Status: Backlog → Triaged → In progress → In review → Done. Auto-seeded by the `Bug auto-add to project` workflow (`.github/workflows/bug-autoadd.yml`); the `@bug-intake` agent files the issue with the `bug` label and the workflow adds it to board #12. First item: #57 (tagline width). |
 | [13](https://github.com/users/marcusjacobson/projects/13) | Microsoft Security Portfolio Roadmap | Rolling roadmap for the 16 forward-looking labs and capstones described in `staging-inbox/ms_security_projects_roadmap_v1.html`. Schema adds **Priority** (p0–p3), **Pillar** (Capstone / Cross-pillar / Purview / Defender + Sentinel / Entra / Azure / Security Copilot), **Tier** (Capstone / Standard), **Target date**. Hybrid item strategy: 3 Active items as tracking issues (#73, #74, #75) so they show up in repo issue search; 5 capstones + 10 standard Planned items as draft items (work lives in dedicated repos, not here). |
 | [15](https://github.com/users/marcusjacobson/projects/15) | Portfolio Maturity | Rolling backlog for repo + live-portfolio improvements surfaced against external best-practice sources (Microsoft Learn, GitHub Docs, OWASP, WCAG, repo hygiene). Schema adds **Priority** (p0–p3), **Size** (XS/S/M/L), **Source** (MS Learn / GitHub Docs / OWASP / WCAG / Repo Hygiene / Other), **Target date**. Status: Backlog → Ready → In progress → In review → Done. Seeded by the upcoming `@maturity-scout` agent (issue #110); weekly `maturity-scan.yml` workflow auto-files candidates with `needs-triage` + a `source:*` label. First item: #110 (agent build). |
+| [18](https://github.com/users/marcusjacobson/projects/18) | Triage Queue | Rolling backlog for every issue tagged `needs-triage`. Default Status field (Todo / In Progress / Done) plus custom **Priority** (p0–p3), **Size** (XS/S/M/L), **Target date**. Auto-seeded by the `Triage auto-add to board` workflow (`.github/workflows/triage-autoadd.yml`); any issue labeled `needs-triage` (by `@maturity-scout`, `@triage`, manual, or otherwise) lands here for disposition. Tracks issue #202. |
 | [16](https://github.com/users/marcusjacobson/projects/16) | Wiki & Build-Docs Automation | Rolling backlog for the wiki structure that documents HOW the repo was built (agents, prompts, workflows, deployment rules) **and** the `@wiki-sync` agent that detects repo deltas and routes them through `@request-intake` + `@board-planner`. Schema adds **Priority** (p0–p3), **Size** (XS/S/M/L), **Phase** (Structure / Agent / Automation / Maintenance), **Target date**. Default Status field kept. Seeded with W1–W14 (#136–#149); rehomed #30, #37, #38, #40 from earlier wiki work. The wiki-sync agent (#143) is read-only by default and never edits `wiki/*.md` itself — every wiki update lands as its own tracked issue + branch + PR on this board. |
 
 ## Secrets
@@ -24,6 +25,19 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **`BUG_PROJECT_TOKEN`** — **classic PAT** with the `project` scope (full control). Used by `.github/workflows/bug-autoadd.yml` to add issues to user-scope board #12. A classic token is required because fine-grained PATs do not currently support user-owned Projects v2 (only org-owned), and the default `GITHUB_TOKEN` cannot write Projects v2 at all. Include `repo` scope as well if the repo ever goes private. Rotate every 12 months or sooner; if expired, the workflow run errors (the issue itself shows no symptom). Repository secret name: `BUG_PROJECT_TOKEN` (name retained for back-compat — do not rename).
 
 ## Sweep log
+
+### 2026-04-27 — create Triage Queue board (#18)
+
+Inputs: user request via `@request-intake` → `@board-planner` — "Create a new board that contains any issues labeled as needs triage, ensure all the existing ones get added to the board, and make it so any new items labeled as such get added to the board automatically."
+
+Decisions:
+
+- **New board #18 "Triage Queue"** — no existing board aggregates `needs-triage`-labeled issues across sources (`@maturity-scout` weekly scans, `@triage` agent proposals, ad-hoc manual labelings). Closest analog is #12 Bug Tracker (label-driven auto-add) but scoped to `bug` only.
+- **Schema:** default Status field (Todo → In Progress → Done) plus custom `Priority` (p0–p3), `Size` (XS/S/M/L), `Target date` (date). Default Status retained — Todo represents "needs triage", Done represents "triaged" (item moves on to its destination board or closes).
+- **Linked to repo** — appears on the Projects tab.
+- **Auto-add workflow:** `.github/workflows/triage-autoadd.yml` mirrors `bug-autoadd.yml` 1:1 with label/board substitution. Fires on `issues: [opened, labeled]` when label is `needs-triage`. Pinned to `actions/add-to-project@v1.0.2` SHA `244f685bbc3b7adfa8466e08b698b5577571133e`. Reuses `BUG_PROJECT_TOKEN` (classic PAT, `project` scope) — no new secret.
+- **Initial seeding:** 0 open issues currently carry `needs-triage` (verified via `gh issue list --label needs-triage`). Board starts empty; future labelings populate it automatically.
+- **Tracking issue:** #202.
 
 ### 2026-04-27 — create Wiki & Build-Docs Automation board (#16)
 
