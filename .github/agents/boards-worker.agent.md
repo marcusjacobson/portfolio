@@ -28,7 +28,7 @@ Refuse to start without a board identifier.
    - `gh project view <n> --owner <owner> --format json` — capture title, fields, and the Status field id + option ids.
    - `gh project field-list <n> --owner <owner> --format json` — capture every Status option id (Ready / In Progress / In review / Done at minimum).
    - List items: `gh project item-list <n> --owner <owner> --format json --limit 200`.
-3. **Seed the audit-log entry.** Append a new dated section to `wiki/Projects.md` under the existing audit-log heading on the session branch. The seed entry records: board title + URL, Status option ids captured, the queue snapshot (issue numbers + titles + current Status). Commit with message `Open boards-worker session for <board title>`. Do **not** push yet.
+3. **Seed the audit-log entry.** Append a new dated section to `wiki/Boards.md` under the existing audit-log heading on the session branch. The seed entry records: board title + URL, Status option ids captured, the queue snapshot (issue numbers + titles + current Status). Commit with message `Open boards-worker session for <board title>`. Do **not** push yet.
 4. **Filter the queue.** Keep items where:
    - `content.type == "Issue"` and the issue is **open**.
    - Status equals the requested column (default `Ready`).
@@ -49,7 +49,7 @@ Refuse to start without a board identifier.
 
 ## Audit-log shape
 
-All entries land in `wiki/Projects.md` under the existing audit-log section, newest entry on top. One entry per session:
+All entries land in `wiki/Boards.md` under the existing audit-log section, newest entry on top. One entry per session:
 
 ```markdown
 ### <yyyy-mm-dd> — boards-worker session: <board title> (#<n>)
