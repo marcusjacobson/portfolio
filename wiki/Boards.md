@@ -42,6 +42,9 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #139 In Progress → Done — PR #153, merge `b574752`
   - #137 Todo → In Progress at 2026-04-27
   - #137 stays In progress — blocker: merge conflict in wiki/Home.md between PR #154 and main's recently-merged Sections list updates; tracked as p0 issue #155
+  - #137 unblocked — boards-worker rebased `feat/137-wiki-prompts-page` onto main, hand-merged Sections list (Agents/Prompts/Workflows coexist); #155 auto-closed
+  - #137 In Progress → Done — PR #154, merge `e706f0d`
+  - #140 Todo → In Progress at 2026-04-27
 - **Outcome:** Batch 2 halted at #137. Phase 1 partial (Agents/Workflows/Repo-Architecture done; Prompts/Deployment-Rules/Home-index pending). Blocker issue #155 must clear before #137/#140/#141 proceed.
 
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
