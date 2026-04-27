@@ -36,7 +36,8 @@ Decisions:
 - **Schema:** default Status field (Todo → In Progress → Done) plus custom `Priority` (p0–p3), `Size` (XS/S/M/L), `Target date` (date). Default Status retained — Todo represents "needs triage", Done represents "triaged" (item moves on to its destination board or closes).
 - **Linked to repo** — appears on the Projects tab.
 - **Auto-add workflow:** `.github/workflows/triage-autoadd.yml` mirrors `bug-autoadd.yml` 1:1 with label/board substitution. Fires on `issues: [opened, labeled]` when label is `needs-triage`. Pinned to `actions/add-to-project@v1.0.2` SHA `244f685bbc3b7adfa8466e08b698b5577571133e`. Reuses `BUG_PROJECT_TOKEN` (classic PAT, `project` scope) — no new secret.
-- **Initial seeding:** 0 open issues currently carry `needs-triage` (verified via `gh issue list --label needs-triage`). Board starts empty; future labelings populate it automatically.
+- **Initial seeding:** filing-time `gh issue list --label needs-triage` returned empty (cause unclear — likely transient gh CLI quirk), so the board was shipped empty. Post-merge re-check found 9 open issues already carrying `needs-triage` (#117, #118, #119, #120, #126, #127, #131, #132, #135). Backfilled via `gh project item-add 18 --owner marcusjacobson --url …` loop. Verified per-issue via `repository.issue.projectItems` GraphQL (the `user.projectV2.items` query is stale-cached, same pattern as the `gh project item-list` quirk noted in repo memory).
+- **Lesson:** the auto-add workflow only fires on `issues: [opened, labeled]` — it cannot backfill historical labelings. Always cross-check "0 existing" claims via two query forms before declaring an "existing items" AC auto-satisfied.
 - **Tracking issue:** #202.
 
 ### 2026-04-27 — create Wiki & Build-Docs Automation board (#16)
