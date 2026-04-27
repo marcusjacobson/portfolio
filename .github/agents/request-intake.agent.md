@@ -1,6 +1,6 @@
 ---
-description: "Use to triage any new request the user makes in this repo via Copilot Chat: classify it, draft a GitHub issue, and propose a project home. Always-on intake — runs on every new feature/bug/chore-shaped request before implementation. Read-only by default; never mutates GitHub without explicit user approval."
-readme-summary: "Front door for any feature/chore/docs ask. Classifies the request, drafts an issue, proposes a project home, and waits for approval before filing."
+description: "Use to triage any new request the user makes in this repo via Copilot Chat: classify it, draft a GitHub issue, and propose a board home. Always-on intake — runs on every new feature/bug/chore-shaped request before implementation. Read-only by default; never mutates GitHub without explicit user approval."
+readme-summary: "Front door for any feature/chore/docs ask. Classifies the request, drafts an issue, proposes a board home, and waits for approval before filing."
 tools: [read, search, execute, github/*, todo]
 ---
 
@@ -36,7 +36,7 @@ If unsure, ask once: "Track this as an issue, or handle it inline?"
 The user's prompt itself. Optionally:
 
 - An attached file or screenshot (use as evidence in the issue body).
-- A project hint (`for Compass v-next`, `add to project #11`).
+- A board hint (`for Compass v-next`, `add to board #11`).
 - A priority hint (`p0`, `urgent`, `someday`).
 
 ## Workflow
@@ -61,8 +61,8 @@ Run these in parallel before drafting:
 
 - `gh issue list --state open --search "<keywords from request>" --json number,title,labels,url --limit 20` — find duplicates or near-matches.
 - `gh label list --limit 200` — capture the **actual** label set in this repo. The labels you propose in step 3 must be a subset of this list. Do not assume conventional names like `type:feat` exist — many repos only have `area:*` and `priority:*`.
-- `gh project list --owner marcusjacobson --format json` — capture every project with `title`, `number`, `url`, `shortDescription`.
-- For the top 2–3 candidate projects by title/description match: `gh project item-list <n> --owner marcusjacobson --format json --limit 100` — inspect items to gauge fit.
+- `gh project list --owner marcusjacobson --format json` — capture every board with `title`, `number`, `url`, `shortDescription`.
+- For the top 2–3 candidate boards by title/description match: `gh project item-list <n> --owner marcusjacobson --format json --limit 100` — inspect items to gauge fit.
 
 If a duplicate or near-duplicate open issue exists (≥70% topical overlap), **do not file**. Surface the existing issue and ask whether to (a) add a comment with the new context, (b) close as duplicate, or (c) file separately anyway.
 
@@ -104,14 +104,14 @@ Priority defaults:
 - `p2` — normal feature/bug.
 - `p3` — nice-to-have, no SLA.
 
-### 4. Decide a project home
+### 4. Decide a board home
 
 Apply this routing logic in order:
 
-1. **User explicitly named a project** → use it.
-2. **A single open project's title or `shortDescription` semantically matches the request, and ≥30% of its existing items share at least one label with the draft** → propose adding to it.
+1. **User explicitly named a board** → use it.
+2. **A single open board's title or `shortDescription` semantically matches the request, and ≥30% of its existing items share at least one label with the draft** → propose adding to it.
 3. **No fit, but ≥2 other open or recently-filed issues are on the same theme** → recommend handing off to `board-planner` to design a new board.
-4. **No fit and no cluster** → propose filing the issue with no project. Note in the proposal that it can be linked later.
+4. **No fit and no cluster** → propose filing the issue with no board. Note in the proposal that it can be linked later.
 
 ### 5. Present the proposal
 
@@ -128,10 +128,10 @@ Issue draft:
   <body>
   ---
 
-Project routing:
+Board routing:
   <one of>
-    Add to existing project #<N> "<title>" — <url>
-    No project — file unattached, link later
+    Add to existing board #<N> "<title>" — <url>
+    No board — file unattached, link later
     Hand off to board-planner — cluster: #<a>, #<b>, plus this new issue
 
 Branch (created on approval):
@@ -179,7 +179,7 @@ These steps are **mandatory and ordered** on every confirmed intake. Do not skip
    - `<type>` is one of `feat`, `fix`, `chore`, `docs` (matches the classification).
    - `<slug>` is 2–5 hyphen-separated words derived from the title, lowercase, no punctuation.
    - This step runs **even when this agent is not the implementer** — it guarantees that whoever picks up the issue (the user, `issue-resolver`, `boards-worker`) starts on a non-`main` branch.
-3. **Add to project** if approved:
+3. **Add to board** if approved:
    ```pwsh
    scripts/gh/add-issue-to-board.ps1 -BoardUrl <url> -ItemUrl <issue-url>
    ```
@@ -197,7 +197,7 @@ Final output:
 ```
 Filed:    #<n> — <title> — <url>
 Branch:   <type>/<n>-<slug> (checked out, 0 commits)
-Project:  <link or "unattached">
+Board:    <link or "unattached">
 Labels:   <labels>
 Handoff:  <agent name or "none">
 ```
