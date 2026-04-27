@@ -21,6 +21,24 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 
 ## Sweep log
 
+### 2026-04-26 — projects-worker session: Board Terminology Split (#14)
+
+- **Branch:** `projects-worker/board-terminology-split-20260426-1507` — PR pending
+- **Operator:** projects-worker agent
+- **Queue at start (Ready):** #85, #86, #87, #88, #89, #90, #91 (sequential, --max=7)
+- **Status field options captured:** Ready=`f75ad846`, In progress=`47fc9ee4`, In review=`2aee1b22`, Done=`98236657`
+- **Schema mutations applied:** rename Todo→Ready (id `f75ad846`), rename "In Progress"→"In progress" (id `47fc9ee4`), add new option "In review" (id `2aee1b22`). Single `updateProjectV2Field` GraphQL mutation against fieldId `PVTSSF_lAHOBvMdD84BVzd8zhRMjT0`. Approved by user message "go 1" on 2026-04-26 (handoff to `@project-planner`, executed and reported back before this session opened).
+- **Per-issue transitions:**
+  - #85 Ready → In progress at 2026-04-26T15:08:36-07:00
+  - #85 In progress → Done — PR #92, merge `77d9b7e`
+  - #86 Ready → In progress at 2026-04-26T18:20:08-07:00
+  - #86 In progress → Done — PR #93, merge `a8251df` (smoke: issue #94, run 24972232517, item `PVTI_lAHOBvMdD84BVzLBzgrD-hI` on board #13)
+  - #87 Ready → In progress at 2026-04-26T18:28:13-07:00
+  - #87 In progress → Done — PR #95, merge `e84ba2f`
+- **Scope corrections:**
+  - 2026-04-26 mid-flight on #87 — `project-intake` excluded from the agent rename. Its mission is to triage *portfolio projects* the user is working on (capstones, security initiatives) and seed them onto board #13. Its noun is "Project" in the portfolio sense — the very noun this initiative preserves. Only `project-planner` → `board-planner` and `projects-worker` → `boards-worker` rename. Issue #87 body updated and a comment posted.
+- **Outcome:** _(in flight)_
+
 ### 2026-04-26 — create Microsoft Security Portfolio Roadmap project (#13)
 
 Inputs: user request via `@project-planner` — "create me a project plan for this sample page I created for upcoming and in-progress projects" (`staging-inbox/ms_security_projects_roadmap_v1.html`). 16 forward-looking items: 5 capstones, 1 cross-pillar, 2 Purview, 4 Defender + Sentinel, 3 Entra, 2 Azure, 1 Security Copilot. 3 of those 16 are Active (Purview-as-Code Repo, Azure-as-Code Comprehensive IaC Repo, Security Copilot On-Demand Lab Toggle); the rest are Planned.
