@@ -1,0 +1,14 @@
+{
+  "$schema": "./wiki-sync-state.schema.json",
+  "lastProcessedSha": "bb5aa4c62c78faaa2b466ad8f16464cb98fb5a64",
+  "lastRunAt": "2026-04-27T12:25:39Z",
+  "lastBatchSummary": {
+    "filed": [],
+    "deferred": [],
+    "cancelled": []
+  },
+  "_seed": {
+    "note": "Initial seed committed with PR for issue #144. The wiki-sync agent (issue #143) has not yet run; this SHA marks the baseline from which the first delta will be computed.",
+    "issue": "https://github.com/marcusjacobson/portfolio/issues/144"
+  }
+}

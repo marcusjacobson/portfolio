@@ -42,3 +42,7 @@ test-results/
 .lighthouseci/
 *.log
 
+# Agent state. .copilot-tracking/ is intentionally tracked in git for auditability;
+# this comment exists so future contributors don't add it to the ignore list by reflex.
+# See .copilot-tracking/README.md.
+
