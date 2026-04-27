@@ -80,37 +80,40 @@ Also read `.gitignore` and `.cleanupignore` (if present) — entries in either s
 
 For each artefact found, assign one class A–H (or **Unclassified**). Skip anything matched by `.gitignore` *and* not present on disk (gitignored + absent = nothing to clean). Keep anything matched by `.cleanupignore`.
 
-### 3. Present the proposal list
+### 3. Present a one-line summary, then prompt for the first item
 
-Output one block. No prose around it.
+After classification, output exactly one summary line and the first candidate. Do **not** print the full list.
 
 ```
-Repo cleanup proposal — <N> candidates
+Repo cleanup — <N> candidates found (<a> class A, <b> class B, …). Walking one at a time.
 
-[1]  <class>  <path or branch>
-       reason: <one line>
-       action on remove: <Remove-Item -Recurse -Force | git branch -d <name> | ...>
-       remediation on keep: <gitignore entry | .cleanupignore line | move to <path> | add `# cleanup:keep` marker>
+[1/<N>] <class>  <path or branch>
+   reason:               <one line>
+   action on remove:     <Remove-Item -Recurse -Force <path> | git branch -d <name> | ...>
+   remediation on keep:  <gitignore entry | .cleanupignore line | move to <path> | add `# cleanup:keep` marker>
 
-[2]  ...
-
-Unclassified (require explicit confirmation):
-[U1] <path> — <heuristic that surfaced it>
-
-Reply with `<index> remove`, `<index> keep`, `<index> skip`, or `quit`.
-Only one index per reply.
+Reply: `remove` | `keep` | `skip` | `show all` | `quit`
 ```
 
-### 4. Walk the list
+Wait for the user's reply before producing item 2. Never print item 2 in the same turn as item 1.
 
-For each user reply:
+For **Unclassified** candidates, prefix the index with `U` (e.g., `[U1/3]`) and require the user to type the verb explicitly — bare `remove` is not accepted on a `U`-prefixed item; the user must type `remove unclassified` to confirm.
 
-- `<n> remove` — echo the action command, run it, confirm result. Move to the next unanswered index automatically and re-prompt.
-- `<n> keep` — apply the remediation (see below), echo the file change, confirm result. Move on.
-- `<n> skip` — record as "deferred this run" and move on without changing anything.
-- `quit` — stop the loop. Print the final report (step 5) covering everything actioned so far.
+If the user types `show all`, print the full numbered list (same shape as the per-item block but without the trailing prompt) for situational awareness, then re-prompt the **same** unanswered item. Do not advance.
 
-If the user replies with a bare `remove` / `keep` / `skip`, assume the next unanswered index.
+### 4. Walk one item at a time
+
+After each user reply, take the action, then present the **next** unanswered item in a new turn. Always exactly one item visible per assistant turn.
+
+- `remove` (or `<n> remove` if the user references a specific index) — echo the action command, run it, confirm result, then present the next unanswered item.
+- `keep` — apply the class-specific remediation from step 5, echo the diff, confirm result, then present the next unanswered item.
+- `skip` — record as "deferred this run" and present the next unanswered item without changing anything.
+- `show all` — print the full list (read-only), then re-prompt the same unanswered item. Do not advance.
+- `quit` — stop the loop. Print the final report (step 6) covering everything actioned so far.
+
+A bare `remove` / `keep` / `skip` always applies to the **currently-prompted** item. If the user names an out-of-order index (`5 remove`), action that index and then resume from the next unanswered index after it.
+
+When the last item has been answered, automatically print the final report (step 6) without further prompting.
 
 ### 5. Apply remediations on `keep`
 
