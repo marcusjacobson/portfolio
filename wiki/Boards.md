@@ -59,11 +59,12 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #146 Todo → In Progress → Done — PR #163, merge `2a7eb42`
   - #142 Todo → In Progress → Done — PR #164, merge `94ce9eb`
   - #30  Todo → In Progress → Done — PR #165, merge `69ee4f1`
-  - #37  Todo → In Progress → Done — PR #166, merge `73b6629`
   - #38  Todo → In Progress → Done — PR #167, merge `fdc7939`
   - #40  Todo → In Progress → Done — PR #168, merge `e276789`
-  - #147 deferred — operational dry-run requires interactive `/wiki-sync-run`; not an issue-resolver code task
-- **Outcome:** Phase 1 Structure (6/6), Phase 2 Agent (5/5), Phase 4 Maintenance (1/1), and rehomed (4/4) complete. Phase 3 Automation: cron #146 landed; only #147 dry-run remains (deferred to interactive run by user). Board #16: 17 Done, 1 Todo. Session ready to close.
+  - #147 Todo → In Progress (live `/wiki-sync-run` against `main`)
+  - #147 In Progress → Done — closed COMPLETED after first live wiki-sync run; cursor PR #179, merge `ce55466`
+- **Wiki-sync first live run:** Cursor `bb5aa4c` → `e276789`. Filed: #169 (Prompts), #171 (Projects/Home verify), #174 (Repo-Architecture), #176 (Workflows), #177 (Agents) — all on board #16 with Status=Todo, Phase=Maintenance, Priority=p3. Closed as duplicates from parallel-intake artifact: #170, #172, #173, #175, #178. Out-of-routing surfaced (5 paths) flagged for routing-table v2 follow-up.
+- **Outcome:** Phase 1 Structure (6/6), Phase 2 Agent (5/5), Phase 3 Automation (2/2 — cron #146, dry-run #147), Phase 4 Maintenance (1/1), and rehomed (4/4) complete. Original 18 Todo all resolved; 5 follow-up wiki-content issues now Todo on board #16 from the live run. Session closed.
 
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
 
