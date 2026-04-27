@@ -1,6 +1,7 @@
 ---
 description: "Use to scope and create a GitHub board (Projects v2) from a theme, milestone, or cluster of issues. Decides if a new board is warranted, designs fields and views, runs scripts/gh/create-board.ps1, and seeds items via add-issue-to-board.ps1."
 readme-summary: "Scopes and creates a GitHub board (Projects v2) from a theme or cluster of issues. Designs fields/views and seeds items via `scripts/gh/`."
+cloud: no  # interactive design decisions (board scope, fields, views) require human input
 tools: [read, edit, search, execute, github/*, todo]
 ---
 
@@ -62,6 +63,45 @@ When invoked on an existing portfolio of boards (not just a fresh board creation
 8. **Re-run the redundancy report at the end** so the user sees the post-state. Save the report into the `wiki/Boards.md` audit log section with a date stamp.
 
 This sweep is also the right entry point when the user asks "are my boards still organized?" or "did I miss adding anything?" — run it read-only (skip step 7) and report.
+
+## Wiki-sync batch sweep
+
+When `@wiki-sync` (or any caller) hands off a batch of issue numbers — typically issues it just filed or relabeled with `agent:wiki-sync` — run a **scoped sweep** instead of a full portfolio sweep. This is the standard entry point for clusters produced by the wiki-sync agent.
+
+**Inputs:**
+
+- An array of issue numbers (e.g. `[#201, #202, #203]`). Required. Refuse to run without it.
+- Optional: caller name (`wiki-sync` by default) for the audit-log entry.
+
+**Scope:** limit candidate boards to **#16 "Wiki & Build-Docs Automation"** and **#15 "Portfolio Maturity Roadmap"** — the two boards most likely to overlap with wiki-sync output. Do not consider any other board for placement during this mode. If a handed-off issue clearly belongs on a third board, flag it in the diff block as `out-of-scope` and let the user route it manually.
+
+**Workflow:**
+
+1. **Resolve the batch.** For each issue number, fetch `number, title, labels, url, body` via `gh issue view <n> --json number,title,labels,url,body`. Drop any issue that lacks the `agent:wiki-sync` label and report the drop in the diff block (do not silently filter).
+2. **Pull current items on #15 and #16.** `gh project item-list <number> --owner <owner> --format json` for each, keeping `content.number`, `content.title`, `content.labels`.
+3. **Duplicate check against maturity-scout.** For each batch issue, look for an existing item on board #15 with the `source:maturity-scout` label whose title or canonical path overlaps. When a likely duplicate is found, recommend the maturity-scout issue as canonical and suggest closing the wiki-sync one as `duplicate` (do not auto-close).
+4. **Route each batch issue.** Default routing rules:
+   - `agent:wiki-sync` + `area:docs` or `area:wiki` → board **#16**, Phase = `Structure` (or `Agent` if the issue body describes an agent change), Priority = `p2`, Size = `S`.
+   - `agent:wiki-sync` + `area:agents` → board **#16**, Phase = `Agent`, Priority = `p2`, Size = `S`.
+   - `agent:wiki-sync` + `source:maturity-scout` (rare cross-tag) → board **#15**, Status = `Todo`, Priority inherited from the issue's `priority:*` label.
+   - Anything else → flag as `needs-routing` and ask the user.
+5. **Output the standard portfolio-sweep diff block** (same shape as the full sweep) so the user sees adds, dedupes, and out-of-scope flags before anything mutates:
+   ```
+   Add to board #16 "Wiki & Build-Docs Automation": #<a> (Phase=Structure, Priority=p2, Size=S), #<b> (Phase=Agent, ...)
+   Add to board #15 "Portfolio Maturity Roadmap": #<c> (Status=Todo, Priority=p1)
+   Duplicate — #<x> overlaps existing #<y> on board #15 (recommend #<y> as canonical, close #<x> as duplicate)
+   Out-of-scope — #<z> has no #15/#16 fit (manual routing required)
+   Dropped — #<q> missing agent:wiki-sync label
+   ```
+6. **Wait for explicit user approval** (yes / edit / cancel) before running any `gh project item-add` or field-set call. Mutate only on approval, exactly as the full sweep does.
+7. **Apply approved actions one at a time**, echoing each `gh` command. Use `scripts/gh/add-issue-to-board.ps1` for adds and `gh project item-edit` for field values.
+8. **Append an audit-log entry** to `wiki/Boards.md` with date stamp, caller name, batch size, and per-issue outcome. Open a PR for the wiki edit (one PR per sweep, not per issue).
+
+**Constraints specific to this mode:**
+
+- Boards considered are **strictly #15 and #16** — do not silently expand scope.
+- Never re-add an issue that is already on either board; skip and note in the diff.
+- Honor the standard sweep rules: read-only when the user asks "did wiki-sync miss anything?" (skip steps 6–8).
 
 ## Constraints
 

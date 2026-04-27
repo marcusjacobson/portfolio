@@ -31,6 +31,10 @@ When the user wants to add a new portfolio Project (capstone, security initiativ
 
 For all non-Project intake (features, bugs, chores), see [`@request-intake`](../.github/agents/request-intake.agent.md) and [`@bug-intake`](../.github/agents/bug-intake.agent.md).
 
+## Note on the audit log move
+
+The GitHub Projects v2 audit log (every Board on this user account, including internal-tooling boards like **Cloud Agent Enablement** (#11) — Source field `config / docs / smoke-test`, seeded issues #32–#40, complementary to board #10 LinkedIn / Portfolio Sync via Option B manual handoff using the `agent-task` label) now lives in [Boards](Boards). It used to live here, until the terminology split (PR #98) gave Boards their own page. This page now covers portfolio Projects only.
+
 ## See also
 
 - [Boards](Boards) — GitHub Projects v2 audit log, schemas, and sweep history.

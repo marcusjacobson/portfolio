@@ -17,12 +17,50 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Need full history so `git log -1` can resolve the last commit
+          # that touched each page when injecting "Last updated" timestamps.
+          fetch-depth: 0
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
+
+      - name: Inject per-page Last updated timestamps
+        # Replace the `<!-- LAST_UPDATED -->...<!-- /LAST_UPDATED -->` placeholder
+        # in each root HTML page with the date (YYYY-MM-DD) of the last commit
+        # that touched that file on the current ref. The rendered HTML is only
+        # written into the build artifact — never committed back to main.
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for f in *.html; do
+            ts=$(git log -1 --format=%cs -- "$f" 2>/dev/null || true)
+            if [ -z "$ts" ]; then
+              ts=$(date -u +%Y-%m-%d)
+            fi
+            perl -i -pe "s|<!-- LAST_UPDATED -->.*?<!-- /LAST_UPDATED -->|<!-- LAST_UPDATED -->${ts}<!-- /LAST_UPDATED -->|g" "$f"
+            echo "  $f -> $ts"
+          done
+
+      - name: Render CHANGELOG.md into changelog.html
+        # Convert the curated CHANGELOG.md into HTML and inject it into the
+        # `<!-- CHANGELOG_BODY -->...<!-- /CHANGELOG_BODY -->` placeholder.
+        # pandoc is preinstalled on ubuntu-latest GitHub runners.
+        run: |
+          set -euo pipefail
+          if [ ! -f CHANGELOG.md ]; then
+            echo "CHANGELOG.md missing; skipping changelog render."
+            exit 0
+          fi
+          pandoc --from=gfm --to=html5 CHANGELOG.md -o /tmp/changelog-body.html
+          # Drop the leading "# Changelog" h1 — the page header already provides it.
+          perl -0777 -i -pe 's|<h1[^>]*>.*?</h1>\s*||s' /tmp/changelog-body.html
+          python3 scripts/render_changelog.py /tmp/changelog-body.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -32,6 +70,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

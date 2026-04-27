@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/marcusjacobson/portfolio/.copilot-tracking/wiki-sync-state.schema.json",
+  "title": "wiki-sync state file",
+  "description": "Durable cursor for the @wiki-sync detector agent (see issues #143, #144, #145). Records the last commit SHA whose wiki/** delta was fully resolved (filed / deferred / cancelled) so the next run only inspects newer commits.",
+  "type": "object",
+  "required": ["lastProcessedSha", "lastRunAt", "lastBatchSummary"],
+  "additionalProperties": true,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional pointer to this schema. Tooling-only; @wiki-sync does not require it."
+    },
+    "lastProcessedSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full 40-char SHA of the most recent commit on main whose wiki/** delta was fully resolved by @wiki-sync. The next run computes the diff lastProcessedSha..HEAD."
+    },
+    "lastRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp (suffix Z) of when @wiki-sync last finished a batch."
+    },
+    "lastBatchSummary": {
+      "type": "object",
+      "description": "Outcome of the most recent batch. Each array holds issue/PR numbers or short identifiers; empty arrays are valid (e.g. seed entry).",
+      "required": ["filed", "deferred", "cancelled"],
+      "additionalProperties": false,
+      "properties": {
+        "filed": {
+          "type": "array",
+          "description": "Items the agent successfully handed off (e.g. to @request-intake or @board-planner) and that produced a tracked issue or board item.",
+          "items": { "type": ["string", "integer"] }
+        },
+        "deferred": {
+          "type": "array",
+          "description": "Items the agent flagged but chose not to file this run (e.g. waiting on a parent issue, or below threshold).",
+          "items": { "type": ["string", "integer"] }
+        },
+        "cancelled": {
+          "type": "array",
+          "description": "Items the agent or operator explicitly dismissed during this batch (won't be re-detected unless reverted).",
+          "items": { "type": ["string", "integer"] }
+        }
+      }
+    },
+    "_seed": {
+      "type": "object",
+      "description": "Optional metadata about the initial seed entry. Removed or overwritten on the first real @wiki-sync run.",
+      "additionalProperties": true
+    }
+  }
+}

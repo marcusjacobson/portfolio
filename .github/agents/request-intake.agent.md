@@ -1,6 +1,7 @@
 ---
 description: "Use to triage any new request the user makes in this repo via Copilot Chat: classify it, draft a GitHub issue, and propose a board home. Always-on intake — runs on every new feature/bug/chore-shaped request before implementation. Read-only by default; never mutates GitHub without explicit user approval."
 readme-summary: "Front door for any feature/chore/docs ask. Classifies the request, drafts an issue, proposes a board home, and waits for approval before filing."
+cloud: no  # interactive approval gates before filing
 tools: [read, search, execute, github/*, todo]
 ---
 
@@ -38,6 +39,37 @@ The user's prompt itself. Optionally:
 - An attached file or screenshot (use as evidence in the issue body).
 - A board hint (`for Compass v-next`, `add to board #11`).
 - A priority hint (`p0`, `urgent`, `someday`).
+
+## Handoff inputs (from other agents)
+
+In addition to free-form chat requests, this agent also accepts pre-classified drafts handed off from other agents (currently `@wiki-sync`; see issues #143, #144, #145). A handoff is a JSON-shaped payload, not a natural-language prompt, and signals that classification has already been done upstream.
+
+Shape:
+
+```json
+{
+  "type": "feat | bug | chore | docs",
+  "paths": ["wiki/Foo.md", "..."],
+  "suggestedTitle": "<imperative ≤72 chars>",
+  "suggestedBody": "<markdown body, may already include ## Context / ## Acceptance criteria>",
+  "suggestedLabels": ["area:docs", "..."],
+  "sourceAgent": "wiki-sync"
+}
+```
+
+Behavior on handoff:
+
+- **Skip step 1 (Classify).** Use the upstream `type` as-is.
+- **Step 2 (Discover existing context) still runs** — duplicate detection and live `gh label list` validation are non-negotiable, even on handoffs. Drop any `suggestedLabels` entry that doesn't appear in the live label list and surface the drop in the proposal.
+- **Step 3 (Draft).** Seed `Title` from `suggestedTitle` and `Body` from `suggestedBody`. The agent may tighten wording or reformat to match the standard `## Context / ## Acceptance criteria / ## Notes` shape, but must not invent new acceptance criteria not present in the handoff.
+- **Auto-included labels by `sourceAgent`:**
+    - `sourceAgent == "wiki-sync"` → always include `agent:wiki-sync` (in addition to the validated `suggestedLabels`).
+- **Default board routing by `sourceAgent` (overridable by user or by an explicit board hint in the handoff):**
+    - `sourceAgent == "wiki-sync"` → board #16 "Wiki & Build-Docs Automation". Skip the step-4 routing logic; go straight to "Add to existing board #16" in the proposal. The user may still override at approval time (`edit: file unattached` or `edit: board #<N>`).
+- **Step 5 (Present the proposal), step 6 (Wait for approval), and step 7 (Mutate) are unchanged.** Handoffs do not auto-apply — the user still confirms before any `gh` mutation runs.
+- **`sourceAgent` and `paths` are recorded** in the issue body's `## Notes` section so the trail back to the upstream agent is preserved (e.g., `Source: @wiki-sync — paths: wiki/Foo.md, wiki/Bar.md`).
+
+If `sourceAgent` is missing or set to a value this agent does not recognize, treat the payload as a normal chat-driven request and run the full workflow from step 1.
 
 ## Workflow
 

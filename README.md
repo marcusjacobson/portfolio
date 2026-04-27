@@ -51,7 +51,7 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 | [.github/workflows/](.github/workflows/) | CI: deploy, link/HTML/CSS/visual checks, CodeQL, gitleaks, wiki sync, labeler. |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) + [.github/instructions/](.github/instructions/) | Repo-wide and scoped Copilot guidance. |
 | [.github/prompts/](.github/prompts/) | Slash-command tasks: `/publish-update`, `/secure-code-review`, `/triage-issue`, `/groom-backlog`. |
-| [.github/agents/](.github/agents/) | Chat agents: `@publish-manager`, `@security-reviewer`, `@repo-ops`. |
+| [.github/agents/](.github/agents/) | Chat agents: `@publish-manager`, `@security-reviewer`, `@repo-ops`, `@linkedin-sync` ([wiki](wiki/LinkedIn-Sync.md)). See [wiki/Agents.md](wiki/Agents.md) for the full catalog. |
 | [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/) + [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) | Templates for repeatable intake. |
 | [.github/labels.yml](.github/labels.yml) | Canonical label set. Synced via [scripts/gh/sync-labels.ps1](scripts/gh/sync-labels.ps1). |
 | [scripts/](scripts/) | PowerShell ops: migration, branch protection, gh CLI helpers. |
@@ -99,4 +99,12 @@ In VS Code chat:
 - Type `/` and pick `publish-update`, `secure-code-review`, `triage-issue`, or `groom-backlog`.
 - In the agent picker, choose `publish-manager`, `security-reviewer`, or `repo-ops`.
 - The GitHub MCP server (defined in [.vscode/mcp.json](.vscode/mcp.json)) prompts for a PAT on first use; the token is never written to disk.
+
+## Agents
+
+This repo combines **local VS Code agents** (chat-mode personas under [.github/agents/](.github/agents/)) with the **GitHub Copilot cloud agent** for asynchronous, issue-driven work. Local agents handle interactive flows like publishing, security review, and intake triage; the cloud agent picks up labeled issues and opens PRs in the background. Work in flight is tracked on GitHub Projects v2 boards (Portfolio Roadmap, Bug Tracker, etc.).
+
+- [Projects tab](https://github.com/marcusjacobson/portfolio/projects) — live boards for roadmap, bugs, and intake.
+- [wiki/Agents.md](wiki/Agents.md) — full catalog of local and cloud agents with their tools and routing.
+- [AGENTS.md (planned — issue #32)](https://github.com/marcusjacobson/portfolio/issues/32) — top-level cloud-agent guidance for the hosted Copilot agent.
 

@@ -55,6 +55,48 @@ Redundancy report (post-state):
 - 0 sunset candidates.
 - Follow-up note: when #143 + #145 ship, the next sweep should re-run with `@board-planner` portfolio-sweep mode scoped to #15 + #16 to confirm wiki-mechanics issues stay separated from repo-hygiene issues.
 
+### 2026-04-27 — boards-worker session: Wiki & Build-Docs Automation (#16)
+
+- **Branch:** `boards-worker/wiki-build-docs-20260427-0424` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo, 18 items):** #30, #37, #38, #40, #136, #137, #138, #139, #140, #141, #142, #143, #144, #145, #146, #147, #148, #149
+- **Status field options captured:** Todo=`f75ad846`, In Progress=`47fc9ee4`, Done=`98236657` (no In-review-style option — per the alias table in `boards-worker.agent.md`, on-failure items stay at In Progress and the blocker is audit-logged)
+- **Project node id:** `PVT_kwHOBvMdD84BV27q`
+- **Status field id:** `PVTSSF_lAHOBvMdD84BV27qzhRPoko`
+- **Schema mutations applied:** _(none — board #16 schema unchanged for this run)_
+- **Per-issue transitions:**
+  - #136 Todo → In Progress at 2026-04-27
+  - #136 In Progress → Done — PR #151, merge `6223514`
+  - #138 Todo → In Progress at 2026-04-27
+  - #138 In Progress → Done — PR #152, merge `47b0c60`
+  - #139 Todo → In Progress at 2026-04-27
+  - #139 In Progress → Done — PR #153, merge `b574752`
+  - #137 Todo → In Progress at 2026-04-27
+  - #137 stays In progress — blocker: merge conflict in wiki/Home.md between PR #154 and main's recently-merged Sections list updates; tracked as p0 issue #155
+  - #137 unblocked — boards-worker rebased `feat/137-wiki-prompts-page` onto main, hand-merged Sections list (Agents/Prompts/Workflows coexist); #155 auto-closed
+  - #137 In Progress → Done — PR #154, merge `e706f0d`
+  - #140 Todo → In Progress at 2026-04-27
+  - #140 In Progress → Done — PR #156, merge `56d5cb9`
+  - #141 Todo → In Progress at 2026-04-27
+  - #141 In Progress → Done — PR #157, merge `bb5aa4c`
+  - #144 Todo → In Progress at 2026-04-27
+  - #144 In Progress → Done — PR #158, merge `7ae42c5`
+  - #148 Todo → In Progress at 2026-04-27
+  - #148 In Progress → Done — PR #159, merge `0216b0f`
+  - #149 Todo → In Progress at 2026-04-27
+  - #149 In Progress → Done — PR #160, merge `87d51c2`
+  - #143 Todo → In Progress → Done — PR #161, merge `d66ae5f`
+  - #145 Todo → In Progress → Done — PR #162, merge `47b1cba`
+  - #146 Todo → In Progress → Done — PR #163, merge `2a7eb42`
+  - #142 Todo → In Progress → Done — PR #164, merge `94ce9eb`
+  - #30  Todo → In Progress → Done — PR #165, merge `69ee4f1`
+  - #38  Todo → In Progress → Done — PR #167, merge `fdc7939`
+  - #40  Todo → In Progress → Done — PR #168, merge `e276789`
+  - #147 Todo → In Progress (live `/wiki-sync-run` against `main`)
+  - #147 In Progress → Done — closed COMPLETED after first live wiki-sync run; cursor PR #179, merge `ce55466`
+- **Wiki-sync first live run:** Cursor `bb5aa4c` → `e276789`. Filed: #169 (Prompts), #171 (Projects/Home verify), #174 (Repo-Architecture), #176 (Workflows), #177 (Agents) — all on board #16 with Status=Todo, Phase=Maintenance, Priority=p3. Closed as duplicates from parallel-intake artifact: #170, #172, #173, #175, #178. Out-of-routing surfaced (5 paths) flagged for routing-table v2 follow-up.
+- **Outcome:** Phase 1 Structure (6/6), Phase 2 Agent (5/5), Phase 3 Automation (2/2 — cron #146, dry-run #147), Phase 4 Maintenance (1/1), and rehomed (4/4) complete. Original 18 Todo all resolved; 5 follow-up wiki-content issues now Todo on board #16 from the live run. Session closed.
+
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
 
 - **Branch:** `boards-worker/maturity-20260426-2120` — PR _(opened at session close)_

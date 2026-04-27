@@ -17,6 +17,9 @@ Specialized chat agents (`*.agent.md`) you can summon in Copilot Chat with `@<ag
 | [`@security-reviewer`](security-reviewer.agent.md) | Reviews a PR diff for XSS, secret leakage, supply-chain risk, unsafe workflow permissions, and CDN trust. | Read-only |
 | [`@repo-ops`](repo-ops.agent.md) | Generic catch-all for Issues, Projects, Labels, and Wiki ops driven by `gh` CLI and the GitHub MCP server. Use when no other agent fits. | Yes |
 | [`@maturity-scout`](maturity-scout.agent.md) | Scans the repo against Microsoft Learn, GitHub docs, OWASP, WCAG, and repo-hygiene best practices and surfaces gap issues onto the Portfolio Maturity board (#15). On-demand mode is read-only; the weekly workflow auto-files candidates with `needs-triage`. | Read-only until approval (chat); auto-files (weekly workflow) |
+| [`@triage`](triage.agent.md) | Triages issues currently labeled `needs-triage` — confirms them for work (labels + priority + board placement) or dismisses them (close as wontfix/duplicate). Operates one issue at a time in chat or as a comment thread when summoned via the hosted Copilot agent. | Read-only until approval |
+| [`@wiki-sync`](wiki-sync.agent.md) | Detects repo-vs-wiki drift since the last processed SHA and routes each delta through `@request-intake` (issue draft) and `@board-planner` (sweep onto board #16). Read-only; never edits `wiki/*.md` and never commits to `main`. | Read-only until approval |
+| [`@repo-cleanup`](repo-cleanup.agent.md) | Sweeps the repo for incidental work artefacts and proposes them for removal one at a time. Read-only until per-item approval; on `keep` it adds the right `.gitignore` / allowlist remediation so the same item isn't re-flagged next run. | Read-only until per-item approval |
 <!-- END: agents-index -->
 
 ## How they fit together
@@ -57,6 +60,16 @@ user request
 - Agents never push directly to `main`. Implementation agents always branch and PR.
 - Agents echo `gh` commands before running them.
 - When a referenced script (`scripts/gh/*.ps1`) is missing, agents fall back to direct `gh` commands rather than inventing one.
+
+## Frontmatter
+
+Every `*.agent.md` file declares a `cloud:` key in its YAML frontmatter that tells humans and tooling whether the agent is safe to invoke from the github.com **Assign to Copilot** picker. Allowed values:
+
+- **`cloud: yes`** — agent is cloud-hardened. Safe to assign to the hosted Copilot coding agent. Forbids `vscode_askQuestions`-style prompts; falls back to issue/PR comments when blocked; never uses `gh pr merge --admin`.
+- **`cloud: read-only`** — agent is cloud-safe but never mutates state. Posts findings as a single PR or issue comment and exits.
+- **`cloud: no`** — agent depends on interactive approval gates, uncommitted local working-tree state, or design conversations that don't fit a one-shot cloud run. Use locally only.
+
+Each `cloud:` line carries a one-line `#` comment explaining the choice (e.g. `cloud: no  # interactive approval gates`). The wiki [`Agents`](../../wiki/Agents.md) page renders the same values in its **Cloud mode** column.
 
 ## Adding or updating an agent
 

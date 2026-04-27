@@ -8,6 +8,7 @@
 - [ ] `npm run lint` passes locally
 - [ ] `npm run test:visual` passes locally (or baselines updated)
 - [ ] Manually verified affected pages by opening the HTML files locally
+- [ ] Updated `CHANGELOG.md` for user-visible changes (or N/A)
 
 ## Security review
 - [ ] No new external scripts without SRI
