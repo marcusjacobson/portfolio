@@ -20,8 +20,8 @@ jobs:
       (github.event.action == 'labeled' && github.event.label.name == 'needs-triage') ||
       (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'needs-triage'))
     steps:
-      - name: Add issue to board #18
+      - name: Add issue to board #19
         uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
         with:
-          project-url: https://github.com/users/marcusjacobson/projects/18
+          project-url: https://github.com/users/marcusjacobson/projects/19
           github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
