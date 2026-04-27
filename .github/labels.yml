@@ -71,10 +71,16 @@
 - name: agent:copilot-enablement
   color: 8957e5
   description: Tasks to enable and operate the GitHub Copilot cloud agent on this repo
+- name: agent:triage
+  color: 8957e5
+  description: Tasks for the @triage agent build or its findings
 
 # Lifecycle
 - name: needs-triage
   color: fef2c0
+- name: triage:proposed
+  color: fbca04
+  description: Triage agent has posted a proposal comment; awaiting user apply/dismiss
 - name: link-rot
   color: c5def5
   description: External link broke.
