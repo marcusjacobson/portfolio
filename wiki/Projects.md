@@ -30,6 +30,7 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 - **Schema mutations applied:** rename Todo→Ready (id `f75ad846`), rename "In Progress"→"In progress" (id `47fc9ee4`), add new option "In review" (id `2aee1b22`). Single `updateProjectV2Field` GraphQL mutation against fieldId `PVTSSF_lAHOBvMdD84BVzd8zhRMjT0`. Approved by user message "go 1" on 2026-04-26 (handoff to `@project-planner`, executed and reported back before this session opened).
 - **Per-issue transitions:**
   - #85 Ready → In progress at 2026-04-26T15:08:36-07:00
+  - #85 In progress → Done — PR #92, merge `77d9b7e`
 - **Outcome:** _(in flight)_
 
 ### 2026-04-26 — create Microsoft Security Portfolio Roadmap project (#13)
