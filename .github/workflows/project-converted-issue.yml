@@ -14,16 +14,16 @@ concurrency:
 
 jobs:
   label-converted-issue:
-    name: Label issues that already live on project #13
+    name: Label issues that already live on board #13
     runs-on: ubuntu-latest
-    # Skip issues opened with the Project label already applied — project-autoadd.yml
-    # handles those, and this workflow is the inverse direction (project-membership
-    # implies label, not label implies project-membership). If the label is already
+    # Skip issues opened with the Board label already applied — project-autoadd.yml
+    # handles those, and this workflow is the inverse direction (board-membership
+    # implies label, not label implies board-membership). If the label is already
     # present we have nothing to add.
     if: >-
-      !contains(github.event.issue.labels.*.name, 'Project')
+      !contains(github.event.issue.labels.*.name, 'Board')
     steps:
-      - name: Probe project #13 and decide which labels to apply
+      - name: Probe board #13 and decide which labels to apply
         id: probe
         env:
           # Classic PAT with `project` scope. Same secret powers bug-autoadd.yml
@@ -73,27 +73,27 @@ jobs:
             -F number="$ISSUE_NUMBER" \
             -f query="$QUERY")
 
-          # Find the project #13 item, if any.
+          # Find the board #13 item, if any.
           ITEM=$(echo "$RESPONSE" | jq '.data.repository.issue.projectItems.nodes[] | select(.project.number == 13)')
 
           if [ -z "$ITEM" ]; then
-            echo "Issue #$ISSUE_NUMBER is not on project #13. Nothing to do."
+            echo "Issue #$ISSUE_NUMBER is not on board #13. Nothing to do."
             exit 0
           fi
 
-          echo "Issue #$ISSUE_NUMBER is on project #13. Applying labels."
+          echo "Issue #$ISSUE_NUMBER is on board #13. Applying labels."
 
-          LABELS=("Project")
+          LABELS=("Board")
 
           PRIORITY=$(echo "$ITEM" | jq -r '.fieldValues.nodes[] | select(.field.name == "Priority") | .name // empty')
 
           case "$PRIORITY" in
             p0|p1|p2|p3)
               LABELS+=("priority:$PRIORITY")
-              echo "Project #13 Priority field = $PRIORITY -> adding priority:$PRIORITY"
+              echo "Board #13 Priority field = $PRIORITY -> adding priority:$PRIORITY"
               ;;
             "")
-              echo "Priority field not set on the project item; skipping priority label."
+              echo "Priority field not set on the board item; skipping priority label."
               ;;
             *)
               echo "Priority field value '$PRIORITY' does not map to a priority:p<n> label; skipping."
@@ -101,7 +101,7 @@ jobs:
           esac
 
           # Emit a comma-separated list of labels for the next step. Empty value
-          # means "issue is not on project #13, skip labelling".
+          # means "issue is not on board #13, skip labelling".
           IFS=','
           echo "labels=${LABELS[*]}" >> "$GITHUB_OUTPUT"
 

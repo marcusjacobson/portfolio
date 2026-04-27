@@ -23,7 +23,7 @@ A **Board** is a GitHub Projects v2 board used for planning, triage, or roadmap 
 | `ms_security_projects.html` | Portfolio (Project) | Repo root, served by GitHub Pages |
 | "the Bug Tracker board" | Board | GitHub Projects v2 |
 | "the Compass v-next board" | Board | GitHub Projects v2 |
-| The `Project` label | Board (signals "add this issue to a Board") | Repo labels — currently named `Project`, will be renamed to `Board` in #86. Until then, treat the label name as historical, not authoritative. |
+| The `Board` label | Board (signals "add this issue to a Board") | Repo labels — renamed from `Project` to `Board` in #86 to keep "Project" exclusive to portfolio work. |
 | "Microsoft Security Portfolio Roadmap" (#13) | A Board that tracks Projects | GitHub Projects v2 |
 
 ## Why the split
