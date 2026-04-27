@@ -1,6 +1,6 @@
 ---
-description: "Triage a single GitHub issue: classify, label, link to project, set priority, and ask any clarifying questions in a comment."
-readme-summary: "Triage one GitHub issue: classify, label, link to a project, set priority, and post any clarifying questions as a comment."
+description: "Triage a single GitHub issue: classify, label, link to board, set priority, and ask any clarifying questions in a comment."
+readme-summary: "Triage one GitHub issue: classify, label, link to a board, set priority, and post any clarifying questions as a comment."
 argument-hint: "Issue number"
 agent: "agent"
 ---
@@ -16,7 +16,7 @@ agent: "agent"
    - `priority:p0|p1|p2|p3` based on impact.
    - `area:html|css|workflow|wiki|docs` based on what it touches.
 4. If the issue has an obvious owner (you), self-assign.
-5. Add to the "Portfolio" project board if one exists (`gh project item-add`).
+5. Add to the "Portfolio" board if one exists (`gh project item-add`).
 6. If clarification is needed, post **one** comment with crisp, numbered questions. Do not pepper the reporter.
 7. Output a one-line summary: `#<n>: <title> → <type>/<priority>/<area>`.
 

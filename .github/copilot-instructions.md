@@ -41,11 +41,11 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 
 - Publishing → use `/publish-update` prompt or the `@publish-manager` agent.
 - Security review → use `/secure-code-review` prompt or `@security-reviewer` agent.
-- Issues / Projects / Wiki ops → use `@repo-ops` (uses `gh` CLI and the GitHub MCP server).
+- Issues / Boards / Wiki ops → use `@repo-ops` (uses `gh` CLI and the GitHub MCP server).
 
 ## Request intake (always-on)
 
-For **any new feature/bug/chore-shaped request** the user makes in this repo, before implementing, route it through the appropriate intake agent. The intake agent classifies the request, drafts a GitHub issue, checks for duplicates, picks a project home, and waits for explicit approval before mutating anything.
+For **any new feature/bug/chore-shaped request** the user makes in this repo, before implementing, route it through the appropriate intake agent. The intake agent classifies the request, drafts a GitHub issue, checks for duplicates, picks a board home, and waits for explicit approval before mutating anything.
 
 Bug-shaped requests (broken, regressed, or buggy behavior — "X is broken on mobile", "the modal scrolls past the viewport", a screenshot of something visibly wrong) route to `@bug-intake` first. It uses a bug-specific template (repro steps, expected/actual, environment, evidence) and routes to a dedicated bug-tracking board. Roadmap-shaped requests (a new portfolio project, capstone, or future security initiative — "add a roadmap item for X", "track a new capstone covering Y", "I want to plan a project for Z") route to `@project-intake`, which creates the item directly as a DraftIssue on the Security Portfolio Roadmap (board #13) and sets `Status=Todo` (plus Pillar, Tier, and Priority). The `Board` label and `board-autoadd` workflow handle real issues filed outside the agent. All other shapes — features, chores, docs, ambiguous asks — route to `@request-intake`. If a specialized intake (`@bug-intake` or `@project-intake`) decides the request isn't its shape, it defers back to `@request-intake`. See [wiki/Terminology.md](../wiki/Terminology.md) for the Project (portfolio) vs Board (GitHub Projects v2) distinction.
 

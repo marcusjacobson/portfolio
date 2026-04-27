@@ -1,4 +1,4 @@
-name: Bug auto-add to project
+name: Bug auto-add to board
 
 on:
   issues:
@@ -20,7 +20,7 @@ jobs:
       (github.event.action == 'labeled' && github.event.label.name == 'bug') ||
       (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'bug'))
     steps:
-      - name: Add issue to project #12
+      - name: Add issue to board #12
         uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
         with:
           project-url: https://github.com/users/marcusjacobson/projects/12
