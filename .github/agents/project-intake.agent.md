@@ -119,9 +119,12 @@ Acceptance-criteria-style "Next steps" rules:
 
 ### Labels (n/a for drafts)
 
-DraftIssues cannot carry labels — labels are a Repository Issue feature and the GraphQL `DraftIssue` type has no labels field. Skip label selection for this path entirely. The `Board` label is reserved for *real* issues filed outside this agent (those are auto-added via `.github/workflows/board-autoadd.yml`).
+DraftIssues cannot carry labels — labels are a Repository Issue feature and the GraphQL `DraftIssue` type has no labels field. Skip label selection for this path entirely.
 
-If and when the user later clicks **Convert to issue** in the project UI, they may apply the `Project` label to the resulting real issue for label hygiene, but the item is already on the board so it's optional.
+The two relevant repo labels are orthogonal and only matter once a draft has been **Converted to issue**:
+
+- **`Project`** — marks the resulting real issue as tracking a portfolio Project the owner is working on. Apply this label after conversion for label hygiene; it is the canonical marker for portfolio work even though the item is already on the roadmap board.
+- **`Board`** — reserved for *real* issues filed outside this agent and auto-added to a board via `.github/workflows/board-autoadd.yml`. Items created through this agent are already on project #13, so the `Board` label is redundant on the converted issue and should not be applied here.
 
 ### Pillar values (must match project #13 field options exactly)
 
