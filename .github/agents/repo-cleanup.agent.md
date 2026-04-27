@@ -60,6 +60,35 @@ If you find a candidate that doesn't fit any class above, surface it under a sep
 
 ## Workflow
 
+### 0. Open an issue and branch before touching anything
+
+This repo's convention (see `.github/copilot-instructions.md`) is **issue + branch + PR for every change**. Cleanup sweeps follow the same rules: nothing — no removals, no `.cleanupignore` edits, no `.gitignore` edits — happens on `main` directly.
+
+Before discovery:
+
+1. **Confirm not on `main`.** Run `git rev-parse --abbrev-ref HEAD`. If the result is `main`, do not proceed to discovery yet.
+2. **File a tracking issue** (skipping `@request-intake` per the mid-flow carveout — this is the agent's own scoped workflow, not a new feature request):
+   ```pwsh
+   gh issue create `
+     --title 'Repo cleanup sweep — <YYYY-MM-DD>' `
+     --label 'chore,area:workflow,priority:p3' `
+     --body 'Tracking issue for an interactive @repo-cleanup sweep. Items removed and remediations applied will be summarised in the linked PR.'
+   ```
+   Capture the issue number as `<N>`.
+3. **Place the issue on a board.** Hand the issue number to `@board-planner` in *wiki-sync batch sweep* style (a single-issue batch). Default routing for cleanup sweeps:
+   - If a `Repo Hygiene` board (or similar) already exists, add the issue there.
+   - Otherwise, propose adding it to **#15 Portfolio Maturity Roadmap** under `source:repo-cleanup` (or asking the user whether to spin up a dedicated board if cleanup work is becoming recurring).
+   - Wait for `@board-planner`'s diff block and the user's approval before any `gh project item-add` runs. Cleanup must not silently land on a board.
+4. **Create a branch** from `main`:
+   ```pwsh
+   git switch main
+   git pull --ff-only
+   git switch -c chore/<N>-repo-cleanup-sweep
+   ```
+5. Echo the issue URL, board placement, and branch name back to the user, then proceed to step 1.
+
+If the user is already on a non-`main` branch when invoking the agent, ask whether to (a) reuse that branch, or (b) stash and create a fresh branch. Default to (b) when the existing branch has unrelated staged/uncommitted changes.
+
 ### 1. Prepare
 
 Run these in parallel:
@@ -151,11 +180,37 @@ Skipped (<s>):
   ...
 
 Branch:   <current branch>
+Issue:    #<N>
 Diff:     git diff --stat
-Next:     run `git status` to confirm; commit remediation file changes if any.
 ```
 
-If remediation files (`.gitignore`, `.cleanupignore`, in-file markers) were modified, the user commits and PRs them like any other change. This agent does not commit on the user's behalf.
+### 7. Commit, push, and open a PR
+
+If any remediation files (`.gitignore`, `.cleanupignore`, in-file `cleanup:keep` markers, renames) were modified, **or** any tracked files were removed during the walk:
+
+1. Stage and commit, referencing the tracking issue from step 0:
+   ```pwsh
+   git add -A
+   git commit -m 'Repo cleanup sweep — <m> removed, <k> kept with remediation' `
+              -m 'Refs #<N>. Removed: <short list>. Kept with remediation: <short list>.'
+   ```
+2. Push the branch:
+   ```pwsh
+   git push -u origin chore/<N>-repo-cleanup-sweep
+   ```
+3. Open a PR linked to the issue:
+   ```pwsh
+   gh pr create `
+     --base main `
+     --title 'Repo cleanup sweep — closes #<N>' `
+     --body  '<paste the step 6 report block here>' `
+     --label 'chore,area:workflow'
+   ```
+4. Watch checks (`gh pr checks --watch`). When green, hand control back to the user — **do not auto-merge.** The user squash-merges per repo policy.
+
+If nothing was changed during the walk (all `skip`s, or `quit` before the first action), close the tracking issue with a comment summarising why and skip the PR.
+
+This agent never pushes directly to `main`, never force-pushes, and never deletes remote branches.
 
 ## Output discipline
 
