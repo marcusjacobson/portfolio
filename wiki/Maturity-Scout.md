@@ -90,6 +90,69 @@ Network egress: the unattended job intentionally performs no live fetches agains
 - Dedupe is mandatory.
 - Filed issues must have all four body sections.
 
+## Operator runbook
+
+Manual operations against the weekly workflow. Use this when smoke-testing changes, replaying after a failed cron, or sweeping a backlog of freshly filed candidates.
+
+### Manual dispatch
+
+The workflow is `.github/workflows/maturity-scan.yml`. Its only `workflow_dispatch` input is `max` (string, default `5`) — the cap on total issues filed across **all** scan steps combined (repo-hygiene + github-docs + wcag share the counter).
+
+```pwsh
+gh workflow run maturity-scan.yml -f max=5 --ref main
+```
+
+Bump `max` only when intentionally draining a known backlog; the cron default of 5 exists to keep the `needs-triage` queue surveyable.
+
+### Watching the run
+
+```pwsh
+gh run list --workflow=maturity-scan.yml --limit 5
+gh run view <run-id>
+gh run view <run-id> --log        # full log on failure
+gh run view <run-id> --log-failed # just failed steps
+```
+
+The job name is `scan` (also a required PR check elsewhere in this repo — different workflow, same string). If the run never starts, confirm the ref exists on `origin/main` and that `BUG_PROJECT_TOKEN` is still valid (see token note below).
+
+### Reading the summary
+
+Each run writes a `$GITHUB_STEP_SUMMARY` block with one section per source it scanned: `repo-hygiene`, `github-docs`, and (post-#113) `wcag`. Each section reports:
+
+- **Filed:** `<n>` — issues created this run, each with a link.
+- **Suppressed (dedupe):** `<m>` — candidates that matched an existing open issue, a recently-closed completed issue (90-day window), or a board #15 item under the dedupe rules above. A `Suppressed (dedupe)` line is **expected and healthy** on a steady-state repo; it confirms the dedupe pass ran. A run with `Filed: 0; Suppressed: 0` means the source check found no gaps at all (also fine), not that dedupe was skipped.
+
+If `Filed` plus `Suppressed` together equal the `max` cap, the scan likely truncated — re-run with a higher `max` or wait for the next cron.
+
+### Verifying board attachment
+
+`maturity-autoadd.yml` uses `actions/add-to-project` with `BUG_PROJECT_TOKEN` to attach freshly filed `needs-triage` issues to board #15 automatically. Verify:
+
+```pwsh
+# Find issues filed by this run (adjust date to the run start, ISO-8601)
+gh issue list --label needs-triage --search 'created:>=2026-04-26' `
+  --json number,title,labels,url
+
+# Confirm each appears on board #15
+gh project item-list 15 --owner marcusjacobson --format json
+```
+
+If an issue is missing from the board (autoadd failed mid-run, token rotated, etc.), reattach manually:
+
+```pwsh
+pwsh scripts/gh/add-issue-to-board.ps1 -IssueNumber <n>
+```
+
+Do **not** edit the issue's labels to "retrigger" autoadd unless you've confirmed the workflow's `on: issues` trigger is wired for `[opened, labeled]` — toggling labels otherwise just churns the audit log.
+
+### BUG_PROJECT_TOKEN scope callout
+
+`BUG_PROJECT_TOKEN` is a **classic PAT** with the `project` scope only. It can attach Projects v2 items (the `addProjectV2ItemById` mutation `actions/add-to-project` calls under the hood) but it **cannot** mutate issue labels — `addLabelsToLabelable` requires `public_repo` or `repo`, which this PAT deliberately does not have.
+
+If `maturity-scan.yml` ever needs to label issues itself (today it relies on `gh issue create --label` running under the default `GITHUB_TOKEN`, which has `issues: write` from the workflow's `permissions:` block), keep the two-token split: probe / attach with `BUG_PROJECT_TOKEN`, label with `secrets.GITHUB_TOKEN`. See PR #83 for the canonical pattern. **Do not widen the PAT scope** — it is shared with `bug-autoadd.yml`, `project-autoadd.yml`, and `project-converted-issue.yml`, and broader scope expands the blast radius across all four workflows.
+
+The same constraint is captured in the repo's stored agent memory under "BUG_PROJECT_TOKEN classic PAT scope limits".
+
 ## See also
 
 - [Boards](Boards.md) — audit log entry for board #15.
