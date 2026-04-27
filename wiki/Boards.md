@@ -24,6 +24,23 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
+
+- **Branch:** `boards-worker/maturity-20260426-2120` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo):** #112, #113, #114
+- **Status field options captured:** Todo=`f75ad846`, In Progress=`47fc9ee4`, Done=`98236657` (no `In review`-style option — per the alias table in `boards-worker.agent.md`, on-failure items stay at In Progress and the blocker is audit-logged)
+- **Schema mutations applied:** _(none — board #15 schema unchanged for this run)_
+- **Per-issue transitions:**
+  - #112 Todo → In Progress at 2026-04-26T21:21:21-07:00
+  - #112 In Progress → Done — PR #125, merge `28a011d`
+  - Filed follow-ups #126 (Option B — `@axe-core/cli`) and #127 (Option C — Playwright + axe) and attached both to board #15
+  - #113 Todo → In Progress at 2026-04-26T21:35:12-07:00
+  - #113 In Progress → Done — PR #128, merge `2356279`
+  - #114 Todo → In Progress at 2026-04-26T21:46:54-07:00
+  - #114 In Progress → Done — PR #129, merge `09317f6`
+- **Outcome:** Clean drain. 3/3 of the Todo queue (#112, #113, #114) shipped this session; 2 follow-ups filed and added to board #15 (#126 Option B `@axe-core/cli`, #127 Option C Playwright + axe-core). Source `source:wcag` is now automated (v1: regex-only checks for `lang` attr, empty link text, heading order). Operator runbook documented in `wiki/Maturity-Scout.md`. Board #15 has 0 items in In Progress at session close. Lychee flagged a transient LinkedIn `999` anti-bot response on PR #129 (cleared by `gh run rerun --failed`) — captured as a possible future follow-up if recurrent.
+
 ### 2026-04-26 — create Portfolio Maturity board (#15)
 
 Inputs: user request via `@request-intake` → `@board-planner` — "create an agent that scans the repo on demand or weekly and adds issues to a board for areas I can mature the repo or live portfolio based on Microsoft Learn, GitHub docs, and other well-known best practices; dedupe against existing recommendations." Board needed up front so the agent-build issue and all future scanner output land in one place.
