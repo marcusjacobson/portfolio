@@ -31,4 +31,7 @@ exclude = [
     "^https?://github\\.com/marcusjacobson/Entra-Deployments-Marcusj-Lab",
     # CHANGELOG.md on main — fresh files added in the same PR 404 until merge.
     "^https?://github\\.com/marcusjacobson/portfolio/blob/main/CHANGELOG\\.md",
+    # Fresh agent/prompt files added in PR #184 (#183) — 404 until merged to main.
+    "^https?://github\\.com/marcusjacobson/portfolio/blob/main/\\.github/agents/repo-cleanup\\.agent\\.md",
+    "^https?://github\\.com/marcusjacobson/portfolio/blob/main/\\.github/prompts/repo-cleanup\\.prompt\\.md",
 ]
