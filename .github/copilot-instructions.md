@@ -43,6 +43,7 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 - Security review → use `/secure-code-review` prompt or `@security-reviewer` agent.
 - Issues / Boards / Wiki ops → use `@repo-ops` (uses `gh` CLI and the GitHub MCP server).
 - LinkedIn / profile / sync (audit drift between portfolio and LinkedIn) → use the `@linkedin-sync` agent. See [wiki/LinkedIn-Sync.md](../wiki/LinkedIn-Sync.md) for the input contract, gap categories, and run modes.
+- Cleanup / sweep stale artefacts → use `/repo-cleanup` or the `@repo-cleanup` agent. Walks generated test outputs, `staging-inbox/` leftovers, merged local branches, stale `.copilot-tracking/` runs, orphaned scripts, and versioned root duplicates one item at a time. Read-only until per-item approval; `keep` produces a remediation so the same item isn't re-flagged.
 
 ## Request intake (always-on)
 

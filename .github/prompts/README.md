@@ -12,6 +12,7 @@ Slash-command prompts (`*.prompt.md`) you can invoke in Copilot Chat with `/<pro
 | [`/publish-update`](publish-update.prompt.md) | Guided publish flow: branch, summarize changes, capture screenshots, label the PR, and open it. | Invoke [`@publish-manager`](../agents/publish-manager.agent.md) for end-to-end orchestration, or [`@security-reviewer`](../agents/security-reviewer.agent.md) before merge. |
 | [`/secure-code-review`](secure-code-review.prompt.md) | Secure review of a PR diff: scans for XSS, secret leakage, supply-chain risk, and unsafe inline scripts; integrates CodeQL and gitleaks results. | Pair with [`@security-reviewer`](../agents/security-reviewer.agent.md) for deeper review. |
 | [`/sync-agent-prompt-readmes`](sync-agent-prompt-readmes.prompt.md) | Scans `.github/agents/` and `.github/prompts/` and rewrites the Index tables in both READMEs from the current `readme-summary:` (or `description:`) frontmatter. | None — runs once and reports a diff. |
+| [`/repo-cleanup`](repo-cleanup.prompt.md) | One-shot entry point to the cleanup workflow. Delegates to `@repo-cleanup`; useful when you want a sweep without typing the full agent invocation. | Hand off to [`@repo-cleanup`](../agents/repo-cleanup.agent.md) for the interactive walk. |
 <!-- END: prompts-index -->
 
 ## Prompts vs. agents
