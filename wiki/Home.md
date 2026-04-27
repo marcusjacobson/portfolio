@@ -13,6 +13,7 @@ Welcome to the wiki. This is the source of truth for project notes, runbooks, an
 - [Agents](Agents) — Local chat-mode agents and the hosted Copilot coding agent that build and maintain this repo.
 - [Prompts](Prompts) — Slash-command prompts under `.github/prompts/` and the agents they hand off to.
 - [Workflows](Workflows) — GitHub Actions catalog: triggers, permissions, secrets, and which checks block PR merges.
+- [Deployment-Rules](Deployment-Rules) — Branch protection, required status contexts, and the Pages deploy contract.
 - [Publishing-Workflow](Publishing-Workflow) — How content reaches the live site.
 - [Security-Review-Checklist](Security-Review-Checklist) — What gets verified on every PR.
 - [Site-Architecture](Site-Architecture) — Page layout and tooling overview.
