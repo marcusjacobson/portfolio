@@ -57,7 +57,11 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #143 Todo → In Progress → Done — PR #161, merge `d66ae5f`
   - #145 Todo → In Progress → Done — PR #162, merge `47b1cba`
   - #146 Todo → In Progress → Done — PR #163, merge `2a7eb42`
-- **Outcome:** Phase 1 Structure complete (6/6) and Phase 2 Agent complete (5/5 — state schema #144, request-intake ext #148, board-planner ext #149, wiki-sync agent design #143, /wiki-sync-run prompt #145). Phase 3 Automation: weekly cron #146 landed; #147 first dry-run remains. One mid-batch blocker (#155, wiki/Home.md Sections-list conflict) auto-closed via PR #154 rebase. Awaiting next batch instruction or session close.
+  - #142 Todo → In Progress → Done — PR #164, merge `94ce9eb`
+  - #30  Todo → In Progress → Done — PR #165, merge `69ee4f1`
+  - #37  Todo → In Progress → Done — PR #166, merge `73b6629`
+  - #147 deferred — operational dry-run requires interactive `/wiki-sync-run`; not an issue-resolver code task
+- **Outcome:** Phase 1 Structure (6/6) and Phase 2 Agent (5/5) complete. Phase 3 Automation: cron #146 landed; #147 dry-run deferred to user. Phase 4 Maintenance: label persistence #142 landed. Rehomed: #30 (linkedin-sync docs), #37 (local-vs-hosted agent map) landed; #38 and #40 remain. Awaiting next batch instruction or session close.
 
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
 
