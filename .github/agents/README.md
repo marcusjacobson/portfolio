@@ -18,6 +18,7 @@ Specialized chat agents (`*.agent.md`) you can summon in Copilot Chat with `@<ag
 | [`@repo-ops`](repo-ops.agent.md) | Generic catch-all for Issues, Projects, Labels, and Wiki ops driven by `gh` CLI and the GitHub MCP server. Use when no other agent fits. | Yes |
 | [`@maturity-scout`](maturity-scout.agent.md) | Scans the repo against Microsoft Learn, GitHub docs, OWASP, WCAG, and repo-hygiene best practices and surfaces gap issues onto the Portfolio Maturity board (#15). On-demand mode is read-only; the weekly workflow auto-files candidates with `needs-triage`. | Read-only until approval (chat); auto-files (weekly workflow) |
 | [`@wiki-sync`](wiki-sync.agent.md) | Detects repo-vs-wiki drift since the last processed SHA and routes each delta through `@request-intake` (issue draft) and `@board-planner` (sweep onto board #16). Read-only; never edits `wiki/*.md` and never commits to `main`. | Read-only until approval |
+| [`@repo-cleanup`](repo-cleanup.agent.md) | Sweeps the repo for incidental work artefacts and proposes them for removal one at a time. Read-only until per-item approval; on `keep` it adds the right `.gitignore` / allowlist remediation so the same item isn't re-flagged next run. | Read-only until per-item approval |
 <!-- END: agents-index -->
 
 ## How they fit together
