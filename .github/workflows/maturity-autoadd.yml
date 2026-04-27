@@ -1,0 +1,33 @@
+name: Maturity auto-add to portfolio maturity board
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: maturity-autoadd-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  add-to-project:
+    name: Add source:repo-hygiene issue to Portfolio Maturity board
+    runs-on: ubuntu-latest
+    # Trigger when the source:repo-hygiene label is applied (either at open
+    # time or later). The maturity-scan workflow files issues and applies
+    # the label, which fires this `labeled` event — the only reliable way
+    # to attach issues to a Projects v2 board from a non-issues trigger.
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'source:repo-hygiene') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'source:repo-hygiene'))
+    steps:
+      - name: Add issue to board #15
+        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/15
+          # Reuses the classic-PAT secret with `project` scope. The default
+          # GITHUB_TOKEN cannot write to user-owned Projects v2 boards.
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
