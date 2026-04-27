@@ -126,7 +126,11 @@ If `Filed` plus `Suppressed` together equal the `max` cap, the scan likely trunc
 
 ### Verifying board attachment
 
-`maturity-autoadd.yml` uses `actions/add-to-project` with `BUG_PROJECT_TOKEN` to attach freshly filed `needs-triage` issues to board #15 automatically. Verify:
+`maturity-scan.yml` attaches each filed issue to board #15 **inline** within the same step, using `BUG_PROJECT_TOKEN`. The board-attach is therefore deterministic and same-run — expect the issue on board #15 by the time the workflow run reports `success`.
+
+This inline pattern exists because GitHub Actions does not trigger downstream workflows from events caused by the default `GITHUB_TOKEN`. The sibling `maturity-autoadd.yml` workflow remains as a fallback for `source:*` issues filed manually or by other automation, but `maturity-scan.yml` does not depend on it. See issue #133 for the original failure mode and fix.
+
+Verify:
 
 ```pwsh
 # Find issues filed by this run (adjust date to the run start, ISO-8601)
@@ -137,13 +141,13 @@ gh issue list --label needs-triage --search 'created:>=2026-04-26' `
 gh project item-list 15 --owner marcusjacobson --format json
 ```
 
-If an issue is missing from the board (autoadd failed mid-run, token rotated, etc.), reattach manually:
+If an issue is missing from the board (e.g. `BUG_PROJECT_TOKEN` rotated mid-run, network blip on the project-add call), reattach manually:
 
 ```pwsh
 pwsh scripts/gh/add-issue-to-board.ps1 -IssueNumber <n>
 ```
 
-Do **not** edit the issue's labels to "retrigger" autoadd unless you've confirmed the workflow's `on: issues` trigger is wired for `[opened, labeled]` — toggling labels otherwise just churns the audit log.
+Do **not** edit the issue's labels to "retrigger" the fallback `maturity-autoadd.yml` — toggling labels just churns the audit log, and the inline path is the source of truth.
 
 ### BUG_PROJECT_TOKEN scope callout
 
