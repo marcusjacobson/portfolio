@@ -34,6 +34,8 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
   - #86 Ready → In progress at 2026-04-26T18:20:08-07:00
   - #86 In progress → Done — PR #93, merge `a8251df` (smoke: issue #94, run 24972232517, item `PVTI_lAHOBvMdD84BVzLBzgrD-hI` on board #13)
   - #87 Ready → In progress at 2026-04-26T18:28:13-07:00
+- **Scope corrections:**
+  - 2026-04-26 mid-flight on #87 — `project-intake` excluded from the agent rename. Its mission is to triage *portfolio projects* the user is working on (capstones, security initiatives) and seed them onto board #13. Its noun is "Project" in the portfolio sense — the very noun this initiative preserves. Only `project-planner` → `board-planner` and `projects-worker` → `boards-worker` rename. Issue #87 body updated and a comment posted.
 - **Outcome:** _(in flight)_
 
 ### 2026-04-26 — create Microsoft Security Portfolio Roadmap project (#13)
