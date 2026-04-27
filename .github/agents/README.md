@@ -16,6 +16,7 @@ Specialized chat agents (`*.agent.md`) you can summon in Copilot Chat with `@<ag
 | [`@publish-manager`](publish-manager.agent.md) | Orchestrates a portfolio publish: local validation, branch, commit, push, PR, and check-watching. | Yes |
 | [`@security-reviewer`](security-reviewer.agent.md) | Reviews a PR diff for XSS, secret leakage, supply-chain risk, unsafe workflow permissions, and CDN trust. | Read-only |
 | [`@repo-ops`](repo-ops.agent.md) | Generic catch-all for Issues, Projects, Labels, and Wiki ops driven by `gh` CLI and the GitHub MCP server. Use when no other agent fits. | Yes |
+| [`@maturity-scout`](maturity-scout.agent.md) | Scans the repo against Microsoft Learn, GitHub docs, OWASP, WCAG, and repo-hygiene best practices and surfaces gap issues onto the Portfolio Maturity board (#15). On-demand mode is read-only; the weekly workflow auto-files candidates with `needs-triage`. | Read-only until approval (chat); auto-files (weekly workflow) |
 <!-- END: agents-index -->
 
 ## How they fit together
