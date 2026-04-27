@@ -29,4 +29,6 @@ exclude = [
     # Private lab repos referenced from project cards (lychee gets 404 unauthenticated)
     "^https?://github\\.com/marcusjacobson/Purview-as-Code-MarcusJ-Lab",
     "^https?://github\\.com/marcusjacobson/Entra-Deployments-Marcusj-Lab",
+    # CHANGELOG.md on main — fresh files added in the same PR 404 until merge.
+    "^https?://github\\.com/marcusjacobson/portfolio/blob/main/CHANGELOG\\.md",
 ]
