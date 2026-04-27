@@ -23,6 +23,17 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-26 — boards-worker session: Board Terminology Split (#14) — continuation
+
+- **Branch:** `boards-worker/board-terminology-split-20260426-1933` — PR pending
+- **Operator:** boards-worker agent
+- **Queue at start (Ready):** #91, #100, #101, #102, #103
+- **Scope:** user directive — work #100, #101, #102, #103 in this session; #91 follows in a separate session.
+- **Status field options captured:** Ready=`f75ad846`, In progress=`47fc9ee4`, In review=`2aee1b22`, Done=`98236657`
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:** _(in flight — to be appended as work proceeds)_
+- **Outcome:** _(in flight)_
+
 ### 2026-04-26 — boards-worker session: Board Terminology Split (#14) — resume
 
 - **Branch:** `boards-worker/board-terminology-split-20260426-1900` — PR pending
