@@ -39,7 +39,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #138 Todo → In Progress at 2026-04-27
   - #138 In Progress → Done — PR #152, merge `47b0c60`
   - #139 Todo → In Progress at 2026-04-27
-- **Outcome:** _(in flight)_
+  - #139 In Progress → Done — PR #153, merge `b574752`
+- **Outcome:** Batch 1 complete (3/3) — wiki structure pages Agents/Workflows/Repo-Architecture published; awaiting next batch instruction or session close.
 
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
 
