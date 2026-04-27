@@ -9,23 +9,25 @@ Two flavors run side by side:
 
 Both flavors converge on the same artifacts: GitHub issues, Projects v2 boards, branches, and PRs. See [Boards](Boards) for the board topology and [Terminology](Terminology) for the Project-vs-Board distinction.
 
-## Local agents
+## Local chat agents
 
-Frontmatter source: each row's purpose is the agent's `readme-summary:` (truncated to 2 sentences). The "When to engage" column condenses the agent's own *When to engage* section. Default handoff is the agent the file calls out as its primary downstream worker.
+These agents live as Markdown specs under [`.github/agents/`](https://github.com/marcusjacobson/portfolio/tree/main/.github/agents) and run inside your VS Code Copilot Chat session. They share state with your editor, respect repo conventions on every turn, and can be paused mid-flow.
 
-| Agent | Purpose | When to engage | Default handoff |
-|-------|---------|----------------|------------------|
-| [`@request-intake`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/request-intake.agent.md) | Front door for any feature/chore/docs ask. Classifies the request, drafts an issue, proposes a board home, and waits for approval before filing. | Any new feature, page, visual change, refactor, or backlog idea raised in chat. | `@issue-resolver` (single item) or `@board-planner` (cluster). |
-| [`@bug-intake`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/bug-intake.agent.md) | Bug-shaped variant of intake: gathers repro steps, environment, and evidence, then routes to a bug-tracking board. | User describes broken or regressed behavior — "X is broken on mobile", a screenshot of something visibly wrong. | `@issue-resolver`; defers to `@request-intake` if the report isn't a bug. |
-| [`@project-intake`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/project-intake.agent.md) | Roadmap-shaped variant of intake: drafts a project/roadmap item and creates it directly as a DraftIssue on the Security Portfolio Roadmap (board #13) with `Status=Todo`. | User proposes a new portfolio project, capstone, or roadmap initiative. | None until the draft is converted to an issue; then `@issue-resolver`. |
-| [`@issue-resolver`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/issue-resolver.agent.md) | Resolves a single GitHub issue end-to-end: branch, implement, lint, commit, open PR, watch checks, merge. Requires an explicit issue number. | One issue is fully scoped and ready to ship. | `@security-reviewer` (PR review) or `@publish-manager` (publish flow). |
-| [`@boards-worker`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/boards-worker.agent.md) | Drains a GitHub board by picking the next eligible item and handing each one to `@issue-resolver`, updating Status as it goes. | A whole board column needs to be worked in batch. | `@issue-resolver` (one issue per loop). |
-| [`@board-planner`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/board-planner.agent.md) | Scopes and creates a GitHub board (Projects v2) from a theme or cluster of issues. Designs fields/views and seeds items via `scripts/gh/`. | A theme, milestone, or issue cluster needs structured tracking. | `@boards-worker` once the board is seeded. |
-| [`@publish-manager`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/publish-manager.agent.md) | Orchestrates a portfolio publish: local validation, branch, commit, push, PR, and check-watching. | Page changes are sitting in the working tree and need to ship. | `@security-reviewer` for the resulting PR. |
-| [`@security-reviewer`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/security-reviewer.agent.md) | Reviews a PR diff for XSS, secret leakage, supply-chain risk, unsafe workflow permissions, and CDN trust. Read-only. | Before merging any PR that touches HTML/JS, workflows, or dependencies. | None — emits a verdict (`APPROVE` / `REQUEST CHANGES` / `COMMENT`). |
-| [`@maturity-scout`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/maturity-scout.agent.md) | Scans the repo against Microsoft Learn, GitHub docs, OWASP, WCAG, and repo-hygiene best practices and surfaces gap issues onto the Portfolio Maturity board (#15). | Periodic best-practice audit, or after a major external standard updates. Also runs weekly via [`maturity-scan.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/maturity-scan.yml). | `@request-intake` (chat triage) or `@boards-worker` (batch drain). |
-| [`@linkedin-sync`](LinkedIn-Sync) | Compares portfolio claims against the user's LinkedIn profile snapshot and files `gap:*` issues for missing, stale, or misaligned items. Also runs a static best-practice checklist on every invocation. See [LinkedIn Sync](LinkedIn-Sync) for the full design. | User says "sync LinkedIn", "check profile drift", or wants to audit cert / project / skill parity between portfolio and LinkedIn. | `@issue-resolver` (single finding) or `@boards-worker` (drain the gap backlog). |
-| [`@repo-ops`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/repo-ops.agent.md) | Generic catch-all for Issues, Projects, Labels, and Wiki ops driven by `gh` CLI and the GitHub MCP server. | Ad-hoc label syncs, wiki edits, or `gh` operations that don't fit another agent. | None — terminal step. |
+Frontmatter source: each row's purpose is the agent's `readme-summary:` (truncated to 2 sentences). The "When to engage" column condenses the agent's own *When to engage* section. "Complements hosted agent?" describes how each local agent interacts with the hosted Copilot coding agent — typically by handing off background work or by reviewing the PR the hosted agent produces.
+
+| Agent | Purpose | When to engage | Default handoff | Complements hosted agent? |
+|-------|---------|----------------|------------------|---------------------------|
+| [`@request-intake`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/request-intake.agent.md) | Front door for any feature/chore/docs ask. Classifies the request, drafts an issue, proposes a board home, and waits for approval before filing. | Any new feature, page, visual change, refactor, or backlog idea raised in chat. | `@issue-resolver` (single item) or `@board-planner` (cluster). | Yes — produces well-scoped issues that can be assigned to `@copilot` for unattended cloud execution. |
+| [`@bug-intake`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/bug-intake.agent.md) | Bug-shaped variant of intake: gathers repro steps, environment, and evidence, then routes to a bug-tracking board. | User describes broken or regressed behavior — "X is broken on mobile", a screenshot of something visibly wrong. | `@issue-resolver`; defers to `@request-intake` if the report isn't a bug. | Yes — well-formed bug issues are good cloud-agent candidates when the repro is file-scoped. |
+| [`@project-intake`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/project-intake.agent.md) | Roadmap-shaped variant of intake: drafts a project/roadmap item and creates it directly as a DraftIssue on the Security Portfolio Roadmap (board #13) with `Status=Todo`. | User proposes a new portfolio project, capstone, or roadmap initiative. | None until the draft is converted to an issue; then `@issue-resolver`. | No — drafts stay on the roadmap until a human converts them; cloud agent isn't engaged at the draft stage. |
+| [`@issue-resolver`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/issue-resolver.agent.md) | Resolves a single GitHub issue end-to-end: branch, implement, lint, commit, open PR, watch checks, merge. Requires an explicit issue number. | One issue is fully scoped and ready to ship. | `@security-reviewer` (PR review) or `@publish-manager` (publish flow). | Alternative — same job as the hosted agent, but synchronous and human-in-the-loop. Pick local for orchestration-heavy issues, hosted for one-shot file edits. |
+| [`@boards-worker`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/boards-worker.agent.md) | Drains a GitHub board by picking the next eligible item and handing each one to `@issue-resolver`, updating Status as it goes. | A whole board column needs to be worked in batch. | `@issue-resolver` (one issue per loop). | Partial — can hand individual items off to the hosted agent via `mcp_io_github_git_assign_copilot_to_issue` when the issue is small and self-contained. |
+| [`@board-planner`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/board-planner.agent.md) | Scopes and creates a GitHub board (Projects v2) from a theme or cluster of issues. Designs fields/views and seeds items via `scripts/gh/`. | A theme, milestone, or issue cluster needs structured tracking. | `@boards-worker` once the board is seeded. | No — board creation requires interactive design decisions that don't fit the hosted agent's one-shot model. |
+| [`@publish-manager`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/publish-manager.agent.md) | Orchestrates a portfolio publish: local validation, branch, commit, push, PR, and check-watching. | Page changes are sitting in the working tree and need to ship. | `@security-reviewer` for the resulting PR. | No — publishing depends on uncommitted local changes, which the hosted agent cannot see. |
+| [`@security-reviewer`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/security-reviewer.agent.md) | Reviews a PR diff for XSS, secret leakage, supply-chain risk, unsafe workflow permissions, and CDN trust. Read-only. | Before merging any PR that touches HTML/JS, workflows, or dependencies. | None — emits a verdict (`APPROVE` / `REQUEST CHANGES` / `COMMENT`). | Yes — runs against PRs the hosted agent opens, providing the human-side review the cloud agent's PRs need before merge. |
+| [`@maturity-scout`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/maturity-scout.agent.md) | Scans the repo against Microsoft Learn, GitHub docs, OWASP, WCAG, and repo-hygiene best practices and surfaces gap issues onto the Portfolio Maturity board (#15). | Periodic best-practice audit, or after a major external standard updates. Also runs weekly via [`maturity-scan.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/maturity-scan.yml). | `@request-intake` (chat triage) or `@boards-worker` (batch drain). | Yes — gap issues it files are often well-scoped enough to assign straight to the hosted agent. |
+| [`@linkedin-sync`](LinkedIn-Sync) | Compares portfolio claims against the user's LinkedIn profile snapshot and files `gap:*` issues for missing, stale, or misaligned items. Also runs a static best-practice checklist on every invocation. See [LinkedIn Sync](LinkedIn-Sync) for the full design. | User says "sync LinkedIn", "check profile drift", or wants to audit cert / project / skill parity between portfolio and LinkedIn. | `@issue-resolver` (single finding) or `@boards-worker` (drain the gap backlog). | Yes — `gap:*` issues with single-page edits can be assigned to the hosted agent for unattended fixes. |
+| [`@repo-ops`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/repo-ops.agent.md) | Generic catch-all for Issues, Projects, Labels, and Wiki ops driven by `gh` CLI and the GitHub MCP server. | Ad-hoc label syncs, wiki edits, or `gh` operations that don't fit another agent. | None — terminal step. | No — `gh`/MCP plumbing is local-only; the hosted agent doesn't operate at this layer. |
 
 ## How they hand off
 
@@ -66,7 +68,18 @@ flowchart TD
 
 `@repo-ops` is a side-channel for everything that doesn't fit the main flow — label syncs, wiki edits, ad-hoc `gh` commands. It can be invoked from any stage.
 
-## Hosted vs. local
+## Hosted cloud agent
+
+The **GitHub Copilot coding agent** (the hosted cloud agent) is a single, GitHub-managed worker that runs in a sandboxed cloud environment, opens its own PR, and reports back as a normal GitHub user. Unlike the local agents above, it isn't defined by a Markdown spec in this repo — its behavior is configured by GitHub, and it inherits this repo's `.github/copilot-instructions.md` and scoped `.github/instructions/*` files at runtime.
+
+It has two summon paths:
+
+- **Assign an issue to `@copilot`** in the GitHub UI (Issues → Assignees → `@copilot`). The agent picks up the issue body, branches, implements, opens a draft PR, and posts updates as comments.
+- **Call [`mcp_io_github_git_assign_copilot_to_issue`](https://docs.github.com/en/copilot/using-github-copilot/coding-agent/about-assigning-tasks-to-copilot)** from any local agent that has the GitHub MCP server available. This is how `@boards-worker`, `@maturity-scout`, and `@linkedin-sync` can offload self-contained items without a human in the loop.
+
+The hosted agent is best at **file-scoped, one-shot tasks**: a typo fix, a single-page content tweak, a small refactor with a clear acceptance test. It is weakest at orchestration (multi-step board drains, cross-cutting refactors, anything that needs interactive design decisions) and at anything that depends on uncommitted local working-tree state.
+
+### Local vs. hosted at a glance
 
 | Dimension | Local chat-mode agents | Hosted Copilot coding agent |
 |-----------|------------------------|------------------------------|
@@ -76,9 +89,25 @@ flowchart TD
 | Mutates repo? | Only with explicit approval; `@issue-resolver` and `@boards-worker` mutate by design. | Yes — opens a PR on its own branch. |
 | Picks up custom instructions? | Yes — reads `.github/copilot-instructions.md` plus scoped `.github/instructions/*` files. | Yes — honors `.github/copilot-instructions.md` and the same scoped instruction files. |
 | Reads prompts? | Yes — slash-commands under [`.github/prompts/`](https://github.com/marcusjacobson/portfolio/tree/main/.github/prompts) are reusable from chat. | No — prompts are a chat-client feature. |
+| Sees uncommitted working-tree changes? | Yes — operates on your local files. | No — only sees what's pushed. |
 | Failure mode | Reports back in the same chat turn; nothing is filed. | Pushes a draft PR even on failure; you review or close it. |
 
-When in doubt, prefer the local chat-mode agents — they share state with your editor, respect repo conventions on every turn, and can be paused mid-flow. Reach for the hosted agent when you want background work to happen while you're offline.
+### Decision guide: local or hosted?
+
+Use the table below to decide which surface to reach for. The short version: **local for orchestration and human-in-the-loop work; hosted for file-scoped, one-shot tasks you want to run in the background.**
+
+| If the task is… | Reach for | Why |
+|------------------|-----------|-----|
+| A single, well-scoped issue with a clear file target (typo, content tweak, small refactor) | Hosted (`@copilot`) | Background execution; no editor lock-up; PR appears when done. |
+| Multi-step orchestration across boards, branches, or PRs | Local (`@boards-worker`, `@board-planner`) | Needs synchronous control flow and approval gates the hosted agent doesn't expose. |
+| Anything that depends on uncommitted local changes (publish flow, in-progress page edits) | Local (`@publish-manager`, `@issue-resolver`) | Hosted agent only sees pushed state. |
+| PR review / security audit | Local (`@security-reviewer`) | Read-only review with repo-specific rules; not a hosted-agent capability. |
+| Triage / intake (turning a chat ask into an issue) | Local (`@request-intake`, `@bug-intake`, `@project-intake`) | Interactive classification, dedupe checks, and approval before any mutation. |
+| Periodic audit (best-practice scan, profile drift) | Local (`@maturity-scout`, `@linkedin-sync`) | Multi-source comparison and batch issue filing; gap issues can then be handed off to hosted. |
+| Background work while you're offline / AFK | Hosted (`@copilot`) | Runs in GitHub's sandbox; doesn't need your machine awake. |
+| Ad-hoc `gh` / MCP plumbing (label sync, wiki edit) | Local (`@repo-ops`) | Hosted agent doesn't operate at the CLI/MCP layer. |
+
+When in doubt, prefer the local chat-mode agents — they share state with your editor, respect repo conventions on every turn, and can be paused mid-flow. Reach for the hosted agent when a task is small, self-contained, and you want it to happen in the background.
 
 ## See also
 
