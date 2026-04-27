@@ -201,7 +201,7 @@ Run, in order, echoing each command:
    ```
 2. **Add to project** if a bug project exists and the user approved:
    ```pwsh
-   scripts/gh/add-issue-to-project.ps1 -ProjectUrl <url> -ItemUrl <issue-url>
+   scripts/gh/add-issue-to-board.ps1 -BoardUrl <url> -ItemUrl <issue-url>
    ```
    Or, if the script is missing, use `gh project item-add <projectNumber> --owner marcusjacobson --url <issue-url>`.
 3. **Set project fields** if known (Priority, Severity, Status). Use `gh project item-edit` with the field id captured in step 2's discovery.
