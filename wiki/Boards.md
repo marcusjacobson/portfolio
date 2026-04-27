@@ -24,6 +24,17 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
+
+- **Branch:** `boards-worker/maturity-20260426-2120` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo):** #112, #113, #114
+- **Status field options captured:** Todo=`f75ad846`, In Progress=`47fc9ee4`, Done=`98236657` (no `In review`-style option — per the alias table in `boards-worker.agent.md`, on-failure items stay at In Progress and the blocker is audit-logged)
+- **Schema mutations applied:** _(none — board #15 schema unchanged for this run)_
+- **Per-issue transitions:**
+  - _(filled in as the batch runs)_
+- **Outcome:** _(filled in at session close)_
+
 ### 2026-04-26 — create Portfolio Maturity board (#15)
 
 Inputs: user request via `@request-intake` → `@board-planner` — "create an agent that scans the repo on demand or weekly and adds issues to a board for areas I can mature the repo or live portfolio based on Microsoft Learn, GitHub docs, and other well-known best practices; dedupe against existing recommendations." Board needed up front so the agent-build issue and all future scanner output land in one place.
