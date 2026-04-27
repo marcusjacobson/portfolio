@@ -4,7 +4,7 @@
 
 The agent is read-only by default. It never files an issue, attaches to a board, or edits a label without explicit user approval in the same chat turn — same contract as every other intake-style agent in this repo.
 
-A companion weekly workflow ([`maturity-scan.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/maturity-scan.yml)) runs the deterministic subset on a schedule and files candidates with the `needs-triage` label so the user can sweep them later from chat.
+A companion weekly workflow (`.github/workflows/maturity-scan.yml`) runs the deterministic subset on a schedule and files candidates with the `needs-triage` label so the user can sweep them later from chat.
 
 ## When to use it
 
@@ -61,7 +61,7 @@ The user can override a suppression by replying `edit <n>: <changes>` and the ag
 
 ## Weekly automation contract
 
-The [`maturity-scan.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/maturity-scan.yml) workflow runs on:
+The `.github/workflows/maturity-scan.yml` workflow runs on:
 
 - `workflow_dispatch` — for manual smoke tests.
 - A weekly cron (`0 14 * * 1` — Mondays at 14:00 UTC).
@@ -92,5 +92,5 @@ Network egress: the unattended job intentionally performs no live fetches agains
 
 - [Boards](Boards.md) — audit log entry for board #15.
 - [Terminology](Terminology.md) — Project (portfolio) vs Board (Projects v2).
-- Agent file: [`.github/agents/maturity-scout.agent.md`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/maturity-scout.agent.md).
-- Workflow: [`.github/workflows/maturity-scan.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/maturity-scan.yml).
+- Agent file: `.github/agents/maturity-scout.agent.md`.
+- Workflow: `.github/workflows/maturity-scan.yml`.
