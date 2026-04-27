@@ -32,7 +32,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Status field options captured:** Todo=`f75ad846`, In Progress=`47fc9ee4`, Done=`98236657` (no `In review`-style option — per the alias table in `boards-worker.agent.md`, on-failure items stay at In Progress and the blocker is audit-logged)
 - **Schema mutations applied:** _(none — board #15 schema unchanged for this run)_
 - **Per-issue transitions:**
-  - _(filled in as the batch runs)_
+  - #112 Todo → In Progress at 2026-04-26T21:21:21-07:00
+  - #112 In Progress → Done — PR #125, merge `28a011d`
 - **Outcome:** _(filled in at session close)_
 
 ### 2026-04-26 — create Portfolio Maturity board (#15)
