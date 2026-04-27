@@ -35,6 +35,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Schema mutations applied:** _(none — board #16 schema unchanged for this run)_
 - **Per-issue transitions:**
   - #136 Todo → In Progress at 2026-04-27
+  - #136 In Progress → Done — PR #151, merge `6223514`
+  - #138 Todo → In Progress at 2026-04-27
 - **Outcome:** _(in flight)_
 
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
