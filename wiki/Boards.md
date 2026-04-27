@@ -34,6 +34,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Per-issue transitions:** _(in flight — to be appended as work proceeds)_
   - #100 Ready → In progress at 2026-04-26T19:35:00-07:00
   - #100 In progress → Done — PR #105, merge `9f7d2bc`
+  - #101 Ready → In progress at 2026-04-26T19:45:00-07:00
+  - #101 In progress → Done — PR #106, merge `165c594`
 - **Outcome:** _(in flight)_
 
 ### 2026-04-26 — boards-worker session: Board Terminology Split (#14) — resume
