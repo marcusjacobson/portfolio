@@ -1,7 +1,7 @@
 ---
 description: "Use to resolve a single GitHub issue end-to-end: branch, implement, lint, commit, open PR, watch checks, merge. Requires an explicit issue number. Runs in local VS Code chat or via the hosted Copilot coding agent."
 readme-summary: "Resolves a single GitHub issue end-to-end: branch, implement, lint, commit, open PR, watch checks, merge. Requires an explicit issue number."
-cloud: yes
+cloud: yes  # full-write end-to-end issue resolution; cloud-hardened in #192 (no --admin, fail-fast)
 invocation-contexts:
   - local-chat        # @issue-resolver in VS Code Copilot Chat
   - hosted-copilot    # issue assigned to @copilot on github.com (or via mcp_io_github_git_assign_copilot_to_issue)

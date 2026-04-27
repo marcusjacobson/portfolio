@@ -1,6 +1,7 @@
 ---
 description: "Use to audit this repo against Microsoft Learn, GitHub docs, OWASP, WCAG, and repo-hygiene best practices and surface improvement issues onto the Portfolio Maturity board (#15). Read-only by default; never mutates GitHub without explicit user approval. Also defines the contract for the weekly maturity-scan workflow."
 readme-summary: "Scans the repo against Microsoft Learn, GitHub docs, OWASP, WCAG, and repo-hygiene best practices and surfaces gap issues onto the Portfolio Maturity board (#15). On-demand mode is read-only; the weekly workflow auto-files candidates with `needs-triage`."
+cloud: no  # interactive approval gates; weekly workflow handles unattended runs separately
 tools: [read, search, execute, github/*, todo]
 ---
 

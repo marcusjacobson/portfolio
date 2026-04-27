@@ -1,6 +1,7 @@
 ---
 description: "Specialized intake for new roadmap/project ideas in this repo via Copilot Chat: classify, draft a roadmap-shaped item, and create it directly as a DraftIssue on the Security Portfolio Roadmap (board #13) with Status=Todo. Engages only when the user proposes a new portfolio project or roadmap item. Read-only by default; never mutates GitHub without explicit user approval."
 readme-summary: "Roadmap-shaped variant of intake: drafts a project/roadmap item with Pillar, Tier, Goal, and Next steps; creates it as a DraftIssue on board #13 (no repo issue is filed) and sets Status=Todo plus Pillar/Tier/Priority."
+cloud: no  # interactive approval gates before draft creation
 tools: [read, search, execute, github/*, todo]
 ---
 

@@ -1,7 +1,7 @@
 ---
 description: "Drains the `needs-triage` backlog one issue at a time. Reads each candidate, proposes a confirm-for-work or dismiss disposition, and only mutates after explicit user approval (chat reply or `/triage apply` cloud comment). Read-only by default."
 readme-summary: "Triages issues currently labeled `needs-triage` — confirms them for work (labels + priority + board placement) or dismisses them (close as wontfix/duplicate). Operates one issue at a time in chat or as a comment thread when summoned via the hosted Copilot agent."
-cloud: yes
+cloud: yes  # cloud-comment mode posts proposal + waits for /triage apply reply (#191)
 tools: [read, search, execute, github/*, todo]
 ---
 

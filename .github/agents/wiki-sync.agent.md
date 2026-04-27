@@ -1,6 +1,7 @@
 ---
 description: "Use to detect deltas between repo state (workflows, agents, prompts, scripts, structural .github/ changes) and wiki/*.md pages, then hand each delta off to `@request-intake` for issue drafting and `@board-planner` for batching onto board #16. Detector-only: never edits wiki/*.md, never calls `gh issue create`, never advances the state cursor without full-batch resolution."
 readme-summary: "Detects repo-vs-wiki drift since the last processed SHA and routes each delta through `@request-intake` (issue draft) and `@board-planner` (sweep onto board #16). Read-only; never edits `wiki/*.md` and never commits to `main`."
+cloud: no  # requires interactive batch confirmation; never advances cursor unattended
 tools: [read, search, execute, github/*, todo]
 ---
 

@@ -61,6 +61,16 @@ user request
 - Agents echo `gh` commands before running them.
 - When a referenced script (`scripts/gh/*.ps1`) is missing, agents fall back to direct `gh` commands rather than inventing one.
 
+## Frontmatter
+
+Every `*.agent.md` file declares a `cloud:` key in its YAML frontmatter that tells humans and tooling whether the agent is safe to invoke from the github.com **Assign to Copilot** picker. Allowed values:
+
+- **`cloud: yes`** — agent is cloud-hardened. Safe to assign to the hosted Copilot coding agent. Forbids `vscode_askQuestions`-style prompts; falls back to issue/PR comments when blocked; never uses `gh pr merge --admin`.
+- **`cloud: read-only`** — agent is cloud-safe but never mutates state. Posts findings as a single PR or issue comment and exits.
+- **`cloud: no`** — agent depends on interactive approval gates, uncommitted local working-tree state, or design conversations that don't fit a one-shot cloud run. Use locally only.
+
+Each `cloud:` line carries a one-line `#` comment explaining the choice (e.g. `cloud: no  # interactive approval gates`). The wiki [`Agents`](../../wiki/Agents.md) page renders the same values in its **Cloud mode** column.
+
 ## Adding or updating an agent
 
 1. Create or edit `<name>.agent.md` with valid YAML frontmatter (`description:` is required).

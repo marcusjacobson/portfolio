@@ -1,7 +1,7 @@
 ---
 description: "Use when reviewing PR diffs for XSS, secrets, supply-chain risks, unsafe workflow permissions, and CDN trust. Read-only."
 readme-summary: "Reviews a PR diff for XSS, secret leakage, supply-chain risk, unsafe workflow permissions, and CDN trust."
-cloud: read-only
+cloud: read-only  # never mutates code, never merges, posts a single PR comment in cloud (#193)
 invocation-contexts:
   - local-chat        # @security-reviewer in VS Code Copilot Chat
   - hosted-copilot    # PR assigned to @copilot for review, or invoked via mcp_io_github_git_assign_copilot_to_issue with an attached PR ref
