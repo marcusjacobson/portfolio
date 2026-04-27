@@ -33,7 +33,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Project node id:** `PVT_kwHOBvMdD84BV27q`
 - **Status field id:** `PVTSSF_lAHOBvMdD84BV27qzhRPoko`
 - **Schema mutations applied:** _(none — board #16 schema unchanged for this run)_
-- **Per-issue transitions:** _(populated as work proceeds)_
+- **Per-issue transitions:**
+  - #136 Todo → In Progress at 2026-04-27
 - **Outcome:** _(in flight)_
 
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
