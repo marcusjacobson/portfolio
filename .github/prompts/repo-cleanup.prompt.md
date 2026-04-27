@@ -13,8 +13,8 @@ You are running the cleanup workflow defined in [`.github/agents/repo-cleanup.ag
 
 1. **Engage `@repo-cleanup`.** Apply any `--scope=`, `--age=`, or `--no-branches` argument the user provided. Default `--age=14` and include local merged branches.
 2. **Run the prepare phase** (the parallel discovery commands listed in the agent file).
-3. **Produce the numbered proposal list** in the exact block format the agent specifies. No prose framing.
-4. **Walk the list one item at a time.** Wait for `<n> remove`, `<n> keep`, `<n> skip`, or `quit` between every item. Echo destructive commands before running them.
+3. **Print the one-line summary and the FIRST candidate only.** Use the per-item block shape from step 3 of the agent file (`[1/<N>] <class> <path>` with `reason:`, `action on remove:`, `remediation on keep:`). Do not print item 2 in the same turn.
+4. **Walk one item at a time.** Wait for `remove`, `keep`, `skip`, `show all`, or `quit` between every item. Bare verbs apply to the currently-prompted item. Echo destructive commands before running them. Always present exactly one candidate per assistant turn.
 5. **Apply remediations on `keep`** using the per-class table in the agent file (`.gitignore`, `.cleanupignore`, in-file `# cleanup:keep` marker, or rename).
 6. **Print the final report** when the user types `quit` or every item has been answered.
 
