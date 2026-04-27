@@ -38,7 +38,9 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #101 In progress → Done — PR #106, merge `165c594`
   - #102 Ready → In progress at 2026-04-26T19:55:00-07:00
   - #102 In progress → Done — PR #107, merge `1c676ff`
-- **Outcome:** _(in flight)_
+  - #103 Ready → In progress at 2026-04-26T20:05:00-07:00
+  - #103 In progress → Done — PR #108, merge `6ac97ac`
+- **Outcome:** All four sweep follow-ons (#100–#103) shipped. `Project` label restored (#100); intake/repo-ops agent prose corrected (#101); copilot-instructions / prompts / workflows prose corrected (#102); `agents/README.md` table refreshed (#103). Halting before #91 per user directive — #91 will be worked in a separate session.
 
 ### 2026-04-26 — boards-worker session: Board Terminology Split (#14) — resume
 
