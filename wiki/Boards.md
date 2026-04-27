@@ -34,6 +34,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Per-issue transitions:**
   - #112 Todo → In Progress at 2026-04-26T21:21:21-07:00
   - #112 In Progress → Done — PR #125, merge `28a011d`
+  - Filed follow-ups #126 (Option B — `@axe-core/cli`) and #127 (Option C — Playwright + axe) and attached both to board #15
+  - #113 Todo → In Progress at 2026-04-26T21:35:12-07:00
 - **Outcome:** _(filled in at session close)_
 
 ### 2026-04-26 — create Portfolio Maturity board (#15)
