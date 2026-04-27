@@ -9,6 +9,7 @@ Welcome to the wiki. This is the source of truth for project notes, runbooks, an
 - [Terminology](Terminology) — "Project" (portfolio) vs "Board" (GitHub Projects v2). Read this first.
 - [Projects](Projects) — Portfolio showcase Projects (the live site's `ms_security_projects.html`).
 - [Boards](Boards) — GitHub Projects v2 audit log, schemas, and sweep history.
+- [Agents](Agents) — Local chat-mode agents and the hosted Copilot coding agent that build and maintain this repo.
 - [Publishing-Workflow](Publishing-Workflow) — How content reaches the live site.
 - [Security-Review-Checklist](Security-Review-Checklist) — What gets verified on every PR.
 - [Site-Architecture](Site-Architecture) — Page layout and tooling overview.
