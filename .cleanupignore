@@ -1,0 +1,7 @@
+# Paths and branches the @repo-cleanup agent should skip on future runs.
+# Format:
+#   <path-or-filename>           # one entry per line; matched literally
+#   branches:
+#     <branch-name>              # list under the branches: header
+
+test-results/
