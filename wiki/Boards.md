@@ -38,7 +38,12 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #90 Ready → In progress at 2026-04-26T19:05:47-07:00
   - #90 In progress → Done — PR #99, merge `052de86`
 - **Mid-flight scope correction:** main's `wiki/Projects.md` audit log moved to `wiki/Boards.md` while #90 was in flight. Session branch was reset to main and this consolidated entry rewritten directly against `wiki/Boards.md` (the new canonical home) rather than rebasing the now-stale per-issue commits.
-- **Outcome:** _(in flight — #90 just shipped; halting before #91 per default `--max=3`. #91 explicitly removes deprecation shims introduced by #88, so it must be the last issue in the rollout and requires separate user approval.)_
+- **Mid-flight intake (read-only sweep):** before approving #91, user requested a thorough repo-wide sweep for "project" vs "board" prose drift under the canonical rule (Project = portfolio work item; Board = GitHub Projects v2 container). User clarified the `Project` label should be **restored** (not folded into `Board`) so it can keep tagging issues that track a portfolio Project the user is working on. Sweep filed 4 follow-on issues onto board #14 with `Status=Ready`:
+  - #100 Restore `Project` label and rewire `@project-intake` to use it (priority:p1) — `PVTI_lAHOBvMdD84BVzd8zgrEQ58`
+  - #101 Fix project/board prose drift in intake and repo-ops agents (priority:p2) — `PVTI_lAHOBvMdD84BVzd8zgrEQ6c`
+  - #102 Fix project/board prose drift in copilot-instructions, prompts, and workflows (priority:p3) — `PVTI_lAHOBvMdD84BVzd8zgrEQ7I`
+  - #103 Refresh `agents/README.md` description for `@project-intake` (priority:p3) — `PVTI_lAHOBvMdD84BVzd8zgrEQ7U`
+- **Outcome:** _(in flight — #88/#89/#90 shipped; #100–#103 added to queue as Ready; halting before #91 per default `--max=3`. #91 explicitly removes deprecation shims introduced by #88, so it must be the last shim-related issue in the rollout and requires separate user approval. Suggested execution after #91: #100 → #101/#102 (parallel) → #103.)_
 
 ### 2026-04-26 — projects-worker session: Board Terminology Split (#14)
 
