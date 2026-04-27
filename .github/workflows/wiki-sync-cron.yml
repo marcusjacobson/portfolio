@@ -1,0 +1,122 @@
+name: Wiki Sync (weekly cron)
+
+# Scheduled reminder to run the human-in-the-loop wiki-sync orchestration
+# (`/wiki-sync-run` → `@wiki-sync` → `@request-intake` → `@board-planner`).
+#
+# CI cannot drive Copilot Chat agents directly, so this workflow only files
+# (or refreshes) a tracking issue tagged `agent:wiki-sync`. A maintainer then
+# runs `/wiki-sync-run` from a chat session and closes the tracker.
+#
+# Disabled by default until #W10 / #W12 ship and a manual dry-run passes.
+# To enable, set the repo variable WIKI_SYNC_CRON_ENABLED to "1"
+# (Settings → Secrets and variables → Actions → Variables).
+
+on:
+  schedule:
+    # Mondays 13:00 UTC — outside business hours but visible in morning sweeps.
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Run even if WIKI_SYNC_CRON_ENABLED is unset'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: wiki-sync-cron
+  cancel-in-progress: false
+
+jobs:
+  file-tracker:
+    name: File weekly wiki-sync tracker
+    runs-on: ubuntu-latest
+    if: ${{ vars.WIKI_SYNC_CRON_ENABLED == '1' || (github.event_name == 'workflow_dispatch' && github.event.inputs.force == 'true') }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Read wiki-sync cursor
+        id: cursor
+        shell: bash
+        run: |
+          set -euo pipefail
+          STATE_FILE=".copilot-tracking/wiki-sync-state.json"
+          if [[ -f "$STATE_FILE" ]]; then
+            LAST_SHA=$(jq -r '.lastProcessedSha // "unknown"' "$STATE_FILE")
+          else
+            LAST_SHA="unknown"
+          fi
+          HEAD_SHA="${GITHUB_SHA}"
+          echo "last_sha=${LAST_SHA}" >> "$GITHUB_OUTPUT"
+          echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
+          echo "Cursor: ${LAST_SHA}"
+          echo "Head:   ${HEAD_SHA}"
+
+      - name: Render tracker issue body
+        id: render
+        shell: bash
+        env:
+          LAST_SHA: ${{ steps.cursor.outputs.last_sha }}
+          HEAD_SHA: ${{ steps.cursor.outputs.head_sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          # Render from external template to avoid the heredoc-in-block-scalar
+          # pitfall documented in issue #115.
+          BODY_FILE="$(mktemp)"
+          sed \
+            -e "s|__LAST_SHA__|${LAST_SHA}|g" \
+            -e "s|__HEAD_SHA__|${HEAD_SHA}|g" \
+            -e "s|__RUN_URL__|${RUN_URL}|g" \
+            .github/workflows/templates/wiki-sync-cron-issue-body.md \
+            > "$BODY_FILE"
+          echo "body_file=${BODY_FILE}" >> "$GITHUB_OUTPUT"
+
+      - name: File or refresh tracker issue
+        shell: bash
+        env:
+          BODY_FILE: ${{ steps.render.outputs.body_file }}
+          HEAD_SHA: ${{ steps.cursor.outputs.head_sha }}
+        run: |
+          set -euo pipefail
+          REPO="${GITHUB_REPOSITORY}"
+          DATE_TAG=$(date -u +%Y-%m-%d)
+          TITLE="Weekly wiki-sync sweep — ${DATE_TAG}"
+
+          # Dedupe: if an open tracker already exists, comment on it instead of
+          # filing a duplicate. Match on the agent:wiki-sync label + open state.
+          EXISTING=$(gh issue list \
+            --repo "$REPO" \
+            --state open \
+            --label 'agent:wiki-sync' \
+            --search 'in:title "Weekly wiki-sync sweep"' \
+            --json number,title \
+            --limit 5)
+          EXISTING_NUM=$(echo "$EXISTING" | jq -r '.[0].number // empty')
+
+          if [[ -n "$EXISTING_NUM" ]]; then
+            echo "Refreshing existing tracker #${EXISTING_NUM}"
+            {
+              echo "Weekly cron tick — ${DATE_TAG} (head ${HEAD_SHA})."
+              echo
+              echo "Tracker still open; previous sweep has not been resolved. See updated body below."
+            } > comment.md
+            gh issue comment "$EXISTING_NUM" --repo "$REPO" --body-file comment.md
+            gh issue edit "$EXISTING_NUM" --repo "$REPO" --body-file "$BODY_FILE"
+          else
+            echo "Filing new tracker"
+            gh issue create \
+              --repo "$REPO" \
+              --title "$TITLE" \
+              --body-file "$BODY_FILE" \
+              --label 'agent:wiki-sync' \
+              --label 'chore' \
+              --label 'area:workflow'
+          fi
