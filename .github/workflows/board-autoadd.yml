@@ -1,4 +1,4 @@
-name: Project auto-add to roadmap
+name: Board auto-add to roadmap
 
 on:
   issues:
@@ -9,7 +9,7 @@ permissions:
   issues: read
 
 concurrency:
-  group: project-autoadd-${{ github.event.issue.number }}
+  group: board-autoadd-${{ github.event.issue.number }}
   cancel-in-progress: false
 
 jobs:
@@ -25,5 +25,5 @@ jobs:
         with:
           project-url: https://github.com/users/marcusjacobson/projects/13
           # Reuses the classic-PAT secret that already powers bug-autoadd.yml.
-          # Project scope on the same user-owned account covers board #13.
+          # Project (board) scope on the same user-owned account covers board #13.
           github-token: ${{ secrets.BUG_PROJECT_TOKEN }}

@@ -1,4 +1,4 @@
-name: Project converted-issue auto-label
+name: Board membership labeler
 
 on:
   issues:
@@ -9,14 +9,14 @@ permissions:
   issues: write
 
 concurrency:
-  group: project-converted-issue-${{ github.event.issue.number }}
+  group: board-membership-labeler-${{ github.event.issue.number }}
   cancel-in-progress: false
 
 jobs:
   label-converted-issue:
     name: Label issues that already live on board #13
     runs-on: ubuntu-latest
-    # Skip issues opened with the Board label already applied — project-autoadd.yml
+    # Skip issues opened with the Board label already applied — board-autoadd.yml
     # handles those, and this workflow is the inverse direction (board-membership
     # implies label, not label implies board-membership). If the label is already
     # present we have nothing to add.
@@ -27,7 +27,7 @@ jobs:
         id: probe
         env:
           # Classic PAT with `project` scope. Same secret powers bug-autoadd.yml
-          # and project-autoadd.yml. The default GITHUB_TOKEN cannot read
+          # and board-autoadd.yml. The default GITHUB_TOKEN cannot read
           # ProjectV2 fields on a user-owned project. NOTE: this token has only
           # `project` scope, so it cannot call `addLabelsToLabelable` /
           # `gh issue edit --add-label`. The labelling step below uses the
