@@ -1,0 +1,27 @@
+name: Triage auto-add to board
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: triage-autoadd-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  add-to-project:
+    name: Add needs-triage issue to Triage Queue
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'needs-triage') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'needs-triage'))
+    steps:
+      - name: Add issue to board #18
+        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/18
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
