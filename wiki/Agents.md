@@ -24,6 +24,7 @@ Frontmatter source: each row's purpose is the agent's `readme-summary:` (truncat
 | [`@publish-manager`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/publish-manager.agent.md) | Orchestrates a portfolio publish: local validation, branch, commit, push, PR, and check-watching. | Page changes are sitting in the working tree and need to ship. | `@security-reviewer` for the resulting PR. |
 | [`@security-reviewer`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/security-reviewer.agent.md) | Reviews a PR diff for XSS, secret leakage, supply-chain risk, unsafe workflow permissions, and CDN trust. Read-only. | Before merging any PR that touches HTML/JS, workflows, or dependencies. | None — emits a verdict (`APPROVE` / `REQUEST CHANGES` / `COMMENT`). |
 | [`@maturity-scout`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/maturity-scout.agent.md) | Scans the repo against Microsoft Learn, GitHub docs, OWASP, WCAG, and repo-hygiene best practices and surfaces gap issues onto the Portfolio Maturity board (#15). | Periodic best-practice audit, or after a major external standard updates. Also runs weekly via [`maturity-scan.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/maturity-scan.yml). | `@request-intake` (chat triage) or `@boards-worker` (batch drain). |
+| [`@linkedin-sync`](LinkedIn-Sync) | Compares portfolio claims against the user's LinkedIn profile snapshot and files `gap:*` issues for missing, stale, or misaligned items. Also runs a static best-practice checklist on every invocation. See [LinkedIn Sync](LinkedIn-Sync) for the full design. | User says "sync LinkedIn", "check profile drift", or wants to audit cert / project / skill parity between portfolio and LinkedIn. | `@issue-resolver` (single finding) or `@boards-worker` (drain the gap backlog). |
 | [`@repo-ops`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/repo-ops.agent.md) | Generic catch-all for Issues, Projects, Labels, and Wiki ops driven by `gh` CLI and the GitHub MCP server. | Ad-hoc label syncs, wiki edits, or `gh` operations that don't fit another agent. | None — terminal step. |
 
 ## How they hand off
@@ -55,6 +56,9 @@ flowchart TD
 
     scout["@maturity-scout"] --> req
     scout --> worker
+
+    linkedin["@linkedin-sync"] --> resolver
+    linkedin --> worker
 
     ops["@repo-ops"]:::side
     classDef side stroke-dasharray: 4 4

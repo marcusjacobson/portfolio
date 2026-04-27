@@ -42,6 +42,7 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 - Publishing → use `/publish-update` prompt or the `@publish-manager` agent.
 - Security review → use `/secure-code-review` prompt or `@security-reviewer` agent.
 - Issues / Boards / Wiki ops → use `@repo-ops` (uses `gh` CLI and the GitHub MCP server).
+- LinkedIn / profile / sync (audit drift between portfolio and LinkedIn) → use the `@linkedin-sync` agent. See [wiki/LinkedIn-Sync.md](../wiki/LinkedIn-Sync.md) for the input contract, gap categories, and run modes.
 
 ## Request intake (always-on)
 
