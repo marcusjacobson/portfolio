@@ -162,15 +162,9 @@ jobs:
             if [[ -n "$SUMMARY_SUPPRESSED" ]]; then echo "$SUMMARY_SUPPRESSED"; fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Attach filed issues to Portfolio Maturity board (#15)
-        if: always()
-        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
-        with:
-          project-url: https://github.com/users/marcusjacobson/projects/15
-          # BUG_PROJECT_TOKEN is the shared classic PAT with `project` scope
-          # documented in repo memory. It can attach issues to user-owned
-          # Projects v2 boards but cannot mutate labels — so the scan step
-          # above applies labels with the default GITHUB_TOKEN, then this
-          # step uses the PAT to attach.
-          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
-          labeled: source:repo-hygiene
+      # Note: filed issues are attached to board #15 by the sibling
+      # workflow `.github/workflows/maturity-autoadd.yml`, which fires
+      # on the `labeled` event when the `source:repo-hygiene` label is
+      # applied. `actions/add-to-project` cannot run inside this scan
+      # job because workflow_dispatch / schedule events have no issue
+      # context in the payload.
