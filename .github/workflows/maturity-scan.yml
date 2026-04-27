@@ -25,6 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Classic PAT with `project` scope — used only for `gh project item-add`
+      # so each step can attach its filed issues to board #15 inline. The
+      # default GITHUB_TOKEN cannot write to user-owned Projects v2, and
+      # issues it creates do not trigger downstream workflows like
+      # maturity-autoadd.yml. See issue #133.
+      PROJECT_TOKEN: ${{ secrets.BUG_PROJECT_TOKEN }}
       MAX_FILED: ${{ github.event.inputs.max || '5' }}
     steps:
       - name: Checkout
@@ -148,8 +154,12 @@ jobs:
             FILED=$((FILED+1))
             SUMMARY_FILED+=$'\n  - '"$URL"' — '"$TITLE"
 
-            # Board attach happens in the next step via actions/add-to-project,
-            # filtered on the `source:repo-hygiene` label this step just applied.
+            # Attach to board #15 inline. Issues created via GITHUB_TOKEN
+            # do not trigger the sibling `maturity-autoadd.yml` workflow
+            # (GitHub anti-recursion). Use BUG_PROJECT_TOKEN here so the
+            # board-attach is deterministic and same-run. See issue #133.
+            GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+              --owner marcusjacobson --url "$URL" >/dev/null
           done
 
           {
@@ -276,6 +286,11 @@ jobs:
             --label "needs-triage,source:github-docs,area:workflow" \
             --body-file "$BODY_FILE")
           rm -f "$BODY_FILE"
+
+          # Attach to board #15 inline (see issue #133 — GITHUB_TOKEN-created
+          # issues don't trigger maturity-autoadd.yml).
+          GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+            --owner marcusjacobson --url "$URL" >/dev/null
 
           {
             echo ""
@@ -489,6 +504,10 @@ jobs:
               --body-file "$body_file")
             rm -f "$body_file"
 
+            # Attach to board #15 inline (see issue #133).
+            GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+              --owner marcusjacobson --url "$url" >/dev/null
+
             FILED=$((FILED+1))
             SUMMARY_FILED+=$'\n  - '"$url"$' — '"$title"
           }
@@ -513,10 +532,9 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # Note: filed issues are attached to board #15 by the sibling
-      # workflow `.github/workflows/maturity-autoadd.yml`, which fires
-      # on the `labeled` event when the `source:repo-hygiene`,
-      # `source:github-docs`, or `source:wcag` label is applied.
-      # `actions/add-to-project` cannot run inside this scan job because
-      # workflow_dispatch / schedule events have no issue context in
-      # the payload.
+      # Note: filed issues are attached to board #15 inline within each
+      # scan step using BUG_PROJECT_TOKEN (see issue #133). Issues created
+      # via the default GITHUB_TOKEN do not trigger downstream workflows,
+      # so the sibling `maturity-autoadd.yml` cannot reliably attach them.
+      # The autoadd workflow remains as a fallback for `source:*` issues
+      # filed manually or by other automation.
