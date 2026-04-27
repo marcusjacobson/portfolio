@@ -53,7 +53,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #148 Todo → In Progress at 2026-04-27
   - #148 In Progress → Done — PR #159, merge `0216b0f`
   - #149 Todo → In Progress at 2026-04-27
-- **Outcome:** Phase 1 Structure complete (6/6) — Agents, Workflows, Repo-Architecture, Prompts, Deployment-Rules, Home build-mechanics index all published. One mid-batch blocker (#155, wiki/Home.md Sections-list conflict) auto-closed via PR #154 rebase. Awaiting next batch instruction or session close.
+  - #149 In Progress → Done — PR #160, merge `87d51c2`
+- **Outcome:** Phase 1 Structure complete (6/6) and Phase 2 Agent prerequisites complete (3/3 — state schema #144, request-intake ext #148, board-planner ext #149). #143 (agent design) and #145 (invocation prompt) now unblocked. One mid-batch blocker (#155, wiki/Home.md Sections-list conflict) auto-closed via PR #154 rebase. Awaiting next batch instruction or session close.
 
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
 
