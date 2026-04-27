@@ -33,6 +33,7 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
   - #85 In progress → Done — PR #92, merge `77d9b7e`
   - #86 Ready → In progress at 2026-04-26T18:20:08-07:00
   - #86 In progress → Done — PR #93, merge `a8251df` (smoke: issue #94, run 24972232517, item `PVTI_lAHOBvMdD84BVzLBzgrD-hI` on board #13)
+  - #87 Ready → In progress at 2026-04-26T18:28:13-07:00
 - **Outcome:** _(in flight)_
 
 ### 2026-04-26 — create Microsoft Security Portfolio Roadmap project (#13)
