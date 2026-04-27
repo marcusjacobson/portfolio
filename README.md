@@ -100,3 +100,11 @@ In VS Code chat:
 - In the agent picker, choose `publish-manager`, `security-reviewer`, or `repo-ops`.
 - The GitHub MCP server (defined in [.vscode/mcp.json](.vscode/mcp.json)) prompts for a PAT on first use; the token is never written to disk.
 
+## Agents
+
+This repo combines **local VS Code agents** (chat-mode personas under [.github/agents/](.github/agents/)) with the **GitHub Copilot cloud agent** for asynchronous, issue-driven work. Local agents handle interactive flows like publishing, security review, and intake triage; the cloud agent picks up labeled issues and opens PRs in the background. Work in flight is tracked on GitHub Projects v2 boards (Portfolio Roadmap, Bug Tracker, etc.).
+
+- [Projects tab](https://github.com/marcusjacobson/portfolio/projects) — live boards for roadmap, bugs, and intake.
+- [wiki/Agents.md](wiki/Agents.md) — full catalog of local and cloud agents with their tools and routing.
+- [AGENTS.md (planned — issue #32)](https://github.com/marcusjacobson/portfolio/issues/32) — top-level cloud-agent guidance for the hosted Copilot agent.
+
