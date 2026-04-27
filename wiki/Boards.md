@@ -23,6 +23,23 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-26 — boards-worker session: Board Terminology Split (#14) — resume
+
+- **Branch:** `boards-worker/board-terminology-split-20260426-1900` — PR pending
+- **Operator:** boards-worker agent
+- **Queue at start (Ready):** #88, #89, #90, #91 (resume after #85–#87 shipped via prior session; default `--max=3` so this batch covers #88, #89, #90 and halts before #91)
+- **Status field options captured:** Ready=`f75ad846`, In progress=`47fc9ee4`, In review=`2aee1b22`, Done=`98236657`
+- **Schema mutations applied:** _(none — schema already correct from prior session)_
+- **Per-issue transitions:**
+  - #88 Ready → In progress at 2026-04-26T18:55:21-07:00
+  - #88 In progress → Done — PR #97, merge `e69d859`
+  - #89 Ready → In progress at 2026-04-26T19:00:56-07:00
+  - #89 In progress → Done — PR #98, merge `817a43f`
+  - #90 Ready → In progress at 2026-04-26T19:05:47-07:00
+  - #90 In progress → Done — PR #99, merge `052de86`
+- **Mid-flight scope correction:** main's `wiki/Projects.md` audit log moved to `wiki/Boards.md` while #90 was in flight. Session branch was reset to main and this consolidated entry rewritten directly against `wiki/Boards.md` (the new canonical home) rather than rebasing the now-stale per-issue commits.
+- **Outcome:** _(in flight — #90 just shipped; halting before #91 per default `--max=3`. #91 explicitly removes deprecation shims introduced by #88, so it must be the last issue in the rollout and requires separate user approval.)_
+
 ### 2026-04-26 — projects-worker session: Board Terminology Split (#14)
 
 - **Branch:** `projects-worker/board-terminology-split-20260426-1507` — PR pending
