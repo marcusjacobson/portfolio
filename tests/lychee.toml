@@ -34,4 +34,6 @@ exclude = [
     # Fresh agent/prompt files added in PR #184 (#183) — 404 until merged to main.
     "^https?://github\\.com/marcusjacobson/portfolio/blob/main/\\.github/agents/repo-cleanup\\.agent\\.md",
     "^https?://github\\.com/marcusjacobson/portfolio/blob/main/\\.github/prompts/repo-cleanup\\.prompt\\.md",
+    # Fresh agent file added in PR #197 (#191) — 404 until merged to main.
+    "^https?://github\\.com/marcusjacobson/portfolio/blob/main/\\.github/agents/triage\\.agent\\.md",
 ]

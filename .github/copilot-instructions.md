@@ -42,6 +42,7 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 - Publishing → use `/publish-update` prompt or the `@publish-manager` agent.
 - Security review → use `/secure-code-review` prompt or `@security-reviewer` agent.
 - Issues / Boards / Wiki ops → use `@repo-ops` (uses `gh` CLI and the GitHub MCP server).
+- Triage of `needs-triage` issues (confirm for work or dismiss) → use the `@triage` agent. Operates one issue at a time. In chat it presents a proposal and waits for `apply` / `dismiss` / `edit:` / `cancel`. When summoned by the hosted Copilot agent on an issue, it posts the proposal as a comment, sets `triage:proposed`, and waits for a `/triage apply` or `/triage dismiss <reason>` reply on the issue.
 - LinkedIn / profile / sync (audit drift between portfolio and LinkedIn) → use the `@linkedin-sync` agent. See [wiki/LinkedIn-Sync.md](../wiki/LinkedIn-Sync.md) for the input contract, gap categories, and run modes.
 - Cleanup / sweep stale artefacts → use `/repo-cleanup` or the `@repo-cleanup` agent. Walks generated test outputs, `staging-inbox/` leftovers, merged local branches, stale `.copilot-tracking/` runs, orphaned scripts, and versioned root duplicates one item at a time. Read-only until per-item approval; `keep` produces a remediation so the same item isn't re-flagged.
 
