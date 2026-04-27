@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Changelog · Marcus Jacobson Portfolio</title>
+<meta name="description" content="Notable user-visible changes to the Marcus Jacobson Microsoft security portfolio site.">
+<style>
+:root{
+  --bg:#1C1C1A;--text1:#E8E6E0;--text2:#B5B3AD;--text3:#7A7873;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.12);
+  --accent:#9B8FE0;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text1);font-family:system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.6}
+.page{max-width:780px;margin:0 auto;padding:3rem 1.25rem 4rem}
+header{margin-bottom:2.5rem}
+.eyebrow{font-size:11px;font-family:monospace;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:0 0 .5rem}
+h1{font-size:2rem;margin:0 0 .5rem;font-weight:600}
+.lede{color:var(--text2);font-size:14px;margin:0;max-width:60ch}
+.lede a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(155,143,224,0.3)}
+.lede a:hover{border-bottom-color:var(--accent)}
+.changelog-body h2{font-size:1.1rem;font-family:monospace;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:.4rem;margin:2.25rem 0 .75rem}
+.changelog-body h3{font-size:.78rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin:1.25rem 0 .35rem}
+.changelog-body ul{padding-left:1.25rem;margin:.25rem 0 .75rem}
+.changelog-body li{font-size:14px;color:var(--text1);margin:.25rem 0}
+.changelog-body p{font-size:14px;color:var(--text2);margin:.5rem 0}
+.changelog-body code{background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;font-size:12.5px}
+.changelog-body a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(155,143,224,0.25)}
+.changelog-body a:hover{border-bottom-color:var(--accent)}
+.footer{margin-top:3rem;padding-top:1.25rem;border-top:1px solid var(--border);font-size:11px;font-family:monospace;color:var(--text3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.footer a{color:inherit;text-decoration:none;opacity:.7}
+.footer a:hover{opacity:1}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <p class="eyebrow">Site changelog</p>
+    <h1>What changed, and when</h1>
+    <p class="lede">A running log of user-visible updates to this portfolio. Format follows <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>. Source of truth is <a href="https://github.com/marcusjacobson/portfolio/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
+  </header>
+
+  <main class="changelog-body">
+    <!-- CHANGELOG_BODY -->
+    <p><em>Changelog content is rendered at deploy time from <code>CHANGELOG.md</code>.</em></p>
+    <!-- /CHANGELOG_BODY -->
+  </main>
+
+  <div class="footer">
+    <span>Marcus Jacobson &middot; Portfolio changelog &middot; Last updated: <!-- LAST_UPDATED -->unreleased<!-- /LAST_UPDATED --></span>
+    <span><a href="index.html">&larr; Home</a> &middot; <a href="https://github.com/marcusjacobson/portfolio">github &#x2197;</a></span>
+  </div>
+</div>
+</body>
+</html>
