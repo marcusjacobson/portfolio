@@ -60,8 +60,10 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #142 Todo → In Progress → Done — PR #164, merge `94ce9eb`
   - #30  Todo → In Progress → Done — PR #165, merge `69ee4f1`
   - #37  Todo → In Progress → Done — PR #166, merge `73b6629`
+  - #38  Todo → In Progress → Done — PR #167, merge `fdc7939`
+  - #40  Todo → In Progress → Done — PR #168, merge `e276789`
   - #147 deferred — operational dry-run requires interactive `/wiki-sync-run`; not an issue-resolver code task
-- **Outcome:** Phase 1 Structure (6/6) and Phase 2 Agent (5/5) complete. Phase 3 Automation: cron #146 landed; #147 dry-run deferred to user. Phase 4 Maintenance: label persistence #142 landed. Rehomed: #30 (linkedin-sync docs), #37 (local-vs-hosted agent map) landed; #38 and #40 remain. Awaiting next batch instruction or session close.
+- **Outcome:** Phase 1 Structure (6/6), Phase 2 Agent (5/5), Phase 4 Maintenance (1/1), and rehomed (4/4) complete. Phase 3 Automation: cron #146 landed; only #147 dry-run remains (deferred to interactive run by user). Board #16: 17 Done, 1 Todo. Session ready to close.
 
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
 
