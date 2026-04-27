@@ -31,6 +31,7 @@ Tracks the GitHub Projects (v2) used for portfolio work, plus the redundancy swe
 - **Per-issue transitions:**
   - #85 Ready → In progress at 2026-04-26T15:08:36-07:00
   - #85 In progress → Done — PR #92, merge `77d9b7e`
+  - #86 Ready → In progress at 2026-04-26T18:20:08-07:00
 - **Outcome:** _(in flight)_
 
 ### 2026-04-26 — create Microsoft Security Portfolio Roadmap project (#13)
