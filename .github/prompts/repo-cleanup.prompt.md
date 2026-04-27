@@ -12,7 +12,7 @@ You are running the cleanup workflow defined in [`.github/agents/repo-cleanup.ag
 ## Steps
 
 1. **Engage `@repo-cleanup`.** Apply any `--scope=`, `--age=`, or `--no-branches` argument the user provided. Default `--age=14` and include local merged branches.
-2. **Open issue + branch first** (step 0 of the agent file). File a `chore,area:workflow,priority:p3` tracking issue, then create `chore/<N>-repo-cleanup-sweep` from `main`. Never run discovery or any mutation while still on `main`.
+2. **Open issue + place on a board + branch first** (step 0 of the agent file). File a `chore,area:workflow,priority:p3` tracking issue, hand it to `@board-planner` for placement (default: a `Repo Hygiene`-style board if one exists, else propose **#15 Portfolio Maturity Roadmap** under `source:repo-cleanup`), then create `chore/<N>-repo-cleanup-sweep` from `main`. Never run discovery or any mutation while still on `main`.
 3. **Run the prepare phase** (the parallel discovery commands listed in the agent file).
 4. **Print the one-line summary and the FIRST candidate only.** Use the per-item block shape from step 3 of the agent file (`[1/<N>] <class> <path>` with `reason:`, `action on remove:`, `remediation on keep:`). Do not print item 2 in the same turn.
 5. **Walk one item at a time.** Wait for `remove`, `keep`, `skip`, `show all`, or `quit` between every item. Bare verbs apply to the currently-prompted item. Echo destructive commands before running them. Always present exactly one candidate per assistant turn.

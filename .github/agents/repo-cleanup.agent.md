@@ -75,13 +75,17 @@ Before discovery:
      --body 'Tracking issue for an interactive @repo-cleanup sweep. Items removed and remediations applied will be summarised in the linked PR.'
    ```
    Capture the issue number as `<N>`.
-3. **Create a branch** from `main`:
+3. **Place the issue on a board.** Hand the issue number to `@board-planner` in *wiki-sync batch sweep* style (a single-issue batch). Default routing for cleanup sweeps:
+   - If a `Repo Hygiene` board (or similar) already exists, add the issue there.
+   - Otherwise, propose adding it to **#15 Portfolio Maturity Roadmap** under `source:repo-cleanup` (or asking the user whether to spin up a dedicated board if cleanup work is becoming recurring).
+   - Wait for `@board-planner`'s diff block and the user's approval before any `gh project item-add` runs. Cleanup must not silently land on a board.
+4. **Create a branch** from `main`:
    ```pwsh
    git switch main
    git pull --ff-only
    git switch -c chore/<N>-repo-cleanup-sweep
    ```
-4. Echo the issue URL and branch name back to the user, then proceed to step 1.
+5. Echo the issue URL, board placement, and branch name back to the user, then proceed to step 1.
 
 If the user is already on a non-`main` branch when invoking the agent, ask whether to (a) reuse that branch, or (b) stash and create a fresh branch. Default to (b) when the existing branch has unrelated staged/uncommitted changes.
 
