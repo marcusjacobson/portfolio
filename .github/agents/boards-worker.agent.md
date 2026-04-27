@@ -15,7 +15,7 @@ Accept any one of:
 
 Optional:
 
-- `--status <name>` — which Status column to drain. Default: `Ready`. Falls back to `Backlog` if `Ready` is empty and the user agrees.
+- `--status <name>` — which Status column to drain. Default: `Ready` if present on the board, otherwise `Todo` (see Status field handling for the full alias table). Falls back to `Backlog` if neither source column is empty and the user agrees.
 - `--max <N>` — hard cap on issues worked in this run. Default: `3`. Must be confirmed before exceeding.
 - `--dry-run` — list the plan without invoking issue-resolver.
 
@@ -26,7 +26,7 @@ Refuse to start without a board identifier.
 1. **Open a session branch.** Refuse to start orchestration from `main`. Run `git checkout main && git pull --ff-only` first, then `git checkout -b boards-worker/<board-slug>-<yyyymmdd-hhmm>` (e.g. `boards-worker/compass-v-next-20260426-1830`). All audit-log writes in this batch land on this branch. The branch is shipped via PR at the end of the batch — never merged into `main` mid-flight.
 2. **Resolve the board.**
    - `gh project view <n> --owner <owner> --format json` — capture title, fields, and the Status field id + option ids.
-   - `gh project field-list <n> --owner <owner> --format json` — capture every Status option id (Ready / In Progress / In review / Done at minimum).
+   - `gh project field-list <n> --owner <owner> --format json` — capture every Status option id. Match against the alias table in **Status field handling** below; do not require literal `Ready` / `In progress` / `In review` / `Done` names.
    - List items: `gh project item-list <n> --owner <owner> --format json --limit 200`.
 3. **Seed the audit-log entry.** Append a new dated section to `wiki/Boards.md` under the existing audit-log heading on the session branch. The seed entry records: board title + URL, Status option ids captured, the queue snapshot (issue numbers + titles + current Status). Commit with message `Open boards-worker session for <board title>`. Do **not** push yet.
 4. **Filter the queue.** Keep items where:
@@ -40,7 +40,7 @@ Refuse to start without a board identifier.
    1. Move the board item to **In progress** via `gh project item-edit --project-id <pid> --id <itemId> --field-id <statusFieldId> --single-select-option-id <inProgressId>`. Append the transition to the audit-log entry on the session branch (`#<n> Ready → In progress at <iso8601>`).
    2. **Delegate** to the `issue-resolver` agent with the issue number. Wait for its full workflow (branch → PR → merge) to complete. Issue-resolver creates and ships its own per-issue branch independent of the session branch.
    3. On success, move the board item to **Done** and append `#<n> In progress → Done — PR #<m>, merge <sha>` to the audit log.
-   4. On failure (lint, checks, or issue-resolver halts asking for input), move to **In review** (or leave as **In progress** if the user chooses to retry), append `#<n> In progress → In review — blocker: <one-line>` to the audit log, surface the blocker, and **stop the batch**. Do not silently move to the next issue.
+   4. On failure (lint, checks, or issue-resolver halts asking for input), move to **In review** when an In-review-style option exists (see Status field handling). When the board has no In-review-style option, leave the item at **In flight** and audit-log `#<n> stays In progress — blocker: <one-line>` instead. Either way, surface the blocker and **stop the batch**. Do not silently move to the next issue.
    5. Sync local back to the session branch: `git checkout main && git pull --ff-only && git checkout <session branch> && git rebase main`. Resolve trivial conflicts inside the audit-log section by keeping both lines.
    6. Commit the audit-log update with message `Log <board slug> #<n> outcome`.
 7. **Report after each issue** with a one-line status so the user can halt mid-batch.
@@ -62,15 +62,35 @@ All entries land in `wiki/Boards.md` under the existing audit-log section, newes
 - **Per-issue transitions:**
   - #<n> Ready → In progress at <iso8601>
   - #<n> In progress → Done — PR #<m>, merge `<sha>`
-  - #<n> In progress → In review — blocker: <one-line>
+  - #<n> In progress → In review — blocker: <one-line>   _(or `#<n> stays In progress — blocker: <one-line>` when the board has no In-review-style option)_
 - **Outcome:** <worked X/Y, blocked on #<n> — reason | clean drain>
 ```
 
 ## Status field handling
 
-- The Status field is a single-select on the board. Capture its `id` and the option `id` for `In progress`, `In review`, and `Done` once at the start; reuse for every move.
-- If the board lacks any of those options, **stop and hand off to the `board-planner` agent** rather than guessing or silently mutating the schema.
-- If the user explicitly approves an inline schema mutation (rename or add option) instead of the board-planner handoff, the agent MUST: (a) record the exact GraphQL mutation in the session audit-log entry under "Schema mutations applied", (b) note the user's approval message verbatim, and (c) prefer renaming an existing option over creating a new one when items already occupy that column (renaming preserves item placement; adding a new option requires a manual move).
+The Status field is a single-select on the board. Capture its `id` and the option `id` for the four logical roles (Source, In-flight, In-review parking, Done) once at the start; reuse for every move.
+
+### Alias table (case-insensitive)
+
+Match each role against the first option name found, in order. The first match wins; later candidates are ignored.
+
+| Role | Accepted option names (case-insensitive) |
+|------|------------------------------------------|
+| Source (drain column) | `Ready`, `Todo`, `To do`, `Backlog` |
+| In-flight | `In progress`, `In Progress`, `Doing`, `Active` |
+| In-review parking | `In review`, `In Review`, `Review`, `Blocked` |
+| Done | `Done`, `Closed`, `Complete`, `Completed` |
+
+The `--status <name>` flag still wins over the auto-pick when the user names a column explicitly. The flag is matched case-insensitively against actual option names.
+
+### Required vs. optional roles
+
+- **Required to start:** Source, In-flight, Done. If any of these is missing after the alias sweep, stop and hand off to the `board-planner` agent — that is a real schema gap, not a naming difference.
+- **Optional:** In-review parking. If no In-review-style option exists, the agent does **not** hand off. Instead, on a per-issue failure (step 6.4), leave the item in the In-flight column and audit-log the blocker explicitly with `#<n> stays In progress — blocker: <one-line>`. The audit-log line is the durable record; no schema mutation is required.
+
+### Inline schema mutations (opt-in only)
+
+If the user explicitly approves an inline schema mutation (rename or add option) instead of the board-planner handoff or the In-review fallback, the agent MUST: (a) record the exact GraphQL mutation in the session audit-log entry under "Schema mutations applied", (b) note the user's approval message verbatim, and (c) prefer renaming an existing option over creating a new one when items already occupy that column (renaming preserves item placement; adding a new option requires a manual move).
 
 ## Constraints
 
