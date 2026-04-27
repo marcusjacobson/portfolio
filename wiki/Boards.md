@@ -54,7 +54,10 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #148 In Progress → Done — PR #159, merge `0216b0f`
   - #149 Todo → In Progress at 2026-04-27
   - #149 In Progress → Done — PR #160, merge `87d51c2`
-- **Outcome:** Phase 1 Structure complete (6/6) and Phase 2 Agent prerequisites complete (3/3 — state schema #144, request-intake ext #148, board-planner ext #149). #143 (agent design) and #145 (invocation prompt) now unblocked. One mid-batch blocker (#155, wiki/Home.md Sections-list conflict) auto-closed via PR #154 rebase. Awaiting next batch instruction or session close.
+  - #143 Todo → In Progress → Done — PR #161, merge `d66ae5f`
+  - #145 Todo → In Progress → Done — PR #162, merge `47b1cba`
+  - #146 Todo → In Progress → Done — PR #163, merge `2a7eb42`
+- **Outcome:** Phase 1 Structure complete (6/6) and Phase 2 Agent complete (5/5 — state schema #144, request-intake ext #148, board-planner ext #149, wiki-sync agent design #143, /wiki-sync-run prompt #145). Phase 3 Automation: weekly cron #146 landed; #147 first dry-run remains. One mid-batch blocker (#155, wiki/Home.md Sections-list conflict) auto-closed via PR #154 rebase. Awaiting next batch instruction or session close.
 
 ### 2026-04-26 — boards-worker session: Portfolio Maturity (#15)
 
