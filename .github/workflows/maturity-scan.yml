@@ -1,0 +1,190 @@
+name: Maturity Scout (weekly scan)
+
+on:
+  workflow_dispatch:
+    inputs:
+      max:
+        description: "Max candidate issues to file in this run"
+        required: false
+        default: "5"
+  schedule:
+    # 14:00 UTC every Monday — outside business hours but visible in morning sweeps.
+    - cron: "0 14 * * 1"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: maturity-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    name: Repo-hygiene maturity scan
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MAX_FILED: ${{ github.event.inputs.max || '5' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Network egress assumptions: this job intentionally performs NO live
+      # fetches against Microsoft Learn, GitHub docs, OWASP, or WCAG. Source
+      # checks that need LLM judgment stay in the on-demand chat mode of
+      # @maturity-scout. The unattended job only runs deterministic
+      # repo-hygiene checks (file existence in this checkout) plus dedupe
+      # queries against the GitHub API.
+
+      - name: Run repo-hygiene checks and file gap issues
+        id: scan
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          REPO="${GITHUB_REPOSITORY}"
+          BOARD_URL="https://github.com/users/marcusjacobson/projects/15"
+          MAX="${MAX_FILED}"
+
+          # ---- Define checks: each entry is "key|path|title|body".
+          # Bodies follow the four-section shape required by issue #110 AC5.
+          declare -a CHECKS=()
+
+          add_check () {
+            CHECKS+=("$1")
+          }
+
+          read_body () {
+            cat <<EOF
+## Source
+
+GitHub repository community standards — <https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions>
+
+> GitHub recommends a baseline of community health files (\`$2\`) so contributors and consumers know what to expect.
+
+## Why it matters
+
+The portfolio repo is public. Missing \`$2\` weakens the contributor and reviewer signal and lowers the GitHub community-profile score, which is one of the visible maturity indicators on the public repo page.
+
+## Suggested change
+
+Add \`$2\` at the documented location with portfolio-appropriate content. Keep it minimal but real — no placeholder text.
+
+## Acceptance criteria
+
+- [ ] \`$2\` exists at the canonical path.
+- [ ] Content is reviewed (not template boilerplate).
+- [ ] Wiki / README cross-links updated if applicable.
+EOF
+          }
+
+          # path | title-suffix | label-area
+          declare -a TARGETS=(
+            "SECURITY.md|Add SECURITY.md so vulnerability reporting has a documented channel|area:docs"
+            "CONTRIBUTING.md|Add CONTRIBUTING.md to document the intake + branch + PR workflow|area:docs"
+            "CODEOWNERS|Add CODEOWNERS so reviews route automatically|area:workflow"
+            ".github/ISSUE_TEMPLATE|Add issue templates so community filings match the four-section shape|area:workflow"
+            ".github/PULL_REQUEST_TEMPLATE.md|Add a pull-request template aligned to the repo conventions|area:workflow"
+            ".github/dependabot.yml|Enable Dependabot for Actions and any tracked manifests|area:workflow"
+            "LICENSE|Add a LICENSE file so the portfolio's reuse terms are explicit|area:docs"
+          )
+
+          # ---- Pull existing issues + board items for dedupe.
+          echo "::group::Fetch existing issues with source:* labels"
+          EXISTING_ISSUES=$(gh issue list \
+            --state all \
+            --search 'in:title in:body label:source:repo-hygiene' \
+            --json number,title,state,closedAt,url \
+            --limit 200)
+          echo "$EXISTING_ISSUES" | jq 'length as $n | "found \($n) issues"'
+          echo "::endgroup::"
+
+          echo "::group::Fetch board #15 items"
+          BOARD_ITEMS=$(gh project item-list 15 \
+            --owner marcusjacobson \
+            --format json \
+            --limit 200 || echo '{"items":[]}')
+          echo "$BOARD_ITEMS" | jq '.items | length as $n | "found \($n) board items"'
+          echo "::endgroup::"
+
+          FILED=0
+          SUPPRESSED=0
+          SUMMARY_FILED=""
+          SUMMARY_SUPPRESSED=""
+
+          for entry in "${TARGETS[@]}"; do
+            if [[ "$FILED" -ge "$MAX" ]]; then
+              echo "Hit max ($MAX); stopping."
+              break
+            fi
+
+            IFS='|' read -r CHECK_PATH TITLE AREA <<< "$entry"
+
+            # Skip if the file/dir already exists in the checkout — no gap.
+            if [[ -e "$CHECK_PATH" ]]; then
+              echo "Present: $CHECK_PATH — skipping."
+              continue
+            fi
+
+            # Dedupe: open or recently-closed (90d) issue mentioning this path?
+            MATCH=$(echo "$EXISTING_ISSUES" | jq -r --arg p "$CHECK_PATH" \
+              '[.[] | select(.title | test($p; "i"))] | .[0] // empty | "\(.number)|\(.url)|\(.state)"')
+            if [[ -n "$MATCH" ]]; then
+              SUPPRESSED=$((SUPPRESSED+1))
+              SUMMARY_SUPPRESSED+=$'\n  - '"$CHECK_PATH"' — overlaps with '"$MATCH"
+              echo "Dedup suppressed: $CHECK_PATH overlaps $MATCH"
+              continue
+            fi
+
+            # Dedupe: board item with same path in title?
+            BMATCH=$(echo "$BOARD_ITEMS" | jq -r --arg p "$CHECK_PATH" \
+              '.items[]? | select(.title // "" | test($p; "i")) | .id' | head -n1)
+            if [[ -n "$BMATCH" ]]; then
+              SUPPRESSED=$((SUPPRESSED+1))
+              SUMMARY_SUPPRESSED+=$'\n  - '"$CHECK_PATH"' — overlaps with board item '"$BMATCH"
+              echo "Board-dedup suppressed: $CHECK_PATH overlaps $BMATCH"
+              continue
+            fi
+
+            # Build body and file the issue.
+            BODY=$(read_body "$TITLE" "$CHECK_PATH")
+            BODY_FILE=$(mktemp)
+            printf '%s\n' "$BODY" > "$BODY_FILE"
+
+            echo "Filing: $TITLE"
+            URL=$(gh issue create \
+              --title "$TITLE" \
+              --label "needs-triage,source:repo-hygiene,$AREA" \
+              --body-file "$BODY_FILE")
+            rm -f "$BODY_FILE"
+
+            FILED=$((FILED+1))
+            SUMMARY_FILED+=$'\n  - '"$URL"' — '"$TITLE"
+
+            # Board attach happens in the next step via actions/add-to-project,
+            # filtered on the `source:repo-hygiene` label this step just applied.
+          done
+
+          {
+            echo "## Maturity Scout — weekly scan"
+            echo ""
+            echo "Filed: $FILED"
+            if [[ -n "$SUMMARY_FILED" ]]; then echo "$SUMMARY_FILED"; fi
+            echo ""
+            echo "Suppressed (dedupe): $SUPPRESSED"
+            if [[ -n "$SUMMARY_SUPPRESSED" ]]; then echo "$SUMMARY_SUPPRESSED"; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Attach filed issues to Portfolio Maturity board (#15)
+        if: always()
+        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/15
+          # BUG_PROJECT_TOKEN is the shared classic PAT with `project` scope
+          # documented in repo memory. It can attach issues to user-owned
+          # Projects v2 boards but cannot mutate labels — so the scan step
+          # above applies labels with the default GITHUB_TOKEN, then this
+          # step uses the PAT to attach.
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
+          labeled: source:repo-hygiene
