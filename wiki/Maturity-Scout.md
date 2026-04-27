@@ -68,10 +68,11 @@ The `.github/workflows/maturity-scan.yml` workflow runs on:
 
 What it does:
 
-- Scope is restricted to `source:repo-hygiene`. The other sources require LLM judgment for relevance and dedupe and stay in on-demand chat mode.
+- Scope is restricted to `source:repo-hygiene` and `source:github-docs`. The other sources require LLM judgment for relevance and dedupe and stay in on-demand chat mode.
+- `source:github-docs` v1 covers the action SHA-pin audit only — it scans every `.github/workflows/*.yml` file and files **one consolidated issue** per run when any `uses:` ref is not pinned to a 40-character commit SHA. Other github-docs checks (CODEOWNERS shape, branch-protection doc completeness) remain on-demand under `@maturity-scout` until added in a follow-up.
 - Runs deterministic file-existence checks against the checkout (no live external fetches).
 - Performs the same dedupe pass against open issues and board items via `gh`.
-- Files each surviving candidate with `needs-triage`, `source:repo-hygiene`, and the matching `area:*` label.
+- Files each surviving candidate with `needs-triage`, the matching `source:*` label, and the matching `area:*` label.
 - Uses `actions/add-to-project` (pinned by SHA) with the shared `BUG_PROJECT_TOKEN` classic PAT to attach to board #15. The default `GITHUB_TOKEN` cannot write Projects v2; the PAT scope-split is documented in the repo's stored agent memory.
 - Caps filings at `max` per run (default 5 for the cron, overridable via `workflow_dispatch` input).
 - Posts a `Filed: <n>; Suppressed: <m>` summary to the workflow run log.

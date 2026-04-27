@@ -162,9 +162,129 @@ jobs:
             if [[ -n "$SUMMARY_SUPPRESSED" ]]; then echo "$SUMMARY_SUPPRESSED"; fi
           } >> "$GITHUB_STEP_SUMMARY"
 
+          # Hand the running tally to the next step so the github-docs
+          # scan respects the same MAX cap.
+          echo "filed=$FILED" >> "$GITHUB_OUTPUT"
+
+      - name: Run github-docs checks (action SHA-pin audit) and file gap issue
+        id: scan_github_docs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX="${MAX_FILED}"
+          FILED_SO_FAR="${{ steps.scan.outputs.filed }}"
+          FILED_SO_FAR="${FILED_SO_FAR:-0}"
+
+          if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
+            echo "Hit MAX ($MAX) in repo-hygiene step; skipping github-docs scan."
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs"
+              echo ""
+              echo "Skipped: MAX cap of $MAX reached by repo-hygiene step."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # ---- Scan: action SHA-pin audit on .github/workflows/*.yml.
+          # Convention (see .github/copilot-instructions.md): third-party
+          # actions must be pinned to a 40-char commit SHA. Flag every
+          # `uses:` line whose ref after `@` is not a 40-char hex SHA.
+          # Skip local action references (`uses: ./...`) and reusable
+          # workflow refs without a `@` (those are validated elsewhere).
+          FINDINGS=""
+          COUNT=0
+          shopt -s nullglob
+          for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
+            # Use grep -nE to capture line numbers; tolerate no matches.
+            while IFS= read -r line; do
+              [[ -z "$line" ]] && continue
+              LINENO_HIT="${line%%:*}"
+              REST="${line#*:}"
+              # Extract the value after `uses:` — strip leading whitespace
+              # and the keyword itself.
+              USES_VAL=$(echo "$REST" | sed -E 's/^[[:space:]]*-?[[:space:]]*uses:[[:space:]]*//; s/[[:space:]]*#.*$//; s/[[:space:]]*$//')
+              # Skip local actions (start with ./ or ../).
+              [[ "$USES_VAL" == ./* || "$USES_VAL" == ../* ]] && continue
+              # Skip lines without an @ (e.g. reusable workflow refs).
+              [[ "$USES_VAL" != *@* ]] && continue
+              REF="${USES_VAL##*@}"
+              # 40-char lowercase hex => SHA-pinned, OK.
+              if [[ "$REF" =~ ^[0-9a-f]{40}$ ]]; then
+                continue
+              fi
+              FINDINGS+=$'- `'"$wf"':'"$LINENO_HIT"'` — `'"$USES_VAL"'`'$'\n'
+              COUNT=$((COUNT+1))
+            done < <(grep -nE '^[[:space:]]*-?[[:space:]]*uses:[[:space:]]*[^[:space:]]+' "$wf" || true)
+          done
+          shopt -u nullglob
+
+          if [[ "$COUNT" -eq 0 ]]; then
+            echo "No unpinned third-party action references found."
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs"
+              echo ""
+              echo "Filed: 0 (no unpinned action references found)"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # ---- Dedupe: open issue with the canonical title prefix and
+          # the source:github-docs label?
+          TITLE_PREFIX="Pin GitHub Actions to commit SHAs"
+          EXISTING=$(gh issue list \
+            --state open \
+            --search "in:title \"$TITLE_PREFIX\" label:source:github-docs" \
+            --json number,title,url \
+            --limit 50)
+          MATCH=$(echo "$EXISTING" | jq -r --arg p "$TITLE_PREFIX" \
+            '[.[] | select(.title | startswith($p))] | .[0] // empty | "\(.number)|\(.url)"')
+          if [[ -n "$MATCH" ]]; then
+            echo "Dedup suppressed: existing open issue $MATCH"
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs"
+              echo ""
+              echo "Filed: 0"
+              echo ""
+              echo "Suppressed (dedupe): 1"
+              echo "  - action SHA-pin audit — overlaps with $MATCH"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # ---- Render body and file the consolidated issue.
+          TITLE="${TITLE_PREFIX} in ${COUNT} workflow file(s)"
+          BODY_FILE=$(mktemp)
+          # Use bash parameter expansion for placeholder substitution to
+          # avoid breaking the YAML block scalar with a heredoc (issue #115).
+          TEMPLATE=$(cat .github/workflows/templates/github-docs-issue-body.md)
+          TEMPLATE="${TEMPLATE//__COUNT__/$COUNT}"
+          # Strip trailing newline from FINDINGS so the bullet list closes cleanly.
+          FINDINGS_TRIMMED="${FINDINGS%$'\n'}"
+          TEMPLATE="${TEMPLATE//__FINDINGS__/$FINDINGS_TRIMMED}"
+          printf '%s\n' "$TEMPLATE" > "$BODY_FILE"
+
+          echo "Filing: $TITLE"
+          URL=$(gh issue create \
+            --title "$TITLE" \
+            --label "needs-triage,source:github-docs,area:workflow" \
+            --body-file "$BODY_FILE")
+          rm -f "$BODY_FILE"
+
+          {
+            echo ""
+            echo "## Maturity Scout — github-docs"
+            echo ""
+            echo "Filed: 1"
+            echo "  - $URL — $TITLE"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # Note: filed issues are attached to board #15 by the sibling
       # workflow `.github/workflows/maturity-autoadd.yml`, which fires
-      # on the `labeled` event when the `source:repo-hygiene` label is
-      # applied. `actions/add-to-project` cannot run inside this scan
-      # job because workflow_dispatch / schedule events have no issue
-      # context in the payload.
+      # on the `labeled` event when the `source:repo-hygiene` or
+      # `source:github-docs` label is applied. `actions/add-to-project`
+      # cannot run inside this scan job because workflow_dispatch /
+      # schedule events have no issue context in the payload.
