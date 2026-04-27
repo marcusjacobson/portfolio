@@ -38,7 +38,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #113 Todo → In Progress at 2026-04-26T21:35:12-07:00
   - #113 In Progress → Done — PR #128, merge `2356279`
   - #114 Todo → In Progress at 2026-04-26T21:46:54-07:00
-- **Outcome:** _(filled in at session close)_
+  - #114 In Progress → Done — PR #129, merge `09317f6`
+- **Outcome:** Clean drain. 3/3 of the Todo queue (#112, #113, #114) shipped this session; 2 follow-ups filed and added to board #15 (#126 Option B `@axe-core/cli`, #127 Option C Playwright + axe-core). Source `source:wcag` is now automated (v1: regex-only checks for `lang` attr, empty link text, heading order). Operator runbook documented in `wiki/Maturity-Scout.md`. Board #15 has 0 items in In Progress at session close. Lychee flagged a transient LinkedIn `999` anti-bot response on PR #129 (cleared by `gh run rerun --failed`) — captured as a possible future follow-up if recurrent.
 
 ### 2026-04-26 — create Portfolio Maturity board (#15)
 
