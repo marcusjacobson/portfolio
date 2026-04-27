@@ -4,6 +4,8 @@ A static HTML portfolio site for Microsoft security architecture tools, framewor
 
 🔗 **Live site:** [https://marcusjacobson.github.io/portfolio/](https://marcusjacobson.github.io/portfolio/)
 
+> **Terminology note:** "Project" means portfolio showcase work; "Board" means a GitHub Projects v2 board. See [wiki/Terminology.md](wiki/Terminology.md) for the full split.
+
 ## Pages
 
 | Page | File | Description |
