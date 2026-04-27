@@ -1,6 +1,7 @@
 ---
 description: "Use to sweep the repo for stale work artefacts (test outputs, staging-inbox leftovers, merged local branches, scratch files, orphaned scripts, versioned duplicates) and confirm removal one item at a time. Read-only by default; never deletes without explicit per-item user approval. On `keep`, applies a remediation so the same item won't be re-flagged."
 readme-summary: "Sweeps the repo for incidental work artefacts and proposes them for removal one at a time. Read-only until per-item approval; on `keep` it adds the right `.gitignore` / allowlist remediation so the same item isn't re-flagged next run."
+cloud: no  # interactive per-item approval; sees uncommitted local state
 tools: [read, edit, search, execute]
 ---
 

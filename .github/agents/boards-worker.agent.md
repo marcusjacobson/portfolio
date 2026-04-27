@@ -1,7 +1,7 @@
 ---
 description: "Use to work an entire GitHub board (Projects v2): pick the next eligible issue, hand it to the issue-resolver agent, update the board status, and repeat until the board is empty or the user halts."
 readme-summary: "Drains a GitHub board (Projects v2) by picking the next eligible item and handing each one to `@issue-resolver`, updating Status as it goes."
-cloud: yes
+cloud: yes  # batch board drain with hard fail-stop on first sub-agent failure (#193)
 invocation-contexts:
   - local-chat        # @boards-worker in VS Code Copilot Chat
   - hosted-copilot    # invoked via mcp_io_github_git_assign_copilot_to_issue against a board-tracking issue

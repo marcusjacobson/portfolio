@@ -1,6 +1,7 @@
 ---
 description: "Use to scope and create a GitHub board (Projects v2) from a theme, milestone, or cluster of issues. Decides if a new board is warranted, designs fields and views, runs scripts/gh/create-board.ps1, and seeds items via add-issue-to-board.ps1."
 readme-summary: "Scopes and creates a GitHub board (Projects v2) from a theme or cluster of issues. Designs fields/views and seeds items via `scripts/gh/`."
+cloud: no  # interactive design decisions (board scope, fields, views) require human input
 tools: [read, edit, search, execute, github/*, todo]
 ---
 

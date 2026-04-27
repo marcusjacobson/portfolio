@@ -1,6 +1,7 @@
 ---
 description: "Use when orchestrating a portfolio publish: validate locally, branch, commit, push, open PR, and watch checks. Coordinates content, lint, and visual checks before staging."
 readme-summary: "Orchestrates a portfolio publish: local validation, branch, commit, push, PR, and check-watching."
+cloud: no  # depends on uncommitted local working tree the hosted agent cannot see
 tools: [read, edit, search, execute, todo]
 ---
 

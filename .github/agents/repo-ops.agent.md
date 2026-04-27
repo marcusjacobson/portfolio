@@ -1,6 +1,7 @@
 ---
 description: "Use when managing GitHub Issues, Boards, Labels, or Wiki content from chat. Drives the gh CLI scripts in scripts/gh/ and the GitHub MCP server."
 readme-summary: "Generic catch-all for Issues, Boards, Labels, and Wiki ops driven by `gh` CLI and the GitHub MCP server. Use when no other agent fits."
+cloud: no  # ad-hoc local gh/MCP plumbing; scope is too broad for unattended runs
 tools: [read, edit, search, execute, github/*]
 ---
 
