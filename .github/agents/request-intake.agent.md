@@ -181,7 +181,7 @@ These steps are **mandatory and ordered** on every confirmed intake. Do not skip
    - This step runs **even when this agent is not the implementer** — it guarantees that whoever picks up the issue (the user, `issue-resolver`, `boards-worker`) starts on a non-`main` branch.
 3. **Add to project** if approved:
    ```pwsh
-   scripts/gh/add-issue-to-project.ps1 -ProjectUrl <url> -ItemUrl <issue-url>
+   scripts/gh/add-issue-to-board.ps1 -BoardUrl <url> -ItemUrl <issue-url>
    ```
    Or, if the script is missing, use `gh project item-add <projectNumber> --owner marcusjacobson --url <issue-url>`.
 4. **Set project fields** if known (Priority, Size). Use `gh project item-edit` with the field id captured in step 2's discovery.
