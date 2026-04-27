@@ -54,7 +54,7 @@ For each `.github/agents/*.agent.md`:
 5. Derive **Mutates repo?** column from explicit signals in the `description:` field (always read this from `description:`, never from `readme-summary:` — the description is keyword-rich and consistently includes mutation-scope signals; the readme-summary is short prose that often omits them):
    - Contains "read-only" or "Read-only by default" → `Read-only` (or `Read-only until approval` if "until approval" / "without explicit user approval" appears).
    - Contains "creates", "merges", "pushes", "opens PR", "drives the gh CLI" → `Yes`.
-   - Project-creating agents → `Yes (project + items)`.
+   - Board-creating agents → `Yes (project + items)`.
    - Otherwise → `Yes`.
 
 Preserve the existing row order from the README when a row already exists; append new rows at the bottom; drop rows whose source file no longer exists.
