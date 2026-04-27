@@ -34,7 +34,7 @@ Accept any one of:
 6. **Link to the repo.** Run `gh project link <number> --owner <owner> --repo <owner>/<repo>` so the board appears under the repo's **Projects** tab. Projects v2 are owned at the user/org level — linking is what surfaces them on the repo.
 7. **Apply the schema.** Use `gh project field-create` for each field that the script doesn't seed. Default fields (Title, Status, Assignees) come for free.
 8. **Seed items.** For each issue URL, run `scripts/gh/add-issue-to-board.ps1 -BoardUrl <url> -ItemUrl <issue-url>`.
-9. **Document.** Add a short `wiki/Projects.md` entry (or update the existing one) with: title, link, scope, success criteria, and a link to the seeding command run. Open a PR for the wiki edit.
+9. **Document.** Add a short `wiki/Boards.md` entry (or update the existing one) with: title, link, scope, success criteria, and a link to the seeding command run. Open a PR for the wiki edit.
 10. **Report.**
 
 ## Dynamic regrouping and redundancy checks
@@ -59,7 +59,7 @@ When invoked on an existing portfolio of boards (not just a fresh board creation
    ```
    Wait for explicit user approval (yes / edit / cancel) before any `gh project item-add` or item-delete call.
 7. **Apply.** Execute approved actions one at a time, echoing the `gh` command used.
-8. **Re-run the redundancy report at the end** so the user sees the post-state. Save the report into the `wiki/Projects.md` audit log section with a date stamp.
+8. **Re-run the redundancy report at the end** so the user sees the post-state. Save the report into the `wiki/Boards.md` audit log section with a date stamp.
 
 This sweep is also the right entry point when the user asks "are my boards still organized?" or "did I miss adding anything?" — run it read-only (skip step 7) and report.
 

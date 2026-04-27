@@ -7,6 +7,8 @@ Welcome to the wiki. This is the source of truth for project notes, runbooks, an
 ## Sections
 
 - [Terminology](Terminology) — "Project" (portfolio) vs "Board" (GitHub Projects v2). Read this first.
+- [Projects](Projects) — Portfolio showcase Projects (the live site's `ms_security_projects.html`).
+- [Boards](Boards) — GitHub Projects v2 audit log, schemas, and sweep history.
 - [Publishing-Workflow](Publishing-Workflow) — How content reaches the live site.
 - [Security-Review-Checklist](Security-Review-Checklist) — What gets verified on every PR.
 - [Site-Architecture](Site-Architecture) — Page layout and tooling overview.
