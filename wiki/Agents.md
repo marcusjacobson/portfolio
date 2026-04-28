@@ -81,6 +81,16 @@ It has two summon paths:
 
 The hosted agent is best at **file-scoped, one-shot tasks**: a typo fix, a single-page content tweak, a small refactor with a clear acceptance test. It is weakest at orchestration (multi-step board drains, cross-cutting refactors, anything that needs interactive design decisions) and at anything that depends on uncommitted local working-tree state.
 
+### Routing contract — `AGENTS.md`
+
+The hosted agent reads [`AGENTS.md`](https://github.com/marcusjacobson/portfolio/blob/main/AGENTS.md) at the repo root on every run (per [GitHub's docs](https://docs.github.com/en/copilot/tutorials/cloud-agent/get-the-best-results#adding-custom-instructions-to-your-repository)). That file is the **only** place the cloud agent's behavior is configured from this repo, and it carries the label-keyed routing rules:
+
+- **Issue carries `needs-triage`** — the hosted agent does **not** branch or implement. It loads [`.github/agents/triage.agent.md`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/triage.agent.md) and runs **Mode 2 (cloud-comment)**: post the self-documenting proposal as a comment, add `triage:proposed`, then stop. The maintainer replies with `/triage <tag> [p<n>]`, `/triage dismiss …`, `/triage needs-info …`, or `/triage cancel`. The [`triage-respond.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/triage-respond.yml) workflow re-invokes the hosted agent on each reply so it can apply or dismiss.
+- **Issue carries `agent-task`** (and **not** `needs-triage`) — the hosted agent runs the resolver flow: branch, implement, lint, commit, one PR per task.
+- **Neither label** — the hosted agent comments that it can't tell which contract to use, and stops.
+
+A budget rule also applies: roughly one premium request per task; the agent must not retry the same approach more than twice. If the second attempt fails, it posts a blocker comment and hands the issue back to the maintainer.
+
 ### Local vs. hosted at a glance
 
 | Dimension | Local chat-mode agents | Hosted Copilot coding agent |
@@ -113,6 +123,7 @@ When in doubt, prefer the local chat-mode agents — they share state with your 
 
 ## See also
 
+- [`AGENTS.md`](https://github.com/marcusjacobson/portfolio/blob/main/AGENTS.md) — routing contract loaded by the hosted Copilot cloud agent on every run.
 - [`.github/agents/README.md`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/README.md) — auto-generated index synced from each agent's `readme-summary:` frontmatter via the [`/sync-agent-prompt-readmes`](https://github.com/marcusjacobson/portfolio/blob/main/.github/prompts/sync-agent-prompt-readmes.prompt.md) prompt.
 - [`.github/prompts/README.md`](https://github.com/marcusjacobson/portfolio/blob/main/.github/prompts/README.md) — slash-command counterparts to these agents.
 - [`.github/copilot-instructions.md`](https://github.com/marcusjacobson/portfolio/blob/main/.github/copilot-instructions.md) — repo-wide rules every agent inherits.

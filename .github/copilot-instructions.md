@@ -15,6 +15,7 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 
 | Folder | Purpose |
 |--------|---------|
+| `AGENTS.md` (root) | Routing contract loaded by the hosted Copilot cloud agent on every run (label-keyed: `needs-triage` → triage Mode 2; `agent-task` → resolver). |
 | `.github/workflows/` | CI: deploy, previews, link-check, lint, visual regression, CodeQL, gitleaks, wiki sync |
 | `.github/instructions/` | Scoped Copilot guidance (auto-attaches by `applyTo`) |
 | `.github/prompts/` | Slash-command tasks (publish, secure review, staging, triage) |
