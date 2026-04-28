@@ -37,6 +37,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #34 In Progress → Done — PR #238, merge `bd5a0c8`
   - #33 Todo → In Progress at 2026-04-28T15:55-07:00
   - #33 In Progress → Done — PR #239, merge `28dbc29`
+  - #35 Todo → In Progress at 2026-04-28T16:08-07:00
+  - #35 In Progress → Done — PR #240, merge `ce8e413`
 - **Outcome:** _(populated at session close)_
 
 ### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — resume
