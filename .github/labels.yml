@@ -71,6 +71,9 @@
 - name: agent:triage
   color: 8957e5
   description: Tasks for the @triage agent build or its findings
+- name: agent-task
+  color: c2a8ff
+  description: Issue is well-scoped and safe to assign to the @copilot cloud agent.
 
 # Lifecycle
 - name: needs-triage
