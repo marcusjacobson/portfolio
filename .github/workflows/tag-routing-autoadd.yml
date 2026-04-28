@@ -14,7 +14,10 @@ name: Tag-routing auto-add to boards
 # `bug` -> #12 is handled by bug-autoadd.yml. `Board` (legacy) -> #13 is
 # handled by board-autoadd.yml. `needs-triage` -> #19 is handled by
 # triage-autoadd.yml. `source:*` -> #15 is handled by maturity-autoadd.yml.
-# This workflow covers the remaining six routing tags.
+# This workflow covers the remaining six routing tags. Each tag has its
+# own job so the job-level `if` is a literal-string compare (matrix-level
+# `if` referencing `matrix.*` was tried initially and produced an
+# 'invalid workflow file' error).
 
 on:
   issues:
@@ -25,40 +28,78 @@ permissions:
   issues: read
 
 concurrency:
-  group: tag-routing-autoadd-${{ github.event.issue.number }}-${{ github.event.label.name || 'opened' }}
+  group: tag-routing-autoadd-${{ github.event.issue.number }}
   cancel-in-progress: false
 
 jobs:
-  add-to-project:
-    name: Route ${{ matrix.tag }} -> board #${{ matrix.project }}
+  route-compass:
+    name: Route compass -> board #9
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - tag: compass
-            project: 9
-          - tag: certification
-            project: 2
-          - tag: linkedin
-            project: 10
-          - tag: wiki
-            project: 16
-          - tag: maturity
-            project: 15
-          - tag: project
-            project: 13
     if: >-
-      (github.event.action == 'labeled' && github.event.label.name == matrix.tag) ||
-      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, matrix.tag))
+      (github.event.action == 'labeled' && github.event.label.name == 'compass') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'compass'))
     steps:
-      - name: Add issue to board #${{ matrix.project }}
-        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
         with:
-          project-url: https://github.com/users/marcusjacobson/projects/${{ matrix.project }}
-          # Reuses the classic-PAT secret that already powers bug-autoadd.yml /
-          # board-autoadd.yml / maturity-autoadd.yml / triage-autoadd.yml.
-          # Project (board) scope on the same user-owned account covers all
-          # six destination boards. The default GITHUB_TOKEN cannot write to
-          # user-owned Projects v2 boards.
+          project-url: https://github.com/users/marcusjacobson/projects/9
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
+
+  route-certification:
+    name: Route certification -> board #2
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'certification') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'certification'))
+    steps:
+      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/2
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
+
+  route-linkedin:
+    name: Route linkedin -> board #10
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'linkedin') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'linkedin'))
+    steps:
+      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/10
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
+
+  route-wiki:
+    name: Route wiki -> board #16
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'wiki') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'wiki'))
+    steps:
+      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/16
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
+
+  route-maturity:
+    name: Route maturity -> board #15
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'maturity') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'maturity'))
+    steps:
+      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/15
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
+
+  route-project:
+    name: Route project -> board #13
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'project') ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'project'))
+    steps:
+      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/13
           github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
