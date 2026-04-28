@@ -34,6 +34,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Schema mutations applied:** _(none)_
 - **Per-issue transitions:**
   - #169 Todo → In Progress at 2026-04-28T20:32-07:00
+  - #169 In Progress → Done — PR #243, merge `ae74212`
+  - #171 Todo → In Progress at 2026-04-28T20:48-07:00
 - **Outcome:** _(populated at session close)_
 
 ### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — second drain
