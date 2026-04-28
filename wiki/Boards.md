@@ -33,7 +33,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Queue at start (Todo, sorted by issue number):** #176, #177
 - **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
 - **Schema mutations applied:** _(none)_
-- **Per-issue transitions:** _(populated as the batch runs)_
+- **Per-issue transitions:**
+  - #176 Todo → In Progress at 2026-04-28T22:02-07:00
 - **Outcome:** _(populated at session close)_
 
 ### 2026-04-28 — boards-worker session: Wiki & Build-Docs Automation (#16)
