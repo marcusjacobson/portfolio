@@ -46,7 +46,7 @@ Expect roughly **one premium request per task**. If your first attempt fails:
 
 ## Index of agent files
 
-For the full list of specialized agents (request-intake, bug-intake, project-intake, issue-resolver, boards-worker, repo-ops, security-reviewer, publish-manager, repo-cleanup, maturity-scout, triage, wiki-sync, linkedin-sync, board-planner) see `.github/agents/` and the [Agents wiki page](wiki/Agents.md). All are chat-mode only — the hosted cloud agent does not load any of these agent files at runtime.
+For the full list of specialized agents (request-intake, bug-intake, project-intake, issue-resolver, boards-worker, repo-ops, security-reviewer, publish-manager, repo-cleanup, maturity-scout, triage, wiki-sync, board-planner) see `.github/agents/` and the [Agents wiki page](wiki/Agents.md). All are chat-mode only — the hosted cloud agent does not load any of these agent files at runtime.
 
 ## Path-specific instruction files
 

@@ -42,7 +42,6 @@ This is the canonical map. The same map is encoded in `.github/workflows/tag-rou
 | `compass` | [#9 Compass v-next](https://github.com/users/marcusjacobson/projects/9) | `tag-routing-autoadd.yml` |
 | `certification` | [#2 Certification/Education Path](https://github.com/users/marcusjacobson/projects/2) | `tag-routing-autoadd.yml` |
 | `bug` | [#12 Bug Tracker](https://github.com/users/marcusjacobson/projects/12) | `bug-autoadd.yml` |
-| `linkedin` | [#10 LinkedIn / Portfolio Sync](https://github.com/users/marcusjacobson/projects/10) | `tag-routing-autoadd.yml` |
 | `wiki` | [#16 Wiki & Build-Docs Automation](https://github.com/users/marcusjacobson/projects/16) | `tag-routing-autoadd.yml` |
 | `maturity` | [#15 Portfolio Maturity](https://github.com/users/marcusjacobson/projects/15) | `tag-routing-autoadd.yml` |
 | `project` | [#13 Microsoft Security Portfolio Roadmap](https://github.com/users/marcusjacobson/projects/13) | `tag-routing-autoadd.yml` |
@@ -86,7 +85,7 @@ Pick exactly one:
 
 | Disposition | Meaning | Resulting actions |
 |-------------|---------|-------------------|
-| `confirm` | Issue is real, well-scoped, and worth doing. | Add the routing tag (`compass`/`certification`/`bug`/`linkedin`/`wiki`/`maturity`/`project`) + `priority:p<n>` + (optionally) one `agent:*` label, verify board placement, remove `needs-triage`. |
+| `confirm` | Issue is real, well-scoped, and worth doing. | Add the routing tag (`compass`/`certification`/`bug`/`wiki`/`maturity`/`project`) + `priority:p<n>` + (optionally) one `agent:*` label, verify board placement, remove `needs-triage`. |
 | `confirm-needs-rewrite` | Issue is real but the body is too thin to act on. | Same labels as `confirm`, but add a comment requesting the missing detail and **leave** `needs-triage` until the user updates the body. |
 | `needs-info` | Real, but the agent needs the user to clarify a specific point before it can recommend a tag/board/priority. | Post a question comment, add `triage:awaiting-info`, **keep** `needs-triage`, exit. The next invocation re-reads the (updated) issue and proposes again. |
 | `dismiss-duplicate` | Already covered by an open issue. | Close as `not planned` with reason `duplicate`, comment linking the canonical issue, remove `needs-triage`. |
