@@ -37,7 +37,9 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Per-issue transitions:**
   - #216 Todo → In Progress at 2026-04-28T07:35-07:00
   - #216 In Progress → Done — PR #222, merge `5cd2dbc`
-- **Outcome:** _(populated at end of batch)_
+  - #217 Todo → In Progress at 2026-04-28T08:05-07:00
+  - #217 In Progress → Done — PR #223, merge `7739bba`
+- **Outcome:** Clean drain — both queued items merged. 2/2 worked, 0 blocked. Smoke-test AC on #217 left unchecked by design (deferred to the existing #39 end-to-end smoke-test slot, which is the natural integration point now that #214 + #215 + #216 + #217 have all landed).
 
 ### 2026-04-27 — recreate Triage Queue as board #19 (deleted #18)
 
