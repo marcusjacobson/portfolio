@@ -6,7 +6,6 @@ name: Tag-routing auto-add to boards
 #
 #   compass        -> #9  Compass v-next
 #   certification  -> #2  Certification/Education Path
-#   linkedin       -> #10 LinkedIn / Portfolio Sync
 #   wiki           -> #16 Wiki & Build-Docs Automation
 #   maturity       -> #15 Portfolio Maturity
 #   project        -> #13 Microsoft Security Portfolio Roadmap
@@ -14,7 +13,7 @@ name: Tag-routing auto-add to boards
 # `bug` -> #12 is handled by bug-autoadd.yml. `Board` (legacy) -> #13 is
 # handled by board-autoadd.yml. `needs-triage` -> #19 is handled by
 # triage-autoadd.yml. `source:*` -> #15 is handled by maturity-autoadd.yml.
-# This workflow covers the remaining six routing tags. Each tag has its
+# This workflow covers the remaining five routing tags. Each tag has its
 # own job so the job-level `if` is a literal-string compare (matrix-level
 # `if` referencing `matrix.*` was tried initially and produced an
 # 'invalid workflow file' error).
@@ -54,18 +53,6 @@ jobs:
       - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
         with:
           project-url: https://github.com/users/marcusjacobson/projects/2
-          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
-
-  route-linkedin:
-    name: Route linkedin -> board #10
-    runs-on: ubuntu-latest
-    if: >-
-      (github.event.action == 'labeled' && github.event.label.name == 'linkedin') ||
-      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'linkedin'))
-    steps:
-      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
-        with:
-          project-url: https://github.com/users/marcusjacobson/projects/10
           github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
 
   route-wiki:

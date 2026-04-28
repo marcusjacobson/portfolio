@@ -33,7 +33,7 @@ For all non-Project intake (features, bugs, chores), see [`@request-intake`](../
 
 ## Note on the audit log move
 
-The GitHub Projects v2 audit log (every Board on this user account, including internal-tooling boards like **Cloud Agent Enablement** (#11) — Source field `config / docs / smoke-test`, seeded issues #32–#40, complementary to board #10 LinkedIn / Portfolio Sync via Option B manual handoff using the `agent-task` label) now lives in [Boards](Boards). It used to live here, until the terminology split (PR #98) gave Boards their own page. This page now covers portfolio Projects only.
+The GitHub Projects v2 audit log (every Board on this user account, including internal-tooling boards like **Cloud Agent Enablement** (#11) — Source field `config / docs / smoke-test`, seeded issues #32–#40) now lives in [Boards](Boards). It used to live here, until the terminology split (PR #98) gave Boards their own page. This page now covers portfolio Projects only.
 
 ## See also
 

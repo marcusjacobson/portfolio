@@ -27,7 +27,6 @@ Frontmatter source: each row's purpose is the agent's `readme-summary:` (truncat
 | [`@security-reviewer`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/security-reviewer.agent.md) | Reviews a PR diff for XSS, secret leakage, supply-chain risk, unsafe workflow permissions, and CDN trust. Read-only. | Before merging any PR that touches HTML/JS, workflows, or dependencies. | None — emits a verdict (`APPROVE` / `REQUEST CHANGES` / `COMMENT`). | `read-only` | Yes — runs against PRs the hosted agent opens, providing the human-side review the cloud agent's PRs need before merge. |
 | [`@maturity-scout`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/maturity-scout.agent.md) | Scans the repo against Microsoft Learn, GitHub docs, OWASP, WCAG, and repo-hygiene best practices and surfaces gap issues onto the Portfolio Maturity board (#15). | Periodic best-practice audit, or after a major external standard updates. Also runs weekly via [`maturity-scan.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/maturity-scan.yml). | `@request-intake` (chat triage) or `@boards-worker` (batch drain). | `no` | Yes — gap issues it files are often well-scoped enough to assign straight to the hosted agent. |
 | [`@triage`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/triage.agent.md) | Triages issues currently labeled `needs-triage` — confirms them for work (labels + priority + board placement) or dismisses them (close as wontfix/duplicate). Operates one issue at a time in local Copilot Chat. | The `needs-triage` queue has open items, or a maturity-scout / external-scanner issue lands and needs disposition. | `@issue-resolver` (single confirmed item) or `@boards-worker` (batch drain after confirmations). | `yes` | No — chat-only. |
-| [`@linkedin-sync`](LinkedIn-Sync) | Compares portfolio claims against the user's LinkedIn profile snapshot and files `gap:*` issues for missing, stale, or misaligned items. Also runs a static best-practice checklist on every invocation. See [LinkedIn Sync](LinkedIn-Sync) for the full design. | User says "sync LinkedIn", "check profile drift", or wants to audit cert / project / skill parity between portfolio and LinkedIn. | `@issue-resolver` (single finding) or `@boards-worker` (drain the gap backlog). | `no` | Yes — `gap:*` issues with single-page edits can be assigned to the hosted agent for unattended fixes. |
 | [`@repo-ops`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/repo-ops.agent.md) | Generic catch-all for Issues, Projects, Labels, and Wiki ops driven by `gh` CLI and the GitHub MCP server. | Ad-hoc label syncs, wiki edits, or `gh` operations that don't fit another agent. | None — terminal step. | `no` | No — `gh`/MCP plumbing is local-only; the hosted agent doesn't operate at this layer. |
 | [`@repo-cleanup`](https://github.com/marcusjacobson/portfolio/blob/main/.github/agents/repo-cleanup.agent.md) | Sweeps the repo for incidental work artefacts and proposes them for removal one at a time. Read-only until per-item approval; `keep` writes a remediation (`.gitignore`, `.cleanupignore`, or in-file marker) so the same item isn't re-flagged. | Periodic hygiene sweep, after long Copilot sessions, or when `staging-inbox/` / `test-results/` / `playwright-report/` has accumulated. | None — terminal step; user commits any remediation diffs manually. | `no` | No — local-only file scan and remediation; the hosted agent doesn't see uncommitted state. |
 
@@ -61,9 +60,6 @@ flowchart TD
     scout["@maturity-scout"] --> req
     scout --> worker
 
-    linkedin["@linkedin-sync"] --> resolver
-    linkedin --> worker
-
     ops["@repo-ops"]:::side
     classDef side stroke-dasharray: 4 4
 ```
@@ -77,7 +73,7 @@ The **GitHub Copilot coding agent** (the hosted cloud agent) is a single, GitHub
 It has two summon paths:
 
 - **Assign an issue to `@copilot`** in the GitHub UI (Issues → Assignees → `@copilot`). The agent picks up the issue body, branches, implements, opens a draft PR, and posts updates as comments.
-- **Call [`mcp_io_github_git_assign_copilot_to_issue`](https://docs.github.com/en/copilot/using-github-copilot/coding-agent/about-assigning-tasks-to-copilot)** from any local agent that has the GitHub MCP server available. This is how `@boards-worker`, `@maturity-scout`, and `@linkedin-sync` can offload self-contained items without a human in the loop.
+- **Call [`mcp_io_github_git_assign_copilot_to_issue`](https://docs.github.com/en/copilot/using-github-copilot/coding-agent/about-assigning-tasks-to-copilot)** from any local agent that has the GitHub MCP server available. This is how `@boards-worker` and `@maturity-scout` can offload self-contained items without a human in the loop.
 
 The hosted agent is best at **file-scoped, one-shot tasks**: a typo fix, a single-page content tweak, a small refactor with a clear acceptance test. It is weakest at orchestration (multi-step board drains, cross-cutting refactors, anything that needs interactive design decisions) and at anything that depends on uncommitted local working-tree state.
 
@@ -113,7 +109,7 @@ Use the table below to decide which surface to reach for. The short version: **l
 | Anything that depends on uncommitted local changes (publish flow, in-progress page edits) | Local (`@publish-manager`, `@issue-resolver`) | Hosted agent only sees pushed state. |
 | PR review / security audit | Local (`@security-reviewer`) | Read-only review with repo-specific rules; not a hosted-agent capability. |
 | Triage / intake (turning a chat ask into an issue) | Local (`@request-intake`, `@bug-intake`, `@project-intake`) | Interactive classification, dedupe checks, and approval before any mutation. |
-| Periodic audit (best-practice scan, profile drift) | Local (`@maturity-scout`, `@linkedin-sync`) | Multi-source comparison and batch issue filing; gap issues can then be handed off to hosted. |
+| Periodic audit (best-practice scan) | Local (`@maturity-scout`) | Multi-source comparison and batch issue filing; gap issues can then be handed off to hosted. |
 | Background work while you're offline / AFK | Hosted (`@copilot`) | Runs in GitHub's sandbox; doesn't need your machine awake. |
 | Ad-hoc `gh` / MCP plumbing (label sync, wiki edit) | Local (`@repo-ops`) | Hosted agent doesn't operate at the CLI/MCP layer. |
 

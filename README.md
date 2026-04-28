@@ -51,7 +51,7 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 | [.github/workflows/](.github/workflows/) | CI: deploy, link/HTML/CSS/visual checks, CodeQL, gitleaks, wiki sync, labeler. |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) + [.github/instructions/](.github/instructions/) | Repo-wide and scoped Copilot guidance. |
 | [.github/prompts/](.github/prompts/) | Slash-command tasks: `/publish-update`, `/secure-code-review`, `/triage-issue`, `/groom-backlog`. |
-| [.github/agents/](.github/agents/) | Chat agents: `@publish-manager`, `@security-reviewer`, `@repo-ops`, `@linkedin-sync` ([wiki](wiki/LinkedIn-Sync.md)). See [wiki/Agents.md](wiki/Agents.md) for the full catalog. |
+| [.github/agents/](.github/agents/) | Chat agents: `@publish-manager`, `@security-reviewer`, `@repo-ops`. See [wiki/Agents.md](wiki/Agents.md) for the full catalog. |
 | [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/) + [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) | Templates for repeatable intake. |
 | [.github/labels.yml](.github/labels.yml) | Canonical label set. Synced via [scripts/gh/sync-labels.ps1](scripts/gh/sync-labels.ps1). |
 | [scripts/](scripts/) | PowerShell ops: migration, branch protection, gh CLI helpers. |

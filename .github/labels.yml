@@ -65,9 +65,6 @@
 - name: agent:wiki-sync
   color: 8957e5
   description: Tasks for the wiki-sync agent build or its findings
-- name: agent:linkedin-sync
-  color: 0e8a16
-  description: Tasks for the LinkedIn-Portfolio sync agent build or its findings
 - name: agent:copilot-enablement
   color: 8957e5
   description: Tasks to enable and operate the GitHub Copilot cloud agent on this repo
@@ -119,9 +116,6 @@
 - name: certification
   color: 1d76db
   description: Routing tag — adds the issue to board #2 Certification/Education Path.
-- name: linkedin
-  color: 1d76db
-  description: Routing tag — adds the issue to board #10 LinkedIn / Portfolio Sync.
 - name: maturity
   color: 1d76db
   description: Routing tag — adds the issue to board #15 Portfolio Maturity.
