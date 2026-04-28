@@ -44,6 +44,31 @@ Expect roughly **one premium request per task**. If your first attempt fails:
 - Diagnose, then try a different approach.
 - **Do not retry the same approach more than twice.** If the second attempt fails the same way, post a comment on the issue explaining the blocker and stop. The maintainer will route the issue elsewhere or refine scope.
 
+## MCP allow-list and firewall posture
+
+The cloud agent is allowed to call only the MCP servers explicitly listed below. Any tool not on this list is out of scope for an autonomous run; if a task appears to require one, comment on the issue and stop instead of guessing.
+
+**Approved MCP servers (default-on, do not remove):**
+
+- **GitHub MCP** — issue/PR/file operations on this repo. Use this for any read or write that has a `gh` CLI equivalent.
+- **Playwright MCP** — browser automation for `tests/visual/`. Used by visual regression; do not invoke for general scraping.
+
+**Not approved without re-review** (do not enable, even if the repo settings UI offers them):
+
+- Any MCP server that touches secrets, credentials, or the keychain.
+- Any MCP server that mutates infrastructure (Azure, AWS, GCP, Kubernetes, Terraform Cloud, etc.).
+- Any MCP server that calls third-party APIs (Slack, Jira, Stripe, social media, AI providers other than the GitHub-hosted model).
+- Any MCP server that executes arbitrary shell on a remote host.
+
+If a maintainer wants to add a new server to this list, the change goes through the normal PR flow against this file *and* repo Settings → Copilot → MCP servers. Both must agree.
+
+**Firewall posture:**
+
+- The integrated GitHub-managed firewall stays **ON** (the default). The cloud agent runs on GitHub-hosted ephemeral runners only; we do not use self-hosted runners and have no need to whitelist additional egress targets.
+- If a task seems to need outbound access beyond the default allow-list (e.g., fetching from an internal mirror, calling a private artifact feed), comment on the issue and stop. Do not edit firewall rules from inside an agent run.
+
+Reference: [Extend Copilot coding agent with MCP](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/extend-cloud-agent-with-mcp).
+
 ## Index of agent files
 
 For the full list of specialized agents (request-intake, bug-intake, project-intake, issue-resolver, boards-worker, repo-ops, security-reviewer, publish-manager, repo-cleanup, maturity-scout, triage, wiki-sync, board-planner) see `.github/agents/` and the [Agents wiki page](wiki/Agents.md). All are chat-mode only — the hosted cloud agent does not load any of these agent files at runtime.
