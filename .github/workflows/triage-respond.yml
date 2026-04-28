@@ -121,15 +121,15 @@ jobs:
           read -r -d '' ISSUE_QUERY <<'GRAPHQL' || true
           query($owner: String!, $name: String!, $number: Int!) {
             repository(owner: $owner, name: $name) {
+              suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 25) {
+                nodes {
+                  __typename
+                  ... on Bot { id login }
+                  ... on User { id login }
+                }
+              }
               issue(number: $number) {
                 id
-                suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 25) {
-                  nodes {
-                    __typename
-                    ... on Bot { id login }
-                    ... on User { id login }
-                  }
-                }
               }
             }
           }
@@ -142,7 +142,7 @@ jobs:
             -f query="$ISSUE_QUERY")
 
           ISSUE_ID=$(echo "$RESPONSE" | jq -r '.data.repository.issue.id')
-          COPILOT_ID=$(echo "$RESPONSE" | jq -r '.data.repository.issue.suggestedActors.nodes[] | select(.login == "copilot-swe-agent") | .id')
+          COPILOT_ID=$(echo "$RESPONSE" | jq -r '.data.repository.suggestedActors.nodes[] | select(.login == "copilot-swe-agent") | .id')
 
           if [ -z "$COPILOT_ID" ] || [ "$COPILOT_ID" = "null" ]; then
             echo "::error::copilot-swe-agent not found in suggestedActors. Is the cloud agent enabled on this repo?"
