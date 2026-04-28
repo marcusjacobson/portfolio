@@ -25,6 +25,17 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — second drain
+
+- **Branch:** `boards-worker/cloud-agent-enablement-20260428-1545` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo):** #33, #34, #35, #36 (planned order: #34 → #33 → #35 → #36)
+- **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:**
+  - _(populated as the batch progresses)_
+- **Outcome:** _(populated at session close)_
+
 ### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — resume
 
 - **Branch:** `boards-worker/cloud-agent-enablement-resume-20260428-0734` — PR _(opened at session close)_
