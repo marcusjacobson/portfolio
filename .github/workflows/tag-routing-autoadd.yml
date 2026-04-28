@@ -1,0 +1,64 @@
+name: Tag-routing auto-add to boards
+
+# Routes issues labeled with a cloud-triage routing tag to the matching
+# Projects v2 board. Tag-to-board map (also documented in
+# .github/agents/triage.agent.md and consumed by the cloud /triage workflow):
+#
+#   compass        -> #9  Compass v-next
+#   certification  -> #2  Certification/Education Path
+#   linkedin       -> #10 LinkedIn / Portfolio Sync
+#   wiki           -> #16 Wiki & Build-Docs Automation
+#   maturity       -> #15 Portfolio Maturity
+#   project        -> #13 Microsoft Security Portfolio Roadmap
+#
+# `bug` -> #12 is handled by bug-autoadd.yml. `Board` (legacy) -> #13 is
+# handled by board-autoadd.yml. `needs-triage` -> #19 is handled by
+# triage-autoadd.yml. `source:*` -> #15 is handled by maturity-autoadd.yml.
+# This workflow covers the remaining six routing tags.
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: tag-routing-autoadd-${{ github.event.issue.number }}-${{ github.event.label.name || 'opened' }}
+  cancel-in-progress: false
+
+jobs:
+  add-to-project:
+    name: Route ${{ matrix.tag }} -> board #${{ matrix.project }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tag: compass
+            project: 9
+          - tag: certification
+            project: 2
+          - tag: linkedin
+            project: 10
+          - tag: wiki
+            project: 16
+          - tag: maturity
+            project: 15
+          - tag: project
+            project: 13
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == matrix.tag) ||
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, matrix.tag))
+    steps:
+      - name: Add issue to board #${{ matrix.project }}
+        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        with:
+          project-url: https://github.com/users/marcusjacobson/projects/${{ matrix.project }}
+          # Reuses the classic-PAT secret that already powers bug-autoadd.yml /
+          # board-autoadd.yml / maturity-autoadd.yml / triage-autoadd.yml.
+          # Project (board) scope on the same user-owned account covers all
+          # six destination boards. The default GITHUB_TOKEN cannot write to
+          # user-owned Projects v2 boards.
+          github-token: ${{ secrets.BUG_PROJECT_TOKEN }}

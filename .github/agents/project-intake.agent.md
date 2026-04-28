@@ -71,9 +71,9 @@ If you accept the request, capture:
 
 Run these in parallel before drafting:
 
-- `gh issue list --state open --label Project --json number,title,url --limit 100` — find duplicate or near-duplicate roadmap items already filed.
+- `gh issue list --state open --label project --json number,title,url --limit 100` — find duplicate or near-duplicate roadmap items already filed.
 - `gh project item-list 13 --owner marcusjacobson --format json --limit 100` — full roadmap inventory (includes drafts), so duplicates can be caught regardless of whether they're issues or drafts.
-- `gh label list --limit 200` — confirm `Project` and the `priority:p*` labels exist. **Never invent labels.**
+- `gh label list --limit 200` — confirm `project` and the `priority:p*` labels exist. **Never invent labels.**
 - `gh project field-list 13 --owner marcusjacobson --format json` — capture the **field IDs** and **single-select option IDs** for `Status`, `Pillar`, `Tier`, `Priority` — needed in step 7 to set fields.
 
 If a duplicate or near-duplicate roadmap item exists (≥70% topical overlap), **do not file**. Surface it and ask whether to (a) comment with the new context, (b) close as duplicate, or (c) file separately anyway.
@@ -124,7 +124,7 @@ DraftIssues cannot carry labels — labels are a Repository Issue feature and th
 
 The two relevant repo labels are orthogonal and only matter once a draft has been **Converted to issue**:
 
-- **`Project`** — marks the resulting real issue as tracking a portfolio Project the owner is working on. Apply this label after conversion for label hygiene; it is the canonical marker for portfolio work even though the item is already on the roadmap board.
+- **`project`** — marks the resulting real issue as tracking a portfolio Project the owner is working on. Apply this label after conversion for label hygiene; it is the canonical marker for portfolio work even though the item is already on the roadmap board.
 - **`Board`** — reserved for *real* issues filed outside this agent and auto-added to a board via `.github/workflows/board-autoadd.yml`. Items created through this agent are already on board #13, so the `Board` label is redundant on the converted issue and should not be applied here.
 
 ### Pillar values (must match board #13 field options exactly)
@@ -225,7 +225,7 @@ Decide:
 
 ## Constraints
 
-- **Drafts cannot be labeled.** Do not attempt to add `Project` or `priority:*` labels to a DraftIssue — the GraphQL `DraftIssue` type has no labels field. Labels are only relevant if/when the user converts the draft to a real issue.
+- **Drafts cannot be labeled.** Do not attempt to add `project` or `priority:*` labels to a DraftIssue — the GraphQL `DraftIssue` type has no labels field. Labels are only relevant if/when the user converts the draft to a real issue.
 - **`Board` label is reserved for real issues** filed outside this agent (handled by `.github/workflows/board-autoadd.yml`). This agent's path bypasses both the label and the workflow.
 - **Status/Pillar/Tier/Priority use `gh project item-edit` with `--single-select-option-id`**, not `--text`.
 - For `gh project item-edit` calls in step 7, `--id` is the **project item id** (`PVTI_…`) returned by `gh project item-create`. If you ever need to update the draft's body later, that requires the **draft content id** (`DI_…`) which is a different value visible under `content.id` in `gh project item-list` output — do not confuse the two.
