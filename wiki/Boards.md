@@ -25,6 +25,24 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — second drain
+
+- **Branch:** `boards-worker/cloud-agent-enablement-20260428-1545` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo):** #33, #34, #35, #36 (planned order: #34 → #33 → #35 → #36)
+- **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:**
+  - #34 Todo → In Progress at 2026-04-28T15:46-07:00
+  - #34 In Progress → Done — PR #238, merge `bd5a0c8`
+  - #33 Todo → In Progress at 2026-04-28T15:55-07:00
+  - #33 In Progress → Done — PR #239, merge `28dbc29`
+  - #35 Todo → In Progress at 2026-04-28T16:08-07:00
+  - #35 In Progress → Done — PR #240, merge `ce8e413`
+  - #36 Todo → In Progress at 2026-04-28T16:25-07:00
+  - #36 In Progress → Done — PR #241, merge `d0897e6`
+- **Outcome:** Clean drain — 4/4 worked, 0 blocked. AC bullet 5 on #36 (LinkedIn-Sync coordination) was de-scoped mid-session by the operator after the LinkedIn-Sync agent was removed from the portfolio; issue body updated before delegation.
+
 ### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — resume
 
 - **Branch:** `boards-worker/cloud-agent-enablement-resume-20260428-0734` — PR _(opened at session close)_
