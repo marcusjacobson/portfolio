@@ -34,7 +34,7 @@ jobs:
       MAX_FILED: ${{ github.event.inputs.max || '5' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       # Network egress assumptions: this job intentionally performs NO live
       # fetches against Microsoft Learn, GitHub docs, OWASP, or WCAG. Source
