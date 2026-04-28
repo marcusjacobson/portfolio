@@ -25,6 +25,16 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Wiki & Build-Docs Automation (#16)
+
+- **Branch:** `boards-worker/wiki-build-docs-20260428-2030` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo, sorted by issue number):** #169, #171, #174, #176, #177 (planned `--max=3`: #169 → #171 → #174)
+- **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:** _(populated as the batch runs)_
+- **Outcome:** _(populated at session close)_
+
 ### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — second drain
 
 - **Branch:** `boards-worker/cloud-agent-enablement-20260428-1545` — PR _(opened at session close)_
