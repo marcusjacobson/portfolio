@@ -35,7 +35,7 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
 - **Schema mutations applied:** _(none)_
 - **Per-issue transitions:**
-  - _(populated as the batch runs)_
+  - #216 Todo → In Progress at 2026-04-28T07:35-07:00
 - **Outcome:** _(populated at end of batch)_
 
 ### 2026-04-27 — recreate Triage Queue as board #19 (deleted #18)
