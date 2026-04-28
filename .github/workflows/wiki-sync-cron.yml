@@ -118,5 +118,6 @@ jobs:
               --body-file "$BODY_FILE" \
               --label 'agent:wiki-sync' \
               --label 'chore' \
-              --label 'area:workflow'
+              --label 'area:workflow' \
+              --label 'needs-triage'
           fi
