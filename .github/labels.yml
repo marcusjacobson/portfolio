@@ -108,3 +108,20 @@
   color: bfdadc
 - name: wiki
   color: 5319e7
+
+# Routing (board auto-add tags consumed by cloud-mode @triage reply menu)
+- name: compass
+  color: 1d76db
+  description: Routing tag — adds the issue to board #9 Compass v-next.
+- name: certification
+  color: 1d76db
+  description: Routing tag — adds the issue to board #2 Certification/Education Path.
+- name: linkedin
+  color: 1d76db
+  description: Routing tag — adds the issue to board #10 LinkedIn / Portfolio Sync.
+- name: maturity
+  color: 1d76db
+  description: Routing tag — adds the issue to board #15 Portfolio Maturity.
+- name: project
+  color: 5319e7
+  description: Routing tag — tracks a portfolio Project; routes to board #13 Security Portfolio Roadmap.
