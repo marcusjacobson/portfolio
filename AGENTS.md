@@ -31,29 +31,11 @@ For VS Code Copilot Chat conventions, the canonical source remains [.github/copi
 - PR title: same style as commit subject.
 - PR description: summary, screenshots for visual changes, tested checklist.
 
-## Cloud-agent routing rules
+## Cloud-agent contract
 
-The hosted agent has no built-in router. These rules tell you which contract to follow based on issue labels.
+When you are assigned to an issue, follow the **resolver flow**: read the issue body, branch, implement, lint, commit, and open **one PR per issue**. One issue → one PR.
 
-### `needs-triage` issues → run the triage agent (Mode 2), do **not** implement
-
-If you have been assigned to an issue carrying the `needs-triage` label:
-
-1. **Do not branch, do not implement, do not open a PR.**
-2. Read [.github/agents/triage.agent.md](.github/agents/triage.agent.md) and execute **Mode 2 — Cloud-comment mode**:
-   - Build the proposal (read the issue, discover context, choose a tag + priority + board home).
-   - Post the self-documenting proposal block as a single issue comment via `gh issue comment`. Include every reply command inline (`/triage <tag>`, `/triage <tag> p<0-3>`, `/triage dismiss …`, `/triage needs-info …`, `/triage cancel`).
-   - Add the `triage:proposed` label.
-   - Stop. Wait for the maintainer to reply.
-3. The `triage-respond.yml` workflow re-invokes you when the maintainer replies; follow the same agent file to apply or dismiss.
-
-### `agent-task` issues → resolver workflow (branch + PR)
-
-If you have been assigned to an issue carrying `agent-task` (and **not** `needs-triage`), follow the resolver flow: branch, implement, lint, commit, open one PR per task. One issue → one PR.
-
-### Anything else
-
-If neither label is present, comment on the issue explaining you can't tell which contract to use, and stop. Do not implement on speculation.
+Triage of `needs-triage` issues happens **in the maintainer's local Copilot Chat**, not in the cloud agent. If a maintainer wants you to take a `needs-triage` issue, they will first triage it in chat (which removes `needs-triage` and adds the appropriate routing label) and then assign you. Do not try to triage labels yourself.
 
 ## Budget note
 
@@ -64,7 +46,7 @@ Expect roughly **one premium request per task**. If your first attempt fails:
 
 ## Index of agent files
 
-For the full list of specialized agents (request-intake, bug-intake, project-intake, issue-resolver, boards-worker, repo-ops, security-reviewer, publish-manager, repo-cleanup, maturity-scout, triage, wiki-sync, linkedin-sync, board-planner) see `.github/agents/` and the [Agents wiki page](wiki/Agents.md). Most are chat-mode only; `triage.agent.md` is the one with a documented cloud-comment mode.
+For the full list of specialized agents (request-intake, bug-intake, project-intake, issue-resolver, boards-worker, repo-ops, security-reviewer, publish-manager, repo-cleanup, maturity-scout, triage, wiki-sync, linkedin-sync, board-planner) see `.github/agents/` and the [Agents wiki page](wiki/Agents.md). All are chat-mode only — the hosted cloud agent does not load any of these agent files at runtime.
 
 ## Path-specific instruction files
 
