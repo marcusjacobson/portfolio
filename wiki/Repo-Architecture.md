@@ -20,7 +20,7 @@ For the agents that drive the flow, see [Agents](Agents). For the workflows that
 | [`wiki/`](https://github.com/marcusjacobson/portfolio/tree/main/wiki) | This wiki. Source of truth, mirrored one-way to the GitHub wiki by [`wiki-sync.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/wiki-sync.yml). Direct edits on github.com are overwritten on the next sync. |
 | [`staging-inbox/`](https://github.com/marcusjacobson/portfolio/tree/main/staging-inbox) | Gitignored drop zone for the Claude project export. Nothing here ships to the live site. |
 | [`package.json`](https://github.com/marcusjacobson/portfolio/blob/main/package.json) | Dev tooling only (`htmlhint`, `stylelint`, `lychee` runner, Playwright). The site itself has no runtime dependencies. |
-| [`LICENSE`](https://github.com/marcusjacobson/portfolio/blob/main/LICENSE) | MIT License — terms under which the code and content may be reused. |
+| [`LICENSE`](https://github.com/marcusjacobson/portfolio/blob/HEAD/LICENSE) | MIT License — terms under which the code and content may be reused. |
 
 ## Request intake flow
 
