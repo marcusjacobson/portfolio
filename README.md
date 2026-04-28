@@ -59,6 +59,7 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 | [wiki/](wiki/) | Wiki-as-code source. Synced one-way to the GitHub wiki on push to `main`. |
 | [.vscode/mcp.json](.vscode/mcp.json) | Workspace GitHub MCP server config (PAT prompted at runtime, never committed). |
 | `staging-inbox/` | Gitignored drop zone for the Claude project export. |
+| [`LICENSE`](LICENSE) | MIT License — terms under which the code and content may be reused. |
 
 ## Workflows
 
@@ -108,3 +109,7 @@ This repo combines **local VS Code agents** (chat-mode personas under [.github/a
 - [wiki/Agents.md](wiki/Agents.md) — full catalog of local and cloud agents with their tools and routing.
 - [AGENTS.md (planned — issue #32)](https://github.com/marcusjacobson/portfolio/issues/32) — top-level cloud-agent guidance for the hosted Copilot agent.
 
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
