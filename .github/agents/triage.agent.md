@@ -47,6 +47,8 @@ This is the canonical map. The same map is encoded in `.github/workflows/tag-rou
 | `maturity` | [#15 Portfolio Maturity](https://github.com/users/marcusjacobson/projects/15) | `tag-routing-autoadd.yml` |
 | `project` | [#13 Microsoft Security Portfolio Roadmap](https://github.com/users/marcusjacobson/projects/13) | `tag-routing-autoadd.yml` |
 
+In addition, every `needs-triage` issue auto-lands on [#19 Triage Queue](https://github.com/users/marcusjacobson/projects/19) (the staging board this agent drains). Once the destination board placement is verified and `needs-triage` is removed, the item must also be **removed from board #19** so the queue reflects only un-triaged work. Project number `19`, project node id `PVT_kwHOBvMdD84BV6uX`.
+
 ## Inputs
 
 - An issue number, or the cue "next" to pull the oldest `needs-triage` open issue.
@@ -163,8 +165,21 @@ gh issue edit <n> --add-label "<routing-tag>,priority:p<n>"
 scripts/gh/add-issue-to-board.ps1 -BoardUrl <url> -ItemUrl <issue-url>
 # Or: gh project item-add <projectNumber> --owner marcusjacobson --url <issue-url>
 
-# Only after board placement is verified, remove triage label
+# Verify destination board placement before stripping needs-triage
+gh issue view <n> --json projectItems --jq '.projectItems[] | {title, status: .status.name}'
+
+# Only after destination board placement is verified, remove triage label
 gh issue edit <n> --remove-label "needs-triage"
+
+# Then remove the item from the Triage Queue staging board (#19).
+# Look up the item's project-item id, then delete it. `gh project item-delete`
+# takes the project NUMBER positionally + --owner + --id (NOT --project-id).
+$itemId = gh project item-list 19 --owner marcusjacobson --format json --limit 100 |
+  ConvertFrom-Json |
+  Select-Object -ExpandProperty items |
+  Where-Object { $_.content.number -eq <n> } |
+  Select-Object -ExpandProperty id
+gh project item-delete 19 --owner marcusjacobson --id $itemId
 ```
 
 #### 7b. `confirm-needs-rewrite` path
@@ -193,6 +208,14 @@ gh issue comment <n> --body-file $tmp
 Remove-Item $tmp
 gh issue edit <n> --remove-label "needs-triage"
 gh issue close <n> --reason "not planned"
+
+# Also remove the item from the Triage Queue staging board (#19).
+$itemId = gh project item-list 19 --owner marcusjacobson --format json --limit 100 |
+  ConvertFrom-Json |
+  Select-Object -ExpandProperty items |
+  Where-Object { $_.content.number -eq <n> } |
+  Select-Object -ExpandProperty id
+gh project item-delete 19 --owner marcusjacobson --id $itemId
 ```
 
 For `dismiss-duplicate` specifically, prefer phrasing the comment as `Closing as duplicate of #<n>.` so GitHub's duplicate detection picks it up.
@@ -207,6 +230,7 @@ Disposition: <confirm | confirm-needs-rewrite | needs-info | dismiss-*>
 Labels:      added <list>; removed <list>
 Priority:    priority:p<n> | N/A
 Board:       <link or "unattached" or "N/A">
+Triage Queue: removed from board #19 | left on board #19 (reason)
 Status:      <closed | open | awaiting rewrite>
 Next:        <hand off to @issue-resolver | none>
 ```
@@ -218,6 +242,7 @@ Next:        <hand off to @issue-resolver | none>
 - **Never invent labels.** If the right label doesn't exist, recommend adding it via `@repo-ops` and either pause or omit it from the proposal — do not call `gh issue edit --add-label` with a name that wasn't in step 2's `gh label list`.
 - **`needs-triage` only comes off on completion.** For `confirm-needs-rewrite` and `needs-info`, leave it. For `confirm`, remove it **only after board placement is verified**. For `dismiss-*`, remove it as part of the close. Never strip the label and then bail.
 - **Do not strip `needs-triage` until board verification succeeds.** Even if the label add succeeded, the `needs-triage` label stays until the issue is confirmed present on the expected board (auto-add or fallback). Failures keep the issue triageable on the next invocation.
+- **Always remove the issue from the Triage Queue board (#19) after destination placement is verified** (or after close on dismissals). The staging board must reflect only un-triaged work. Use `gh project item-delete 19 --owner marcusjacobson --id <PVTI_...>` — note the project number is positional and the flag is `--id`, not `--project-id`.
 - **No code edits.** This agent does not modify repository files (never `git commit`, never `gh pr create`). Only label/comment/close/board mutations on the target issue.
 - **Chat-only.** This agent is not invoked by the hosted Copilot cloud agent. If the cloud agent is somehow assigned to a `needs-triage` issue, the maintainer should unassign it and run triage in chat instead.
 
