@@ -26,6 +26,18 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — resume
+
+- **Branch:** `boards-worker/cloud-agent-enablement-resume-20260428-0734` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Context:** Resume of the earlier 2026-04-28 session whose branch was cleaned up after #214 and #215 merged. Prior outcomes for continuity: #214 Todo → Done via PR #219 (merge `efe6606`); #215 Todo → Done via PR #220 (merge `983d74e`) plus YAML follow-up PR #221 (merge `47a9219`).
+- **Queue at start (Todo, scoped to caller's list):** #216, #217
+- **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:**
+  - _(populated as the batch runs)_
+- **Outcome:** _(populated at end of batch)_
+
 ### 2026-04-27 — recreate Triage Queue as board #19 (deleted #18)
 
 After the initial backfill of 9 issues onto board #18, the project's `items` GraphQL connection persistently returned `totalCount: 0` despite items existing (queryable from the issue side via `repository.issue.projectItems` and via direct node-id lookups, with `isArchived: false`). The web UI mirrored the broken connection (board displayed empty). A field-value mutation nudge did not unstick the index. Cross-board comparison confirmed boards #12/#15/#16 still returned correct item counts on the same query, so the corruption was scoped to #18 alone — consistent with a GitHub Projects v2 indexing incident around the time #18 was created and seeded.
