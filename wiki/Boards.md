@@ -37,7 +37,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #176 Todo → In Progress at 2026-04-28T22:02-07:00
   - #176 In Progress → Done — PR #246, merge `683d9a7`
   - #177 Todo → In Progress at 2026-04-28T22:18-07:00
-- **Outcome:** _(populated at session close)_
+  - #177 In Progress → Done — PR #247, merge `174347f`
+- **Outcome:** Clean drain — 2/2 worked, 0 blocked. Board #16 Todo column now empty. #176 added a wiki-sync-cron row to the Hygiene scouting table in `wiki/Workflows.md` (PR #246). #177 added a `@wiki-sync` row to `wiki/Agents.md`, refreshed the `@request-intake` and `@board-planner` rows for handoff/sweep behavior, and extended the handoff Mermaid diagram (PR #247). Note: the #177 issue context mentioned a LinkedIn-sync row but `wiki/LinkedIn-Sync.md` doesn't exist in the repo and no LinkedIn AC was listed — flagged in the issue resolution comment as a possible follow-up.
 
 ### 2026-04-28 — boards-worker session: Wiki & Build-Docs Automation (#16)
 
