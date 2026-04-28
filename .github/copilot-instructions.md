@@ -1,6 +1,8 @@
 # Repo conventions for Copilot
 
-This is a static HTML portfolio site published to GitHub Pages. There is **no build step** for the site itself — every `*.html` page must be browser-runnable as-is from the repo root.
+> **No build step.** This is a static HTML portfolio site published to GitHub Pages. Every `*.html` page must be browser-runnable as-is from the repo root. There is no bundler, no transpiler, no `npm run build` for the site itself. The `npm` toolchain (under `package.json`) is purely dev-time tooling for lint, link-check, and visual regression.
+
+> **Two contexts, one repo.** This file is the canonical guide for **VS Code Copilot Chat** (interactive, has access to local agents, prompts, and slash-commands). The hosted **Copilot cloud (coding) agent** loads [AGENTS.md](../AGENTS.md) instead. When working as the cloud agent, follow [AGENTS.md](../AGENTS.md) — it is the smaller, resolver-only contract. Do not assume slash-prompts or named local agents are available in cloud runs.
 
 ## Site authoring
 
@@ -31,6 +33,30 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 - **Never push directly to `main`.** Open a PR; checks must be green.
 - **Pin Action versions** in `.github/workflows/*.yml`. Use major version tags (`@v4`) at minimum; SHAs preferred for third-party actions.
 - **`permissions:` is required** on every workflow. Default to `contents: read` and elevate per job only as needed.
+
+## Verified shell commands
+
+These commands are known to work in both the local dev environment and the ephemeral cloud-agent runner (after `copilot-setup-steps` has primed Node 20 and dependencies):
+
+| Command | Purpose |
+|---------|---------|
+| `npm ci` | Install dev dependencies (idempotent; required after `package-lock.json` changes). |
+| `npm run lint` | Runs `htmlhint` against `*.html` and `stylelint` against `**/*.css`. |
+| `npm run test:visual` | Playwright visual regression. Snapshots live in `tests/visual/__snapshots__/`. |
+| `npm run test:visual:update` | Regenerate visual snapshots. The **only** sanctioned way to change them. |
+| `npx lychee --config tests/lychee.toml .` | Local link-check (CI runs the same via `link-check.yml`). |
+
+The cloud agent does not have a separate `npm run build` step because the site has no build. Do not invent one.
+
+## When working as the cloud (hosted) agent
+
+If you are running as the GitHub-hosted Copilot coding agent (assigned to an issue from the Agents tab or via `@copilot`), follow [AGENTS.md](../AGENTS.md) as the primary contract. Key cloud-agent specifics that override or narrow the rules above:
+
+- **One issue → one branch → one PR.** Never bundle multiple issues into a single PR. Triage is **not** your job; if an issue is unclear, comment on it and stop.
+- **Triage stays in local chat.** If you are assigned a `needs-triage` issue, the maintainer triaged it in local chat first and removed that label before assigning you. Do not edit triage labels yourself.
+- **Budget discipline.** Expect roughly one premium request per task. If the first attempt fails, diagnose and try a different approach. Do not retry the same approach more than twice — comment on the issue with the blocker and stop.
+- **No interactive prompts.** You cannot ask the maintainer questions mid-run. If you need confirmation (destructive action, ambiguous AC, schema change), post a comment and stop instead of guessing.
+- **Local agents and slash-prompts are not available** in cloud runs. References in this file to `@publish-manager`, `@security-reviewer`, `@repo-ops`, `/publish-update`, `/secure-code-review`, etc. only apply in VS Code chat.
 
 ## Commit & PR style
 
