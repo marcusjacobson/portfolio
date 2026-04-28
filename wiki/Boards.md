@@ -36,6 +36,7 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Schema mutations applied:** _(none)_
 - **Per-issue transitions:**
   - #216 Todo → In Progress at 2026-04-28T07:35-07:00
+  - #216 In Progress → Done — PR #222, merge `5cd2dbc`
 - **Outcome:** _(populated at end of batch)_
 
 ### 2026-04-27 — recreate Triage Queue as board #19 (deleted #18)
