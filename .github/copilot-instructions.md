@@ -15,7 +15,7 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 
 | Folder | Purpose |
 |--------|---------|
-| `AGENTS.md` (root) | Routing contract loaded by the hosted Copilot cloud agent on every run (label-keyed: `needs-triage` → triage Mode 2; `agent-task` → resolver). |
+| `AGENTS.md` (root) | Cloud-agent contract loaded by the hosted Copilot cloud agent on every run. Resolver-only: any assigned issue → branch + one PR. Triage stays in local chat. |
 | `.github/workflows/` | CI: deploy, previews, link-check, lint, visual regression, CodeQL, gitleaks, wiki sync |
 | `.github/instructions/` | Scoped Copilot guidance (auto-attaches by `applyTo`) |
 | `.github/prompts/` | Slash-command tasks (publish, secure review, staging, triage) |
@@ -43,7 +43,7 @@ This is a static HTML portfolio site published to GitHub Pages. There is **no bu
 - Publishing → use `/publish-update` prompt or the `@publish-manager` agent.
 - Security review → use `/secure-code-review` prompt or `@security-reviewer` agent.
 - Issues / Boards / Wiki ops → use `@repo-ops` (uses `gh` CLI and the GitHub MCP server).
-- Triage of `needs-triage` issues (confirm for work or dismiss) → use the `@triage` agent. Operates one issue at a time. In chat it presents a proposal and waits for `apply` / `dismiss` / `edit:` / `cancel`. When summoned by the hosted Copilot agent on an issue, it posts a self-documenting proposal as a comment, sets `triage:proposed`, and waits for a `/triage <tag> [p<n>]`, `/triage dismiss <reason>`, `/triage needs-info <question>`, or `/triage cancel` reply on the issue.
+- Triage of `needs-triage` issues (confirm for work or dismiss) → use the `@triage` agent in local Copilot Chat. Operates one issue at a time. Presents a proposal and waits for `apply` / `dismiss` / `edit:` / `cancel`. Triage is **chat-only**; the hosted cloud agent does not run triage.
 - LinkedIn / profile / sync (audit drift between portfolio and LinkedIn) → use the `@linkedin-sync` agent. See [wiki/LinkedIn-Sync.md](../wiki/LinkedIn-Sync.md) for the input contract, gap categories, and run modes.
 - Cleanup / sweep stale artefacts → use `/repo-cleanup` or the `@repo-cleanup` agent. Walks generated test outputs, `staging-inbox/` leftovers, merged local branches, stale `.copilot-tracking/` runs, orphaned scripts, and versioned root duplicates one item at a time. Read-only until per-item approval; `keep` produces a remediation so the same item isn't re-flagged.
 
