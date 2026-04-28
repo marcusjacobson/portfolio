@@ -25,6 +25,22 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Wiki & Build-Docs Automation (#16)
+
+- **Branch:** `boards-worker/wiki-build-docs-20260428-2030` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo, sorted by issue number):** #169, #171, #174, #176, #177 (planned `--max=3`: #169 → #171 → #174)
+- **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:**
+  - #169 Todo → In Progress at 2026-04-28T20:32-07:00
+  - #169 In Progress → Done — PR #243, merge `ae74212`
+  - #171 Todo → In Progress at 2026-04-28T20:48-07:00
+  - #171 In Progress → Done — closed verified-no-change (no PR; Home.md has no Projects.md anchor links to repair)
+  - #174 Todo → In Progress at 2026-04-28T21:02-07:00
+  - #174 In Progress → Done — PR #244, merge `44f89ea`
+- **Outcome:** Clean drain — 3/3 worked, 0 blocked. #169 shipped a wiki edit (PR #243); #171 closed verified-no-change after confirming Home.md has no Projects.md anchor links to repair (AC explicitly authorized this path); #174 shipped a wiki edit (PR #244) with AC bullet 2 (`@linkedin-sync` mention) satisfied-by-removal because the agent was retired in PR #237. Remaining Todo on board #16: #176, #177 (defer to next session).
+
 ### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — second drain
 
 - **Branch:** `boards-worker/cloud-agent-enablement-20260428-1545` — PR _(opened at session close)_
