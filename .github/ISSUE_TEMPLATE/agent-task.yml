@@ -1,0 +1,46 @@
+name: Agent task (@copilot)
+description: Well-scoped task safe to assign to the GitHub Copilot cloud agent.
+title: "[agent-task] "
+labels: [agent-task]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template when filing an issue you intend to assign to `@copilot` (the GitHub-hosted Copilot cloud agent).
+        Keep the scope tight — one branch, one PR. If the task is ambiguous or spans multiple concerns, split it first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What needs to change and why. State the goal in one or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: Concrete, testable outcomes. Use a checklist; the agent ticks these off as it works.
+      value: |
+        - [ ] 
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: suggested-files
+    attributes:
+      label: Suggested files
+      description: Files or folders the agent should look at first. Helps it find the right context fast.
+      placeholder: |
+        - path/to/file.html
+        - .github/workflows/example.yml
+    validations:
+      required: false
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      description: Confirm this task is appropriate for autonomous execution.
+      options:
+        - label: This issue is safe to assign to `@copilot` (well-scoped, no destructive operations on shared infra, no secrets needed beyond the default token).
+          required: true
