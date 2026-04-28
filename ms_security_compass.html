@@ -39,7 +39,7 @@ svg{display:block;width:100%;height:auto;max-width:950px;margin:0 auto;backgroun
 .ltag{font-size:10px;padding:1px 7px;border-radius:20px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:0.5px solid rgba(255,255,255,0.2)}
 .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-top:.4rem}
 .col{background:rgba(0,0,0,0.25);border-radius:var(--border-radius-md);padding:.6rem .85rem}
-.col h4{font-size:10px;font-weight:500;color:rgba(255,255,255,0.55);margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em}
+.col h3{font-size:10px;font-weight:500;color:rgba(255,255,255,0.55);margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em}
 .col ul{margin:0;padding:0 0 0 1rem;font-size:12px;line-height:1.6;color:rgba(255,255,255,0.9)}
 button.db{font-size:12px;margin-top:.65rem;cursor:pointer}
 /* SVG node text — applied to all non-Venn nodes */
@@ -795,7 +795,7 @@ function show(k){
   const ghBtn=hasProjects
     ?`<button id="gh-btn-${k}" class="db" style="color:#fff;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);padding:4px 12px;border-radius:6px" onclick="renderGithub('${k}',D['${k}'])">GitHub projects ↗</button>`
     :`<button class="db" disabled style="color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);padding:4px 12px;border-radius:6px;cursor:default">No projects linked yet</button>`;
-  document.getElementById('modal-body').innerHTML=`<div class="ph"><span class="bdg" style="background:rgba(255,255,255,0.15);color:#fff;border:0.5px solid rgba(255,255,255,0.3)">${d.label}</span><span class="ltag">${d.layer}</span></div><div class="cols"><div class="col"><h4>What I advise on</h4><ul>${d.what.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="col"><h4>Why it matters to clients</h4><ul>${d.why.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="col"><h4>How signals flow</h4><ul>${d.flows.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div id="gh-section-${k}" style="margin-top:.5rem">${ghBtn}</div>`;
+  document.getElementById('modal-body').innerHTML=`<div class="ph"><span class="bdg" style="background:rgba(255,255,255,0.15);color:#fff;border:0.5px solid rgba(255,255,255,0.3)">${d.label}</span><span class="ltag">${d.layer}</span></div><div class="cols"><div class="col"><h3>What I advise on</h3><ul>${d.what.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="col"><h3>Why it matters to clients</h3><ul>${d.why.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="col"><h3>How signals flow</h3><ul>${d.flows.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div id="gh-section-${k}" style="margin-top:.5rem">${ghBtn}</div>`;
   modal.scrollTop=0;
   document.getElementById('modal-backdrop').classList.add('on');
 }
