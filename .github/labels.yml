@@ -81,6 +81,9 @@
 - name: triage:proposed
   color: fbca04
   description: Triage agent has posted a proposal comment; awaiting user apply/dismiss
+- name: triage:awaiting-info
+  color: fbca04
+  description: Triage agent paused awaiting user clarification (needs-info disposition)
 - name: link-rot
   color: c5def5
   description: External link broke.
