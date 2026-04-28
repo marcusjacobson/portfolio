@@ -40,7 +40,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #35 Todo → In Progress at 2026-04-28T16:08-07:00
   - #35 In Progress → Done — PR #240, merge `ce8e413`
   - #36 Todo → In Progress at 2026-04-28T16:25-07:00
-- **Outcome:** _(populated at session close)_
+  - #36 In Progress → Done — PR #241, merge `d0897e6`
+- **Outcome:** Clean drain — 4/4 worked, 0 blocked. AC bullet 5 on #36 (LinkedIn-Sync coordination) was de-scoped mid-session by the operator after the LinkedIn-Sync agent was removed from the portfolio; issue body updated before delegation.
 
 ### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — resume
 
