@@ -69,8 +69,11 @@ The split-token pattern in `board-membership-labeler.yml` is intentional: `BUG_P
 | Workflow | Triggers | Permissions | Secrets | Status check | Required context? |
 |----------|----------|-------------|---------|--------------|-------------------|
 | [`maturity-scan.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/maturity-scan.yml) | Weekly cron (Mon 14:00 UTC), `workflow_dispatch` (input: `max`, default 5) | `contents: read`, `issues: write` | `BUG_PROJECT_TOKEN` (for inline `gh project item-add` to board #15). | `scan` | No. Files repo-hygiene gap issues using templates under [`.github/workflows/templates/`](https://github.com/marcusjacobson/portfolio/tree/main/.github/workflows/templates). See [Maturity-Scout](Maturity-Scout) for the chat-mode counterpart. |
+| [`wiki-sync-cron.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/wiki-sync-cron.yml) | Weekly cron (Mon 13:00 UTC), `workflow_dispatch` (input: `force`, default `false`) | `contents: read`, `issues: write`, `pull-requests: write` | None (uses default `GITHUB_TOKEN`). Gated by repo variable `WIKI_SYNC_CRON_ENABLED`. | `file-tracker` | No. Files (or refreshes) an `agent:wiki-sync` tracker issue prompting a maintainer to run `/wiki-sync-run`. Body rendered from [`.github/workflows/templates/wiki-sync-cron-issue-body.md`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/templates/wiki-sync-cron-issue-body.md). |
 
 `maturity-scan.yml` deliberately performs no live network fetches — every check is a deterministic file-existence probe in the checkout plus dedupe against the GitHub API. LLM-judgment checks live in the on-demand `@maturity-scout` chat agent.
+
+`wiki-sync-cron.yml` is disabled by default: the `file-tracker` job only runs when the repo variable `WIKI_SYNC_CRON_ENABLED` is set to `"1"`, or when a maintainer dispatches it with `force=true`. CI cannot drive Copilot Chat directly, so the workflow's only output is the tracker issue itself — the `/wiki-sync-run` orchestration (`@wiki-sync` → `@request-intake` → `@board-planner`) runs in chat and closes the tracker when the sweep is done.
 
 ### Heredoc indentation pitfall
 
