@@ -1,0 +1,166 @@
+name: Triage comment listener
+
+# Re-invokes the cloud `@triage` agent when a maintainer posts a `/triage`
+# command on an issue carrying `triage:proposed`. The agent itself (defined
+# in .github/agents/triage.agent.md) parses the comment body and performs
+# the routing or dismissal — this workflow only verifies the comment is
+# actionable and re-assigns @copilot so the hosted Copilot coding agent
+# picks up the comment as its next instruction.
+#
+# Trigger contract (must stay in sync with .github/agents/triage.agent.md
+# step 5b "Reply with one of the commands below to apply"):
+#
+#   /triage <tag>                 # tag in: compass, certification, bug,
+#                                 # linkedin, wiki, maturity, project
+#   /triage <tag> p<0-3>          # priority override
+#   /triage dismiss duplicate of #<N>
+#   /triage dismiss wontfix <reason>
+#   /triage dismiss invalid <reason>
+#   /triage needs-info <question>
+#   /triage cancel
+#
+# Drive-by comments (non-maintainer authors) and comments that do not
+# match the regex no-op silently. The workflow never edits labels or
+# closes issues directly — that is the agent's contract.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: triage-respond-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  reinvoke-triage:
+    name: Re-invoke @triage on /triage command
+    runs-on: ubuntu-latest
+    # Filter at the job level so non-matching comments do not even spin up
+    # a runner. Conditions:
+    #   1. Comment is on an issue (not a PR — issue_comment fires for both).
+    #   2. Issue carries the `triage:proposed` label (set by the agent).
+    #   3. Comment author is a maintainer (OWNER / MEMBER / COLLABORATOR).
+    #      Drive-by comments from CONTRIBUTOR / NONE / FIRST_TIME_CONTRIBUTOR
+    #      / FIRST_TIMER must not mutate state.
+    #   4. Comment body starts with `/triage` (case-sensitive — the agent's
+    #      step 5b documents lowercase).
+    if: >-
+      github.event.issue.pull_request == null &&
+      contains(github.event.issue.labels.*.name, 'triage:proposed') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association) &&
+      startsWith(github.event.comment.body, '/triage')
+    steps:
+      - name: Validate /triage command syntax
+        id: parse
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+
+          # The agent's step 5b documents the full grammar. We accept any
+          # syntactically valid command here; the agent itself enforces
+          # business rules (e.g. tag must be one of the seven, priority
+          # must be 0-3). Workflow-side regex stays loose on purpose so
+          # the agent contract stays the single source of truth.
+          #
+          # First non-empty line of the comment is the command (callers
+          # may add free-form context on subsequent lines, e.g. a wontfix
+          # rationale).
+          FIRST_LINE=$(printf '%s\n' "$COMMENT_BODY" | sed -n '1p' | tr -d '\r')
+
+          # Documented command shapes:
+          #   /triage <tag>
+          #   /triage <tag> p<n>
+          #   /triage dismiss <reason...>
+          #   /triage needs-info <question...>
+          #   /triage cancel
+          if echo "$FIRST_LINE" | grep -Eq '^/triage (compass|certification|bug|linkedin|wiki|maturity|project)( p[0-3])?[[:space:]]*$'; then
+            echo "command=route" >> "$GITHUB_OUTPUT"
+          elif echo "$FIRST_LINE" | grep -Eq '^/triage dismiss (duplicate of #[0-9]+|wontfix .+|invalid .+)$'; then
+            echo "command=dismiss" >> "$GITHUB_OUTPUT"
+          elif echo "$FIRST_LINE" | grep -Eq '^/triage needs-info .+$'; then
+            echo "command=needs-info" >> "$GITHUB_OUTPUT"
+          elif echo "$FIRST_LINE" | grep -Eq '^/triage cancel[[:space:]]*$'; then
+            echo "command=cancel" >> "$GITHUB_OUTPUT"
+          else
+            echo "Comment did not match any documented /triage command. No-op."
+            echo "command=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Detected /triage command on issue #$ISSUE_NUMBER."
+
+      - name: Re-assign @copilot to the issue
+        if: steps.parse.outputs.command != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+
+          # Re-invoke the hosted Copilot coding agent by replacing the
+          # assignee list with @copilot. We use the GraphQL
+          # `replaceActorsForAssignable` mutation rather than
+          # `gh issue edit --add-assignee` because the SWE agent is a
+          # special bot actor and gh CLI assignment by name has been
+          # unreliable; the GraphQL form takes the bot's node ID directly.
+          #
+          # If Copilot is already assigned, the mutation still fires the
+          # `assigned` event, which the hosted agent treats as a fresh
+          # instruction to re-read the issue (and thus pick up the new
+          # /triage comment).
+
+          read -r -d '' ISSUE_QUERY <<'GRAPHQL' || true
+          query($owner: String!, $name: String!, $number: Int!) {
+            repository(owner: $owner, name: $name) {
+              issue(number: $number) {
+                id
+                suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 25) {
+                  nodes {
+                    __typename
+                    ... on Bot { id login }
+                    ... on User { id login }
+                  }
+                }
+              }
+            }
+          }
+          GRAPHQL
+
+          RESPONSE=$(gh api graphql \
+            -F owner="$OWNER" \
+            -F name="$REPO_NAME" \
+            -F number="$ISSUE_NUMBER" \
+            -f query="$ISSUE_QUERY")
+
+          ISSUE_ID=$(echo "$RESPONSE" | jq -r '.data.repository.issue.id')
+          COPILOT_ID=$(echo "$RESPONSE" | jq -r '.data.repository.issue.suggestedActors.nodes[] | select(.login == "copilot-swe-agent") | .id')
+
+          if [ -z "$COPILOT_ID" ] || [ "$COPILOT_ID" = "null" ]; then
+            echo "::error::copilot-swe-agent not found in suggestedActors. Is the cloud agent enabled on this repo?"
+            exit 1
+          fi
+
+          echo "Issue node id: $ISSUE_ID"
+          echo "Copilot actor id: $COPILOT_ID"
+
+          gh api graphql \
+            -F assignableId="$ISSUE_ID" \
+            -F actorIds[]="$COPILOT_ID" \
+            -f query='mutation($assignableId: ID!, $actorIds: [ID!]!) {
+              replaceActorsForAssignable(input: {assignableId: $assignableId, actorIds: $actorIds}) {
+                assignable {
+                  ... on Issue { number assignees(first: 5) { nodes { login } } }
+                }
+              }
+            }' > /dev/null
+
+          echo "Re-assigned @copilot to issue #$ISSUE_NUMBER (command: ${{ steps.parse.outputs.command }})."
