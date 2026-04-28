@@ -38,6 +38,8 @@ exclude = [
     "^https?://github\\.com/marcusjacobson/portfolio/blob/main/\\.github/agents/triage\\.agent\\.md",
     # LICENSE added in PR #226 — 404 until merged to main.
     "^https?://github\\.com/marcusjacobson/portfolio/blob/main/LICENSE$",
+    # AGENTS.md added in PR #232 — 404 until merged to main.
+    "^https?://github\\.com/marcusjacobson/portfolio/blob/main/AGENTS\\.md$",
     # LinkedIn returns 404 to unauthenticated bots (intermittent). Public profile is verified manually.
     "^https?://(www\\.)?linkedin\\.com/in/",
 ]
