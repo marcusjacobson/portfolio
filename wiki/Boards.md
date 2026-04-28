@@ -38,7 +38,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #171 Todo → In Progress at 2026-04-28T20:48-07:00
   - #171 In Progress → Done — closed verified-no-change (no PR; Home.md has no Projects.md anchor links to repair)
   - #174 Todo → In Progress at 2026-04-28T21:02-07:00
-- **Outcome:** _(populated at session close)_
+  - #174 In Progress → Done — PR #244, merge `44f89ea`
+- **Outcome:** Clean drain — 3/3 worked, 0 blocked. #169 shipped a wiki edit (PR #243); #171 closed verified-no-change after confirming Home.md has no Projects.md anchor links to repair (AC explicitly authorized this path); #174 shipped a wiki edit (PR #244) with AC bullet 2 (`@linkedin-sync` mention) satisfied-by-removal because the agent was retired in PR #237. Remaining Todo on board #16: #176, #177 (defer to next session).
 
 ### 2026-04-28 — boards-worker session: Cloud Agent Enablement (#11) — second drain
 
