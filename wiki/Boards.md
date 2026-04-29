@@ -25,6 +25,21 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Wiki & Build-Docs Automation (#16) — continuation
+
+- **Branch:** `boards-worker/wiki-build-docs-20260428-2200` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Context:** Continuation of the earlier 2026-04-28 session (PR #245) which drained #169, #171, #174. This session targets the remaining two Todo items on board #16.
+- **Queue at start (Todo, sorted by issue number):** #176, #177
+- **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:**
+  - #176 Todo → In Progress at 2026-04-28T22:02-07:00
+  - #176 In Progress → Done — PR #246, merge `683d9a7`
+  - #177 Todo → In Progress at 2026-04-28T22:18-07:00
+  - #177 In Progress → Done — PR #247, merge `174347f`
+- **Outcome:** Clean drain — 2/2 worked, 0 blocked. Board #16 Todo column now empty. #176 added a wiki-sync-cron row to the Hygiene scouting table in `wiki/Workflows.md` (PR #246). #177 added a `@wiki-sync` row to `wiki/Agents.md`, refreshed the `@request-intake` and `@board-planner` rows for handoff/sweep behavior, and extended the handoff Mermaid diagram (PR #247). Note: the #177 issue context mentioned a LinkedIn-sync row but `wiki/LinkedIn-Sync.md` doesn't exist in the repo and no LinkedIn AC was listed — flagged in the issue resolution comment as a possible follow-up.
+
 ### 2026-04-28 — boards-worker session: Wiki & Build-Docs Automation (#16)
 
 - **Branch:** `boards-worker/wiki-build-docs-20260428-2030` — PR _(opened at session close)_
