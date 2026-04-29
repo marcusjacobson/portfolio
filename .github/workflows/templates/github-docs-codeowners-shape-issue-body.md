@@ -1,6 +1,6 @@
 ## Source
 
-GitHub docs — About code owners — <https://docs.github.com/en/repositories/managing-your-repositories-settings-and-features/customizing-your-repository/about-code-owners#codeowners-syntax>
+GitHub docs — About code owners — <https://docs.github.com/en/repositories/managing-your-repositories-settings-and-features/customizing-your-repository/about-code-owners>
 
 > Each line in a CODEOWNERS file consists of a pattern followed by one or more owners. Owners must be listed using their GitHub username (prefixed with `@`) or an email address.
 
