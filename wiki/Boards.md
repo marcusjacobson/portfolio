@@ -25,6 +25,23 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Portfolio Maturity (#15) — #255/#256/#257 drain
+
+- **Branch:** `boards-worker/portfolio-maturity-20260428-2200` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo):** #255, #256, #257 (planned `--max=3`, drained by priority p2 → p3 → p3)
+- **Trigger:** All three were spawned by #135 maturity-scout audit (PR #258). Each extends `.github/workflows/maturity-scan.yml` with new producer step(s) — sequential drain mandatory to avoid merge conflicts on the same file.
+- **Status field options captured:** Todo=`f75ad846`, In Progress=`47fc9ee4`, In-review parking=_(none — audit-log fallback)_, Done=`98236657`
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:**
+  - #255 Todo → In Progress at 2026-04-29T05:07:22Z
+  - #255 In Progress → Done — PR #263, merge `c07e80d`
+  - #256 Todo → In Progress at 2026-04-29T05:17:04Z
+  - #256 In Progress → Done — PR #264, merge `0e7e95e`
+  - #257 Todo → In Progress at 2026-04-29T05:28:03Z
+  - #257 In Progress → Done — PR #265, merge `de1968b`
+- **Outcome:** Clean drain — 3/3 worked, 0 blocked. #255 wired `scan_owasp` step (4 rules: sri-external-script, sri-external-style, target-blank-noopener, mixed-content) + `owasp-issue-body.md` template + wiki coverage update (PR #263). #256 wired `scan_branch_protection_drift` + `scan_label_drift` producers between `scan` and `scan_github_docs`, with two new templates and wiki coverage update (PR #264). #257 added three sibling steps (`scan_permissions_block`, `scan_codeowners_shape`, `scan_reusable_workflow_pin`) extending the `source:github-docs` lane, with wiki coverage matrix update removing the prior "follow-up" call-out (PR #265). All three deferred the smoke-test AC to the next cron / manual dispatch.
+
 ### 2026-04-28 — boards-worker session: Portfolio Maturity (#15) — #127 drain (post-#126)
 
 - **Branch:** `boards-worker/portfolio-maturity-20260428-2100` — PR _(opened at session close)_
