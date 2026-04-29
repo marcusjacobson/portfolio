@@ -181,6 +181,355 @@ jobs:
           # scan respects the same MAX cap.
           echo "filed=$FILED" >> "$GITHUB_OUTPUT"
 
+      # ---- Branch-protection drift (issue #256): compare the live API
+      # state of `main`'s branch protection against the baseline encoded
+      # in `scripts/apply-branch-protection.ps1`. Files at most one
+      # consolidated issue per run listing every diverged setting.
+      # Required-status-check contexts are compared **string-exact** —
+      # matrix-rendered names like `analyze (javascript-typescript)`
+      # must NOT be normalized to `analyze` (stored-memory pitfall).
+      - name: Run branch-protection drift check and file gap issue
+        id: scan_branch_protection_drift
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX="${MAX_FILED}"
+          FILED_SO_FAR="${{ steps.scan.outputs.filed }}"
+          FILED_SO_FAR="${FILED_SO_FAR:-0}"
+
+          if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
+            echo "Hit MAX ($MAX) in earlier steps; skipping branch-protection drift check."
+            {
+              echo ""
+              echo "## Maturity Scout — branch-protection drift"
+              echo ""
+              echo "Skipped: MAX cap of $MAX reached by earlier steps."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          SCRIPT=scripts/apply-branch-protection.ps1
+          if [[ ! -f "$SCRIPT" ]]; then
+            echo "::warning::Baseline script $SCRIPT not found; skipping drift check."
+            {
+              echo ""
+              echo "## Maturity Scout — branch-protection drift"
+              echo ""
+              echo "Skipped: baseline script not present in checkout."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Parse baseline from the PowerShell script.
+          # Strip PowerShell line comments before extracting single-quoted
+          # strings so commented-out contexts (e.g. `# 'playwright'`) are
+          # NOT treated as part of the baseline.
+          BASELINE_CONTEXTS=$(awk '/\$contexts = @\(/,/^\)/' "$SCRIPT" \
+            | sed -E 's/[[:space:]]*#.*$//' \
+            | grep -oE "'[^']+'" \
+            | tr -d "'" \
+            | sort -u)
+
+          parse_baseline_bool () {
+            grep -E "^[[:space:]]+$1[[:space:]]*=" "$SCRIPT" \
+              | head -n1 \
+              | sed -E "s/.*=[[:space:]]*\\\$([a-zA-Z]+).*/\1/"
+          }
+
+          BASELINE_DISMISS_STALE=$(parse_baseline_bool dismiss_stale_reviews)
+          BASELINE_ENFORCE_ADMINS=$(parse_baseline_bool enforce_admins)
+          BASELINE_REQ_LINEAR=$(parse_baseline_bool required_linear_history)
+          BASELINE_ALLOW_FORCE=$(parse_baseline_bool allow_force_pushes)
+          BASELINE_ALLOW_DELETIONS=$(parse_baseline_bool allow_deletions)
+          # The script's `$Reviewers` parameter defaults to 0 (solo dev).
+          BASELINE_REVIEWERS=$(grep -E '\[int\]\$Reviewers[[:space:]]*=' "$SCRIPT" \
+            | head -n1 \
+            | sed -E 's/.*=[[:space:]]*([0-9]+).*/\1/')
+          BASELINE_REVIEWERS="${BASELINE_REVIEWERS:-0}"
+          # The script does not set required_signatures; baseline = disabled.
+          BASELINE_REQ_SIGNATURES=false
+
+          # ---- Fetch live state.
+          LIVE=$(gh api "/repos/${GITHUB_REPOSITORY}/branches/main/protection" 2>/tmp/bp-err.log || true)
+          if [[ -z "$LIVE" ]]; then
+            echo "::warning::Could not fetch live branch-protection state."
+            cat /tmp/bp-err.log || true
+            {
+              echo ""
+              echo "## Maturity Scout — branch-protection drift"
+              echo ""
+              echo "Skipped: live API state unavailable."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          LIVE_CONTEXTS=$(echo "$LIVE" | jq -r '.required_status_checks.contexts[]?' | sort -u)
+          LIVE_DISMISS_STALE=$(echo "$LIVE" | jq -r '.required_pull_request_reviews.dismiss_stale_reviews // false')
+          LIVE_REVIEWERS=$(echo "$LIVE" | jq -r '.required_pull_request_reviews.required_approving_review_count // 0')
+          LIVE_ENFORCE_ADMINS=$(echo "$LIVE" | jq -r '.enforce_admins.enabled // false')
+          LIVE_REQ_SIGNATURES=$(echo "$LIVE" | jq -r '.required_signatures.enabled // false')
+          LIVE_REQ_LINEAR=$(echo "$LIVE" | jq -r '.required_linear_history.enabled // false')
+          LIVE_ALLOW_FORCE=$(echo "$LIVE" | jq -r '.allow_force_pushes.enabled // false')
+          LIVE_ALLOW_DELETIONS=$(echo "$LIVE" | jq -r '.allow_deletions.enabled // false')
+
+          # ---- Compare and collect findings.
+          FINDINGS=""
+          COUNT=0
+
+          add_finding () {
+            FINDINGS+=$'- **'"$1"$'** — baseline: `'"$2"$'`; live: `'"$3"$'`\n'
+            COUNT=$((COUNT+1))
+          }
+
+          # Context-set diff (string-exact, NOT normalized — see header comment).
+          while IFS= read -r ctx; do
+            [[ -z "$ctx" ]] && continue
+            add_finding "required_status_checks.contexts (missing on live)" "$ctx" "(absent)"
+          done < <(comm -23 <(echo "$BASELINE_CONTEXTS") <(echo "$LIVE_CONTEXTS"))
+
+          while IFS= read -r ctx; do
+            [[ -z "$ctx" ]] && continue
+            add_finding "required_status_checks.contexts (extra on live)" "(absent)" "$ctx"
+          done < <(comm -13 <(echo "$BASELINE_CONTEXTS") <(echo "$LIVE_CONTEXTS"))
+
+          cmp_field () {
+            local name="$1" base="$2" live="$3"
+            if [[ "$base" != "$live" ]]; then
+              add_finding "$name" "$base" "$live"
+            fi
+          }
+
+          cmp_field "required_pull_request_reviews.dismiss_stale_reviews" "$BASELINE_DISMISS_STALE" "$LIVE_DISMISS_STALE"
+          cmp_field "required_pull_request_reviews.required_approving_review_count" "$BASELINE_REVIEWERS" "$LIVE_REVIEWERS"
+          cmp_field "enforce_admins.enabled" "$BASELINE_ENFORCE_ADMINS" "$LIVE_ENFORCE_ADMINS"
+          cmp_field "required_signatures.enabled" "$BASELINE_REQ_SIGNATURES" "$LIVE_REQ_SIGNATURES"
+          cmp_field "required_linear_history.enabled" "$BASELINE_REQ_LINEAR" "$LIVE_REQ_LINEAR"
+          cmp_field "allow_force_pushes.enabled" "$BASELINE_ALLOW_FORCE" "$LIVE_ALLOW_FORCE"
+          cmp_field "allow_deletions.enabled" "$BASELINE_ALLOW_DELETIONS" "$LIVE_ALLOW_DELETIONS"
+
+          if [[ "$COUNT" -eq 0 ]]; then
+            echo "Branch-protection drift: none."
+            {
+              echo ""
+              echo "## Maturity Scout — branch-protection drift"
+              echo ""
+              echo "Filed: 0 (no drift detected)"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Dedupe: existing open issue with the canonical title prefix
+          # and source:repo-hygiene label.
+          TITLE_PREFIX="Branch-protection drift on main"
+          EXISTING=$(gh issue list \
+            --state open \
+            --search "in:title \"$TITLE_PREFIX\" label:source:repo-hygiene" \
+            --json number,title,url \
+            --limit 50)
+          MATCH=$(echo "$EXISTING" | jq -r --arg p "$TITLE_PREFIX" \
+            '[.[] | select(.title | startswith($p))] | .[0] // empty | "\(.number)|\(.url)"')
+          if [[ -n "$MATCH" ]]; then
+            echo "Dedup suppressed: existing open issue $MATCH"
+            {
+              echo ""
+              echo "## Maturity Scout — branch-protection drift"
+              echo ""
+              echo "Filed: 0"
+              echo ""
+              echo "Suppressed (dedupe): 1"
+              echo "  - branch-protection drift — overlaps with $MATCH"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Render body and file the consolidated issue.
+          TITLE="${TITLE_PREFIX} — ${COUNT} setting(s) diverged"
+          BODY_FILE=$(mktemp)
+          TEMPLATE=$(cat .github/workflows/templates/repo-hygiene-branch-protection-drift-issue-body.md)
+          TEMPLATE="${TEMPLATE//__COUNT__/$COUNT}"
+          FINDINGS_TRIMMED="${FINDINGS%$'\n'}"
+          TEMPLATE="${TEMPLATE//__FINDINGS__/$FINDINGS_TRIMMED}"
+          printf '%s\n' "$TEMPLATE" > "$BODY_FILE"
+
+          echo "Filing: $TITLE"
+          URL=$(gh issue create \
+            --title "$TITLE" \
+            --label "needs-triage,source:repo-hygiene,area:workflow" \
+            --body-file "$BODY_FILE")
+          rm -f "$BODY_FILE"
+
+          # Attach to board #15 inline (see issue #133).
+          GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+            --owner marcusjacobson --url "$URL" >/dev/null
+
+          {
+            echo ""
+            echo "## Maturity Scout — branch-protection drift"
+            echo ""
+            echo "Filed: 1"
+            echo "  - $URL — $TITLE"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          NEW_TOTAL=$((FILED_SO_FAR+1))
+          echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
+
+      # ---- Label drift (issue #256): diff `.github/labels.yml` against
+      # `gh label list`. Files at most one consolidated issue per run
+      # listing labels missing in the repo, extra in the repo, or with
+      # color/description mismatches.
+      - name: Run label drift check and file gap issue
+        id: scan_label_drift
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX="${MAX_FILED}"
+          FILED_SO_FAR="${{ steps.scan_branch_protection_drift.outputs.filed_total }}"
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan.outputs.filed }}"
+          fi
+          FILED_SO_FAR="${FILED_SO_FAR:-0}"
+
+          if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
+            echo "Hit MAX ($MAX) in earlier steps; skipping label drift check."
+            {
+              echo ""
+              echo "## Maturity Scout — label drift"
+              echo ""
+              echo "Skipped: MAX cap of $MAX reached by earlier steps."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ ! -f .github/labels.yml ]]; then
+            echo "::warning::.github/labels.yml not found; skipping label drift check."
+            {
+              echo ""
+              echo "## Maturity Scout — label drift"
+              echo ""
+              echo "Skipped: .github/labels.yml not present in checkout."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # `yq` (mikefarah Go version) is pre-installed on ubuntu-latest;
+          # convert the YAML to JSON so jq can do the diffing.
+          YAML_JSON=$(yq -o=json '.' .github/labels.yml)
+          LIVE_JSON=$(gh label list --json name,description,color --limit 200)
+
+          YAML_NAMES=$(echo "$YAML_JSON" | jq -r '.[].name' | sort)
+          LIVE_NAMES=$(echo "$LIVE_JSON" | jq -r '.[].name' | sort)
+
+          FINDINGS=""
+          COUNT=0
+
+          # Declared in YAML but not present in repo.
+          while IFS= read -r name; do
+            [[ -z "$name" ]] && continue
+            FINDINGS+=$'- **missing in repo** — `'"$name"$'` declared in `.github/labels.yml` but no live label with that name.\n'
+            COUNT=$((COUNT+1))
+          done < <(comm -23 <(echo "$YAML_NAMES") <(echo "$LIVE_NAMES"))
+
+          # Present in repo but not declared in YAML.
+          while IFS= read -r name; do
+            [[ -z "$name" ]] && continue
+            FINDINGS+=$'- **extra in repo** — `'"$name"$'` exists in the repo but not declared in `.github/labels.yml`.\n'
+            COUNT=$((COUNT+1))
+          done < <(comm -13 <(echo "$YAML_NAMES") <(echo "$LIVE_NAMES"))
+
+          # Common labels: check color/description for string-exact match.
+          while IFS= read -r name; do
+            [[ -z "$name" ]] && continue
+            Y_COLOR=$(echo "$YAML_JSON" | jq -r --arg n "$name" '.[] | select(.name==$n) | .color // ""')
+            L_COLOR=$(echo "$LIVE_JSON" | jq -r --arg n "$name" '.[] | select(.name==$n) | .color // ""')
+            Y_DESC=$(echo "$YAML_JSON" | jq -r --arg n "$name" '.[] | select(.name==$n) | (.description // "")')
+            L_DESC=$(echo "$LIVE_JSON" | jq -r --arg n "$name" '.[] | select(.name==$n) | (.description // "")')
+            if [[ "$Y_COLOR" != "$L_COLOR" ]]; then
+              FINDINGS+=$'- **color mismatch** — `'"$name"$'`: yaml `'"$Y_COLOR"$'`, live `'"$L_COLOR"$'`\n'
+              COUNT=$((COUNT+1))
+            fi
+            if [[ "$Y_DESC" != "$L_DESC" ]]; then
+              FINDINGS+=$'- **description mismatch** — `'"$name"$'`: yaml `'"$Y_DESC"$'`, live `'"$L_DESC"$'`\n'
+              COUNT=$((COUNT+1))
+            fi
+          done < <(comm -12 <(echo "$YAML_NAMES") <(echo "$LIVE_NAMES"))
+
+          if [[ "$COUNT" -eq 0 ]]; then
+            echo "Label drift: none."
+            {
+              echo ""
+              echo "## Maturity Scout — label drift"
+              echo ""
+              echo "Filed: 0 (no drift detected)"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Dedupe: existing open issue with the canonical title prefix
+          # and source:repo-hygiene label.
+          TITLE_PREFIX="Label drift between .github/labels.yml and live repo"
+          EXISTING=$(gh issue list \
+            --state open \
+            --search "in:title \"$TITLE_PREFIX\" label:source:repo-hygiene" \
+            --json number,title,url \
+            --limit 50)
+          MATCH=$(echo "$EXISTING" | jq -r --arg p "$TITLE_PREFIX" \
+            '[.[] | select(.title | startswith($p))] | .[0] // empty | "\(.number)|\(.url)"')
+          if [[ -n "$MATCH" ]]; then
+            echo "Dedup suppressed: existing open issue $MATCH"
+            {
+              echo ""
+              echo "## Maturity Scout — label drift"
+              echo ""
+              echo "Filed: 0"
+              echo ""
+              echo "Suppressed (dedupe): 1"
+              echo "  - label drift — overlaps with $MATCH"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Render body and file the consolidated issue.
+          TITLE="${TITLE_PREFIX} — ${COUNT} divergence(s)"
+          BODY_FILE=$(mktemp)
+          TEMPLATE=$(cat .github/workflows/templates/repo-hygiene-label-drift-issue-body.md)
+          TEMPLATE="${TEMPLATE//__COUNT__/$COUNT}"
+          FINDINGS_TRIMMED="${FINDINGS%$'\n'}"
+          TEMPLATE="${TEMPLATE//__FINDINGS__/$FINDINGS_TRIMMED}"
+          printf '%s\n' "$TEMPLATE" > "$BODY_FILE"
+
+          echo "Filing: $TITLE"
+          URL=$(gh issue create \
+            --title "$TITLE" \
+            --label "needs-triage,source:repo-hygiene,area:workflow" \
+            --body-file "$BODY_FILE")
+          rm -f "$BODY_FILE"
+
+          # Attach to board #15 inline (see issue #133).
+          GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+            --owner marcusjacobson --url "$URL" >/dev/null
+
+          {
+            echo ""
+            echo "## Maturity Scout — label drift"
+            echo ""
+            echo "Filed: 1"
+            echo "  - $URL — $TITLE"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          NEW_TOTAL=$((FILED_SO_FAR+1))
+          echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
+
       - name: Run github-docs checks (action SHA-pin audit) and file gap issue
         id: scan_github_docs
         shell: bash
@@ -188,7 +537,13 @@ jobs:
           set -euo pipefail
 
           MAX="${MAX_FILED}"
-          FILED_SO_FAR="${{ steps.scan.outputs.filed }}"
+          FILED_SO_FAR="${{ steps.scan_label_drift.outputs.filed_total }}"
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan_branch_protection_drift.outputs.filed_total }}"
+          fi
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan.outputs.filed }}"
+          fi
           FILED_SO_FAR="${FILED_SO_FAR:-0}"
 
           if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
