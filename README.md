@@ -61,6 +61,7 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 | `staging-inbox/` | Gitignored drop zone for the Claude project export. |
 | [`LICENSE`](LICENSE) | MIT License — terms under which the code and content may be reused. |
 | [`SECURITY.md`](SECURITY.md) | How to report a security issue privately, plus what is in and out of scope. |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Issue intake, branch + PR workflow, local validation, and commit style. |
 | [`.github/CODEOWNERS`](.github/CODEOWNERS) | Routes review requests to the maintainer for every path in the repo. |
 
 ## Workflows
