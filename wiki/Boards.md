@@ -25,6 +25,23 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Portfolio Maturity (#15) — post-triage drain
+
+- **Branch:** `boards-worker/portfolio-maturity-20260428-2007` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo, post-`@triage`):** #118, #126, #135 (planned `--max=3`)
+- **Skipped (dependency halt):** #127 — body explicitly says "File only after Option B has shipped" (Option B = #126 still open). User excluded via "drain except 127" directive.
+- **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:**
+  - #118 Todo → In Progress at 2026-04-28T20:08-07:00
+  - #118 In Progress → Done — PR #254, merge `fb72032`
+  - #135 Todo → In Progress at 2026-04-28T20:15-07:00
+  - #135 In Progress → Done — PR #258, merge `8abdca8`
+  - #126 Todo → In Progress at 2026-04-28T20:24-07:00
+  - #126 stays In Progress — blocker: lychee link-check failing on transient `github.com` HTTP 502s on pre-existing links (PR #259, not a defect in #126's diff). Board has no In-review-style option, audit-log fallback used.
+- **Outcome:** Halted on first sub-agent failure per fail-stop policy. Worked 2/3 — #118 PR #254 merge `fb72032`; #135 PR #258 merge `8abdca8` (spawned follow-ups #255, #256, #257). Blocked on #126 — PR #259 awaits lychee re-run after GitHub 502 outage clears; user decides retry vs. skip in a follow-up invocation.
+
 ### 2026-04-28 — boards-worker session: Portfolio Maturity (#15)
 
 - **Branch:** `boards-worker/portfolio-maturity-20260428-1936` — PR _(opened at session close)_
