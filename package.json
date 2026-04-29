@@ -8,10 +8,12 @@
     "lint:css": "stylelint \"**/*.css\" --allow-empty-input",
     "lint": "npm run lint:html && npm run lint:css",
     "test:visual": "playwright test --config tests/playwright.config.ts",
-    "test:visual:update": "playwright test --config tests/playwright.config.ts --update-snapshots"
+    "test:visual:update": "playwright test --config tests/playwright.config.ts --update-snapshots",
+    "test:a11y": "playwright test --config tests/a11y/playwright.config.ts"
   },
   "devDependencies": {
     "@axe-core/cli": "^4.10.1",
+    "@axe-core/playwright": "^4.10.1",
     "@playwright/test": "^1.48.0",
     "htmlhint": "^1.1.4",
     "http-server": "^14.1.1",

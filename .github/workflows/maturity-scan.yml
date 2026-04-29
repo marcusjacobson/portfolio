@@ -7,6 +7,11 @@ on:
         description: "Max candidate issues to file in this run"
         required: false
         default: "5"
+      enable_axe_pw:
+        description: "Run Option C (Playwright + @axe-core/playwright) WCAG scan. Disabled by default to avoid double-filing alongside Option B (@axe-core/cli, #126). See wiki/Maturity-Scout.md."
+        required: false
+        type: boolean
+        default: false
   schedule:
     # 14:00 UTC every Monday — outside business hours but visible in morning sweeps.
     - cron: "0 14 * * 1"
@@ -815,6 +820,295 @@ jobs:
           {
             echo ""
             echo "## Maturity Scout — WCAG axe-core checks"
+            echo ""
+            echo "Pages scanned: ${#PAGES[@]} (axe ok: $AXE_OK, failed: $AXE_FAIL)"
+            echo ""
+            echo "Filed: $FILED"
+            if [[ -n "$SUMMARY_FILED" ]]; then echo "$SUMMARY_FILED"; fi
+            echo ""
+            echo "Suppressed: $SUPPRESSED"
+            if [[ -n "$SUMMARY_SUPPRESSED" ]]; then echo "$SUMMARY_SUPPRESSED"; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          NEW_TOTAL=$((FILED_SO_FAR + FILED))
+          echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
+
+      # ---- WCAG Option C (issue #127): Playwright + @axe-core/playwright.
+      # Adds DOM-aware coverage with computed-style support (the
+      # prerequisite for `color-contrast`). Disabled by default to avoid
+      # double-filing alongside Option B (@axe-core/cli, #126); turn on
+      # via the `enable_axe_pw=true` workflow_dispatch input. The two
+      # scans share the same issue title format
+      # (`Fix axe-core violation: <rule> on portfolio pages`) so the
+      # dedupe pass below will suppress an Option C filing if Option B
+      # already filed the same rule earlier in the same run. See
+      # wiki/Maturity-Scout.md for the coexistence decision.
+      - name: Install Playwright browsers (Chromium) for Option C
+        if: github.event.inputs.enable_axe_pw == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run WCAG axe-core (Playwright) scan and file gap issues
+        id: scan_wcag_axe_pw
+        if: github.event.inputs.enable_axe_pw == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX="${MAX_FILED}"
+          FILED_SO_FAR="${{ steps.scan_wcag_axe.outputs.filed_total }}"
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan_wcag.outputs.filed_total }}"
+          fi
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan_github_docs.outputs.filed_total }}"
+          fi
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan.outputs.filed }}"
+          fi
+          FILED_SO_FAR="${FILED_SO_FAR:-0}"
+
+          if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
+            echo "Hit MAX ($MAX) in earlier steps; skipping Option C scan."
+            {
+              echo ""
+              echo "## Maturity Scout — WCAG axe-core (Playwright) checks"
+              echo ""
+              echo "Skipped: MAX cap of $MAX reached by earlier steps."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Scope: top-level *.html only (matches the v1/Option B steps).
+          shopt -s nullglob
+          PAGES=()
+          for f in *.html; do
+            PAGES+=("$f")
+          done
+          shopt -u nullglob
+
+          if [[ "${#PAGES[@]}" -eq 0 ]]; then
+            echo "No top-level *.html pages found; skipping Option C scan."
+            {
+              echo ""
+              echo "## Maturity Scout — WCAG axe-core (Playwright) checks"
+              echo ""
+              echo "Skipped: no top-level portfolio pages."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Boot a local static server so Playwright can hit each
+          # page over HTTP (axe-core's color-contrast rule needs computed
+          # styles from a real browser load).
+          mkdir -p .axe-pw-reports
+          npx --yes http-server -p 8080 -c-1 -s . >/tmp/http-server-pw.log 2>&1 &
+          SERVER_PID=$!
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS "http://localhost:8080/index.html" -o /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          if ! curl -fsS "http://localhost:8080/index.html" -o /dev/null; then
+            echo "::error::http-server failed to start on :8080 (Option C)"
+            cat /tmp/http-server-pw.log || true
+            kill "$SERVER_PID" >/dev/null 2>&1 || true
+            exit 1
+          fi
+          trap 'kill "$SERVER_PID" >/dev/null 2>&1 || true' EXIT
+
+          # ---- Run the Playwright a11y spec; it writes one JSON per
+          # page into .axe-pw-reports/. Tolerate non-zero exit so a
+          # single broken page doesn't abort the whole scan; we count
+          # successful JSON outputs below.
+          AXE_BASE_URL="http://localhost:8080/" \
+            npx playwright test --config tests/a11y/playwright.config.ts \
+            >/tmp/axe-pw.log 2>&1 || true
+
+          # Tally how many pages produced a JSON file.
+          AXE_OK=0
+          AXE_FAIL=0
+          for page in "${PAGES[@]}"; do
+            slug="${page%.html}"
+            if [[ -f ".axe-pw-reports/${slug}.json" ]]; then
+              AXE_OK=$((AXE_OK+1))
+            else
+              AXE_FAIL=$((AXE_FAIL+1))
+              echo "::warning::Option C produced no JSON for $page"
+            fi
+          done
+
+          if [[ "$AXE_OK" -eq 0 ]]; then
+            echo "::error::Option C scan produced no JSON for any page."
+            cat /tmp/axe-pw.log || true
+            {
+              echo ""
+              echo "## Maturity Scout — WCAG axe-core (Playwright) checks"
+              echo ""
+              echo "Failed: Option C scan produced no JSON for any page."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          # ---- Exclusion list: rules already covered by htmlhint and the
+          # v1 (regex) wcag scan. Mirrors the EXCLUDED_RULES in
+          # `scan_wcag_axe` so Option B and Option C produce identical
+          # candidate sets for the same DOM.
+          EXCLUDED_RULES=(
+            # htmlhint-enforced (per .htmlhintrc)
+            "alt-require"
+            "title-require"
+            "id-unique"
+            "tagname-lowercase"
+            "attr-no-duplication"
+            "src-not-empty"
+            "doctype-html5"
+            # v1 wcag scan (issue #113)
+            "html-has-lang"
+            "link-name"
+            "heading-order"
+          )
+
+          is_excluded () {
+            local r="$1"
+            for x in "${EXCLUDED_RULES[@]}"; do
+              if [[ "$r" == "$x" ]]; then return 0; fi
+            done
+            return 1
+          }
+
+          # ---- Aggregate violations across all pages by rule id.
+          # The Playwright spec wraps each result as a single-element
+          # array, matching the @axe-core/cli output shape so the same
+          # `(if type == "array" then .[0] else . end)` jq filter works.
+          : > /tmp/axe-pw-rows.tsv
+          for f in .axe-pw-reports/*.json; do
+            [[ -f "$f" ]] || continue
+            page=$(basename "$f" .json).html
+            jq -r --arg page "$page" '
+              (if type == "array" then .[0] else . end) as $r
+              | $r.violations[]?
+              | [
+                  .id,
+                  $page,
+                  (.impact // "unknown"),
+                  (.helpUrl // ""),
+                  ((.nodes[0].target[0]) // "")
+                ] | @tsv
+            ' "$f" >> /tmp/axe-pw-rows.tsv || true
+          done
+
+          declare -A RULE_COUNT
+          declare -A RULE_IMPACT
+          declare -A RULE_HELPURL
+          declare -A RULE_FINDINGS
+          ALL_RULES=""
+
+          while IFS=$'\t' read -r rule page impact helpUrl target; do
+            [[ -z "$rule" ]] && continue
+            if is_excluded "$rule"; then
+              continue
+            fi
+            if [[ -z "${RULE_COUNT[$rule]:-}" ]]; then
+              RULE_COUNT[$rule]=0
+              RULE_IMPACT[$rule]="$impact"
+              RULE_HELPURL[$rule]="$helpUrl"
+              RULE_FINDINGS[$rule]=""
+              ALL_RULES+="$rule"$'\n'
+            fi
+            RULE_COUNT[$rule]=$((RULE_COUNT[$rule]+1))
+            case "${RULE_IMPACT[$rule]}" in
+              critical) ;;
+              serious) [[ "$impact" == "critical" ]] && RULE_IMPACT[$rule]="$impact" ;;
+              moderate) [[ "$impact" == "critical" || "$impact" == "serious" ]] && RULE_IMPACT[$rule]="$impact" ;;
+              *) RULE_IMPACT[$rule]="$impact" ;;
+            esac
+            RULE_FINDINGS[$rule]+=$'- `'"$page"$'` — `'"${target:-(no selector)}"$'` (impact: '"$impact"$')\n'
+          done < /tmp/axe-pw-rows.tsv
+
+          UNIQUE_RULES=$(printf '%s' "$ALL_RULES" | sort -u)
+
+          if [[ -z "$UNIQUE_RULES" ]]; then
+            echo "No Option C violations after exclusion filter."
+            {
+              echo ""
+              echo "## Maturity Scout — WCAG axe-core (Playwright) checks"
+              echo ""
+              echo "Filed: 0 (no violations after filter)"
+              echo "Pages scanned: ${#PAGES[@]} (axe ok: $AXE_OK, failed: $AXE_FAIL)"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Pre-fetch open source:wcag issues for dedupe. Title
+          # convention matches Option B verbatim
+          # (`Fix axe-core violation: <rule> on portfolio pages`) so the
+          # `contains($r)` jq match catches both scans uniformly.
+          OPEN_WCAG=$(gh issue list \
+            --state open \
+            --search 'label:source:wcag' \
+            --json number,title,url \
+            --limit 200)
+
+          FILED=0
+          SUPPRESSED=0
+          SUMMARY_FILED=""
+          SUMMARY_SUPPRESSED=""
+
+          while IFS= read -r rule; do
+            [[ -z "$rule" ]] && continue
+
+            if [[ $((FILED_SO_FAR + FILED)) -ge "$MAX" ]]; then
+              echo "Hit MAX ($MAX); skipping rule $rule."
+              SUMMARY_SUPPRESSED+=$'\n  - '"$rule"$' — skipped (MAX cap reached)'
+              SUPPRESSED=$((SUPPRESSED+1))
+              continue
+            fi
+
+            count="${RULE_COUNT[$rule]}"
+            impact="${RULE_IMPACT[$rule]}"
+            helpUrl="${RULE_HELPURL[$rule]}"
+            findings="${RULE_FINDINGS[$rule]%$'\n'}"
+            title="Fix axe-core violation: ${rule} on portfolio pages"
+
+            match=$(echo "$OPEN_WCAG" | jq -r --arg r "$rule" \
+              '[.[] | select(.title | contains($r))] | .[0] // empty | "\(.number)|\(.url)"')
+            if [[ -n "$match" ]]; then
+              echo "Dedup suppressed ($rule): existing open issue $match"
+              SUMMARY_SUPPRESSED+=$'\n  - '"$rule"$' — overlaps with '"$match"
+              SUPPRESSED=$((SUPPRESSED+1))
+              continue
+            fi
+
+            template=$(cat .github/workflows/templates/wcag-axe-pw-issue-body.md)
+            template="${template//__RULE__/$rule}"
+            template="${template//__COUNT__/$count}"
+            template="${template//__IMPACT__/$impact}"
+            template="${template//__HELP_URL__/$helpUrl}"
+            template="${template//__FINDINGS__/$findings}"
+            body_file=$(mktemp)
+            printf '%s\n' "$template" > "$body_file"
+
+            echo "Filing ($rule): $title"
+            url=$(gh issue create \
+              --title "$title" \
+              --label "needs-triage,source:wcag,area:html" \
+              --body-file "$body_file")
+            rm -f "$body_file"
+
+            GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+              --owner marcusjacobson --url "$url" >/dev/null
+
+            FILED=$((FILED+1))
+            SUMMARY_FILED+=$'\n  - '"$url"$' — '"$title"
+          done <<< "$UNIQUE_RULES"
+
+          {
+            echo ""
+            echo "## Maturity Scout — WCAG axe-core (Playwright) checks"
             echo ""
             echo "Pages scanned: ${#PAGES[@]} (axe ok: $AXE_OK, failed: $AXE_FAIL)"
             echo ""
