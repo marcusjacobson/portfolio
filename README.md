@@ -60,6 +60,7 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 | [.vscode/mcp.json](.vscode/mcp.json) | Workspace GitHub MCP server config (PAT prompted at runtime, never committed). |
 | `staging-inbox/` | Gitignored drop zone for the Claude project export. |
 | [`LICENSE`](LICENSE) | MIT License — terms under which the code and content may be reused. |
+| [`SECURITY.md`](SECURITY.md) | How to report a security issue privately, plus what is in and out of scope. |
 
 ## Workflows
 
