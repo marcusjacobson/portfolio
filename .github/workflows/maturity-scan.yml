@@ -833,6 +833,236 @@ jobs:
           NEW_TOTAL=$((FILED_SO_FAR + FILED))
           echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
 
+      # ---- OWASP static checks (issue #255): regex-only pass over the
+      # top-level *.html portfolio pages. Files at most one consolidated
+      # issue per rule, sharing the run-wide MAX cap with the earlier
+      # scan steps via step outputs.
+      - name: Run OWASP static checks and file gap issues
+        id: scan_owasp
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX="${MAX_FILED}"
+          FILED_SO_FAR="${{ steps.scan_wcag_axe.outputs.filed_total }}"
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan_wcag.outputs.filed_total }}"
+          fi
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan_github_docs.outputs.filed_total }}"
+          fi
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan.outputs.filed }}"
+          fi
+          FILED_SO_FAR="${FILED_SO_FAR:-0}"
+
+          if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
+            echo "Hit MAX ($MAX) in earlier steps; skipping OWASP scan."
+            {
+              echo ""
+              echo "## Maturity Scout — OWASP checks"
+              echo ""
+              echo "Skipped: MAX cap of $MAX reached by earlier steps."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Scope: top-level *.html only (matches scan_wcag* steps).
+          shopt -s nullglob
+          PAGES=()
+          for f in *.html; do
+            PAGES+=("$f")
+          done
+          shopt -u nullglob
+
+          if [[ "${#PAGES[@]}" -eq 0 ]]; then
+            echo "No top-level *.html pages found; skipping OWASP scan."
+            {
+              echo ""
+              echo "## Maturity Scout — OWASP checks"
+              echo ""
+              echo "Skipped: no top-level portfolio pages."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Rule 1: sri-external-script
+          # Trigger: <script src="https://..."> without BOTH integrity= and
+          # crossorigin= on the same tag. Same-origin (no https:// prefix)
+          # and relative refs are skipped.
+          R1_FINDINGS=""
+          R1_COUNT=0
+          for f in "${PAGES[@]}"; do
+            while IFS= read -r hit; do
+              [[ -z "$hit" ]] && continue
+              LINE_BODY="${hit#*:}"
+              # Must have integrity= AND crossorigin= on the same line.
+              if echo "$LINE_BODY" | grep -qE 'integrity[[:space:]]*=' && \
+                 echo "$LINE_BODY" | grep -qE 'crossorigin[[:space:]]*='; then
+                continue
+              fi
+              SNIPPET=$(echo "$hit" | sed -E 's/^[0-9]+://; s/^[[:space:]]+//; s/[[:space:]]+$//')
+              R1_FINDINGS+=$'- `'"$f"$'` — `'"$SNIPPET"$'`\n'
+              R1_COUNT=$((R1_COUNT+1))
+            done < <(grep -niE '<script[^>]*src[[:space:]]*=[[:space:]]*"https://' "$f" || true)
+          done
+
+          # ---- Rule 2: sri-external-style
+          # Trigger: <link rel="stylesheet" href="https://..."> without
+          # both integrity= and crossorigin=. Tag attribute order varies,
+          # so match <link ...> tags that contain both rel="stylesheet"
+          # (case-insensitive) and href="https://...".
+          R2_FINDINGS=""
+          R2_COUNT=0
+          for f in "${PAGES[@]}"; do
+            while IFS= read -r hit; do
+              [[ -z "$hit" ]] && continue
+              LINE_BODY="${hit#*:}"
+              # Filter to stylesheet rel only.
+              if ! echo "$LINE_BODY" | grep -qiE 'rel[[:space:]]*=[[:space:]]*"[^"]*stylesheet'; then
+                continue
+              fi
+              if echo "$LINE_BODY" | grep -qE 'integrity[[:space:]]*=' && \
+                 echo "$LINE_BODY" | grep -qE 'crossorigin[[:space:]]*='; then
+                continue
+              fi
+              SNIPPET=$(echo "$hit" | sed -E 's/^[0-9]+://; s/^[[:space:]]+//; s/[[:space:]]+$//')
+              R2_FINDINGS+=$'- `'"$f"$'` — `'"$SNIPPET"$'`\n'
+              R2_COUNT=$((R2_COUNT+1))
+            done < <(grep -niE '<link[^>]*href[[:space:]]*=[[:space:]]*"https://' "$f" || true)
+          done
+
+          # ---- Rule 3: target-blank-noopener
+          # Trigger: <a ... target="_blank" ...> without rel= containing
+          # noopener or noreferrer.
+          R3_FINDINGS=""
+          R3_COUNT=0
+          for f in "${PAGES[@]}"; do
+            while IFS= read -r hit; do
+              [[ -z "$hit" ]] && continue
+              LINE_BODY="${hit#*:}"
+              # Allow if rel attribute contains noopener or noreferrer.
+              REL_VAL=$(echo "$LINE_BODY" | grep -oiE 'rel[[:space:]]*=[[:space:]]*"[^"]*"' | head -n1 || true)
+              if echo "$REL_VAL" | grep -qiE 'noopener|noreferrer'; then
+                continue
+              fi
+              SNIPPET=$(echo "$hit" | sed -E 's/^[0-9]+://; s/^[[:space:]]+//; s/[[:space:]]+$//')
+              R3_FINDINGS+=$'- `'"$f"$'` — `'"$SNIPPET"$'`\n'
+              R3_COUNT=$((R3_COUNT+1))
+            done < <(grep -niE '<a[[:space:]][^>]*target[[:space:]]*=[[:space:]]*"_blank"' "$f" || true)
+          done
+
+          # ---- Rule 4: mixed-content
+          # Trigger: any http:// reference inside src=, href=, or action=
+          # attribute values (case-insensitive).
+          R4_FINDINGS=""
+          R4_COUNT=0
+          for f in "${PAGES[@]}"; do
+            while IFS= read -r hit; do
+              [[ -z "$hit" ]] && continue
+              SNIPPET=$(echo "$hit" | sed -E 's/^[0-9]+://; s/^[[:space:]]+//; s/[[:space:]]+$//')
+              R4_FINDINGS+=$'- `'"$f"$'` — `'"$SNIPPET"$'`\n'
+              R4_COUNT=$((R4_COUNT+1))
+            done < <(grep -niE '(src|href|action)[[:space:]]*=[[:space:]]*"http://' "$f" || true)
+          done
+
+          # ---- Render + file: one consolidated issue per rule that has
+          # findings. Each rule honours the shared MAX cap.
+          FILED=0
+          SUPPRESSED=0
+          SUMMARY_FILED=""
+          SUMMARY_SUPPRESSED=""
+          SUMMARY_CLEAN=""
+
+          file_rule () {
+            local rule="$1"
+            local title="$2"
+            local count="$3"
+            local findings="$4"
+
+            if [[ "$count" -eq 0 ]]; then
+              SUMMARY_CLEAN+=$'\n  - '"$rule"$': clean'
+              return 0
+            fi
+
+            if [[ $((FILED_SO_FAR + FILED)) -ge "$MAX" ]]; then
+              echo "Hit MAX ($MAX); skipping rule $rule."
+              SUMMARY_SUPPRESSED+=$'\n  - '"$rule"$' — skipped (MAX cap reached)'
+              SUPPRESSED=$((SUPPRESSED+1))
+              return 0
+            fi
+
+            # Dedupe: any open issue with this exact title and source:owasp?
+            local existing match
+            existing=$(gh issue list \
+              --state open \
+              --search "in:title \"$title\" label:source:owasp" \
+              --json number,title,url \
+              --limit 5)
+            match=$(echo "$existing" | jq -r --arg t "$title" \
+              '[.[] | select(.title == $t)] | .[0] // empty | "\(.number)|\(.url)"')
+            if [[ -n "$match" ]]; then
+              echo "Dedup suppressed ($rule): existing open issue $match"
+              SUMMARY_SUPPRESSED+=$'\n  - '"$rule"$' — overlaps with '"$match"
+              SUPPRESSED=$((SUPPRESSED+1))
+              return 0
+            fi
+
+            # Render body from template (parameter expansion only — no
+            # heredoc inside the YAML block scalar; see issue #115).
+            local template body_file
+            template=$(cat .github/workflows/templates/owasp-issue-body.md)
+            template="${template//__RULE__/$rule}"
+            template="${template//__COUNT__/$count}"
+            local trimmed="${findings%$'\n'}"
+            template="${template//__FINDINGS__/$trimmed}"
+            body_file=$(mktemp)
+            printf '%s\n' "$template" > "$body_file"
+
+            echo "Filing ($rule): $title"
+            local url
+            url=$(gh issue create \
+              --title "$title" \
+              --label "needs-triage,source:owasp,area:html" \
+              --body-file "$body_file")
+            rm -f "$body_file"
+
+            # Attach to board #15 inline (see issue #133).
+            GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+              --owner marcusjacobson --url "$url" >/dev/null
+
+            FILED=$((FILED+1))
+            SUMMARY_FILED+=$'\n  - '"$url"$' — '"$title"
+          }
+
+          file_rule "sri-external-script" "Add SRI to external <script> tags on portfolio pages" "$R1_COUNT" "$R1_FINDINGS"
+          file_rule "sri-external-style" "Add SRI to external <link rel=stylesheet> tags on portfolio pages" "$R2_COUNT" "$R2_FINDINGS"
+          file_rule "target-blank-noopener" "Add rel=noopener to target=_blank links on portfolio pages" "$R3_COUNT" "$R3_FINDINGS"
+          file_rule "mixed-content" "Replace http:// references on portfolio pages" "$R4_COUNT" "$R4_FINDINGS"
+
+          {
+            echo ""
+            echo "## Maturity Scout — OWASP checks"
+            echo ""
+            echo "Filed: $FILED"
+            if [[ -n "$SUMMARY_FILED" ]]; then echo "$SUMMARY_FILED"; fi
+            echo ""
+            echo "Suppressed: $SUPPRESSED"
+            if [[ -n "$SUMMARY_SUPPRESSED" ]]; then echo "$SUMMARY_SUPPRESSED"; fi
+            if [[ -n "$SUMMARY_CLEAN" ]]; then
+              echo ""
+              echo "Clean rules:"
+              echo "$SUMMARY_CLEAN"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Hand the running tally to the next step (Option C) so the
+          # MAX cap chain stays intact.
+          NEW_TOTAL=$((FILED_SO_FAR + FILED))
+          echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
+
       # ---- WCAG Option C (issue #127): Playwright + @axe-core/playwright.
       # Adds DOM-aware coverage with computed-style support (the
       # prerequisite for `color-contrast`). Disabled by default to avoid
@@ -855,7 +1085,10 @@ jobs:
           set -euo pipefail
 
           MAX="${MAX_FILED}"
-          FILED_SO_FAR="${{ steps.scan_wcag_axe.outputs.filed_total }}"
+          FILED_SO_FAR="${{ steps.scan_owasp.outputs.filed_total }}"
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan_wcag_axe.outputs.filed_total }}"
+          fi
           if [[ -z "$FILED_SO_FAR" ]]; then
             FILED_SO_FAR="${{ steps.scan_wcag.outputs.filed_total }}"
           fi
