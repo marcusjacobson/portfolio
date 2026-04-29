@@ -32,6 +32,24 @@ Skip it when:
 
 The five `source:*` labels are defined in [`.github/labels.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/labels.yml) and synced via `scripts/gh/sync-labels.ps1`.
 
+## Coverage matrix
+
+This is the canonical answer to "why did the weekly scan find so few things?" Audit performed in #135.
+
+| `source:*` lane | Producer | Rules wired today | Known gaps | Decision |
+|---|---|---|---|---|
+| `source:repo-hygiene` | `maturity-scan.yml` step `scan` | 7 file-existence checks: `SECURITY.md`, `CONTRIBUTING.md`, `CODEOWNERS`, `.github/ISSUE_TEMPLATE`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/dependabot.yml`, `LICENSE` | Branch-protection drift detection (compare `scripts/apply-branch-protection.ps1` baseline vs. live API state); label drift (`.github/labels.yml` vs. `gh label list`); stale-workflow detection (referenced action no longer exists upstream); auto-merge / require-review baseline drift | **Expand** — follow-up #256 filed for branch-protection + label drift producer. |
+| `source:github-docs` | `maturity-scan.yml` step `scan_github_docs` | 1 rule: action SHA-pin audit across `.github/workflows/*.yml` | CODEOWNERS shape validation (path globs cover the surfaces they need to); branch-protection doc completeness (does the wiki match what's enforced?); `permissions:` block presence on every workflow; concurrency block hygiene; `pull_request_target` usage audit | **Expand** — follow-up #257 filed for `permissions:`-presence, CODEOWNERS shape, and reusable-workflow pin checks. |
+| `source:wcag` | `maturity-scan.yml` step `scan_wcag` | 3 regex rules: `html-has-lang` (3.1.1), `link-name` (4.1.2), `heading-order` (1.3.1) across the 6 top-level `*.html` portfolio pages | Color contrast, landmarks/regions, ARIA validity, full WCAG 2.2 AA — anything that needs DOM rendering | **Already in flight** — tracked in #126 (`@axe-core/cli`) and #127 (Playwright + axe-core). No new follow-up needed from this audit. |
+| `source:owasp` | None — unwired | None | Static checks deterministic for a static-HTML site: external `<script src=...>` without `integrity=` (SRI); `<link rel="stylesheet" href=...>` without `integrity=`; `target="_blank"` without `rel="noopener noreferrer"`; mixed-content (`http://` references in `*.html`); inline `<script>` blocks vs. CSP posture | **Expand** — follow-up #255 filed to add a producer step. |
+| `source:ms-learn` | None — unwired (by design) | None | Microsoft Learn page coverage for the security technologies claimed on the portfolio — every check requires LLM judgment to map a Learn page to a portfolio claim and assess whether the claim is current. | **Defer indefinitely — keep chat-mode only.** Adding a deterministic producer for this lane is not viable; the value is in the LLM-driven `@maturity-scout` chat audits already documented above. No follow-up issue. If a future deterministic check is identified (e.g. "the cert badge URL on `certification_strategy.html` resolves and matches the claimed exam code"), file it then. |
+
+Notes from the #135 audit:
+
+- The repo defines **five** `source:*` labels, not six. The original #135 framing referenced a `source:linkedin-sync` label that does not exist in `.github/labels.yml` and never has — the LinkedIn alignment claim lives in the portfolio chat-mode tooling, not as a maturity source.
+- The `repo-hygiene` lane was originally claimed to cover "roughly 4 file paths"; the wired check list is in fact 7 paths. Of those 7, only `CODEOWNERS` is currently a gap on disk — the rest were closed out via #117, #118, and the v1 batch.
+- No inline implementation was added in the #135 audit PR. Rationale: every gap above either (a) needs network/API access (branch-protection drift, label drift) and deserves token-scope review in its own PR, or (b) is a different lane (`source:owasp`) that needs its own producer step rather than being tacked onto `repo-hygiene`. The audit deliberately scoped to documentation + follow-up filings to keep the change reviewable.
+
 ## Filed-issue shape
 
 Every issue the agent (or workflow) files has exactly four sections:
