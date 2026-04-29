@@ -37,6 +37,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #117 Todo → In Progress at 2026-04-28T19:38-07:00
   - #117 In Progress → Done — PR #250, merge `855f4d4`
   - #119 Todo → In Progress at 2026-04-28T19:48-07:00
+  - #119 In Progress → Done — PR #251, merge `dd38cdb`
+  - #123 Todo → In Progress at 2026-04-28T19:58-07:00
 - **Outcome:** _(pending)_
 
 ### 2026-04-28 — boards-worker session: Wiki & Build-Docs Automation (#16) — continuation
