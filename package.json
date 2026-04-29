@@ -11,8 +11,10 @@
     "test:visual:update": "playwright test --config tests/playwright.config.ts --update-snapshots"
   },
   "devDependencies": {
+    "@axe-core/cli": "^4.10.1",
     "@playwright/test": "^1.48.0",
     "htmlhint": "^1.1.4",
+    "http-server": "^14.1.1",
     "stylelint": "^17.9.1",
     "stylelint-config-standard": "^40.0.0"
   }
