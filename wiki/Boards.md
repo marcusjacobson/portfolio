@@ -33,8 +33,10 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Trigger:** #127 was previously dependency-blocked behind #126 (Option B = `@axe-core/cli`). #126 shipped (PR #259, merge `7939cb50`) and is closed.
 - **Status field options captured:** Todo=`f75ad846`, In Progress=`47fc9ee4`, In-review parking=_(none — audit-log fallback)_, Done=`98236657`
 - **Schema mutations applied:** _(none)_
-- **Per-issue transitions:** _(in flight)_
-- **Outcome:** _(in flight)_
+- **Per-issue transitions:**
+  - #127 Todo → In Progress at 2026-04-29T04:03:04Z
+  - #127 In Progress → Done at 2026-04-29T04:17:18Z — PR #261, merge `2b91d65a`
+- **Outcome:** Worked 1/1 — #127 PR #261 merge `2b91d65a` (Option C `@axe-core/playwright` step added to maturity-scan.yml as opt-in `enable_axe_pw` workflow_dispatch input; both Option B and Option C share the same issue title format so the existing dedupe pass guarantees no double-filing if both ever run unattended).
 
 ### 2026-04-28 — boards-worker session: Portfolio Maturity (#15) — post-triage drain
 
