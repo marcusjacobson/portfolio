@@ -25,6 +25,23 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Portfolio Maturity (#15)
+
+- **Branch:** `boards-worker/portfolio-maturity-20260428-1936` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo, eligible after filtering `needs-triage`):** #117, #119, #123 (planned `--max=3`)
+- **Skipped (carries `needs-triage` — chat triage required first):** #118, #126, #127, #135
+- **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:**
+  - #117 Todo → In Progress at 2026-04-28T19:38-07:00
+  - #117 In Progress → Done — PR #250, merge `855f4d4`
+  - #119 Todo → In Progress at 2026-04-28T19:48-07:00
+  - #119 In Progress → Done — PR #251, merge `dd38cdb`
+  - #123 Todo → In Progress at 2026-04-28T19:58-07:00
+  - #123 In Progress → Done — PR #252, merge `1494983`
+- **Outcome:** Clean drain — 3/3 worked, 0 blocked. #117 shipped `SECURITY.md` (PR #250); #119 shipped `.github/CODEOWNERS` (PR #251); #123 shipped `scripts/gh/sync-board-fields.ps1` and ran it (16 Priority fields set, idempotent on re-run, 3 items skipped — no `priority:p*` label) (PR #252). Board #15 Todo column remaining: #118, #126, #127, #135 (all carry `needs-triage` — out of scope for this batch).
+
 ### 2026-04-28 — boards-worker session: Wiki & Build-Docs Automation (#16) — continuation
 
 - **Branch:** `boards-worker/wiki-build-docs-20260428-2200` — PR _(opened at session close)_
