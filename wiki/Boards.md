@@ -39,7 +39,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
   - #119 Todo → In Progress at 2026-04-28T19:48-07:00
   - #119 In Progress → Done — PR #251, merge `dd38cdb`
   - #123 Todo → In Progress at 2026-04-28T19:58-07:00
-- **Outcome:** _(pending)_
+  - #123 In Progress → Done — PR #252, merge `1494983`
+- **Outcome:** Clean drain — 3/3 worked, 0 blocked. #117 shipped `SECURITY.md` (PR #250); #119 shipped `.github/CODEOWNERS` (PR #251); #123 shipped `scripts/gh/sync-board-fields.ps1` and ran it (16 Priority fields set, idempotent on re-run, 3 items skipped — no `priority:p*` label) (PR #252). Board #15 Todo column remaining: #118, #126, #127, #135 (all carry `needs-triage` — out of scope for this batch).
 
 ### 2026-04-28 — boards-worker session: Wiki & Build-Docs Automation (#16) — continuation
 
