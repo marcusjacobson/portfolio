@@ -25,6 +25,17 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Portfolio Maturity (#15) — #127 drain (post-#126)
+
+- **Branch:** `boards-worker/portfolio-maturity-20260428-2100` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo):** #127 (planned `--max=1`)
+- **Trigger:** #127 was previously dependency-blocked behind #126 (Option B = `@axe-core/cli`). #126 shipped (PR #259, merge `7939cb50`) and is closed.
+- **Status field options captured:** Todo=`f75ad846`, In Progress=`47fc9ee4`, In-review parking=_(none — audit-log fallback)_, Done=`98236657`
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:** _(in flight)_
+- **Outcome:** _(in flight)_
+
 ### 2026-04-28 — boards-worker session: Portfolio Maturity (#15) — post-triage drain
 
 - **Branch:** `boards-worker/portfolio-maturity-20260428-2007` — PR _(opened at session close)_
