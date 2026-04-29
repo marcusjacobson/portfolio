@@ -25,6 +25,17 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Portfolio Maturity (#15) — #255/#256/#257 drain
+
+- **Branch:** `boards-worker/portfolio-maturity-20260428-2200` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo):** #255, #256, #257 (planned `--max=3`, drained by priority p2 → p3 → p3)
+- **Trigger:** All three were spawned by #135 maturity-scout audit (PR #258). Each extends `.github/workflows/maturity-scan.yml` with new producer step(s) — sequential drain mandatory to avoid merge conflicts on the same file.
+- **Status field options captured:** Todo=`f75ad846`, In Progress=`47fc9ee4`, In-review parking=_(none — audit-log fallback)_, Done=`98236657`
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:** _(filled in as session progresses)_
+- **Outcome:** _(filled in at session close)_
+
 ### 2026-04-28 — boards-worker session: Portfolio Maturity (#15) — #127 drain (post-#126)
 
 - **Branch:** `boards-worker/portfolio-maturity-20260428-2100` — PR _(opened at session close)_
