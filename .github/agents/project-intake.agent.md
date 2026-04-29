@@ -99,7 +99,7 @@ Labels: project, needs-triage, priority:p<n>
 Body:
 **Pillar:** <Capstone | Cross-pillar | Purview | Defender + Sentinel | Entra | Azure | Security Copilot>
 **Tier:** <Capstone | Standard>
-**Status:** Todo
+**Status:** Hold
 
 ## Purpose
 <1–3 sentences on the outcome — who it's for, what success looks like>
@@ -178,7 +178,7 @@ Issue draft:
   ---
 
 Board routing (automatic, via labels):
-  Projects Roadmap (board #13) — added by tag-routing-autoadd.yml on `project`
+  Projects Roadmap (board #13) — added by tag-routing-autoadd.yml on `project`; this agent then sets Status=Hold (roadmap default)
   Triage Queue   (board #19) — added by triage-autoadd.yml on `needs-triage`
 
 Branch (created on approval):
@@ -223,7 +223,13 @@ Run, in order, echoing each command:
    gh run list --workflow triage-autoadd.yml --limit 3
    ```
    If either failed, surface the failure and stop — do not retry the same approach more than twice. The issue is already filed; report the partial state.
-3. **Create the working branch** off the latest `main` so a downstream resolver starts on a non-`main` branch:
+3. **Set the Projects Roadmap Status field to `Hold`.** New roadmap items default to `Todo`, but the roadmap is intentionally parked behind active work — items must land in `Hold` and only move to `Todo` after `@triage` confirms them for active work. Resolve the project item id, then flip the Status field:
+   ```pwsh
+   $itemId = gh api graphql -f query=('{ repository(owner:"marcusjacobson",name:"portfolio") { issue(number:<issue#>) { projectItems(first:5) { nodes { id project { number } } } } } }') --jq '.data.repository.issue.projectItems.nodes[] | select(.project.number==13) | .id'
+   gh project item-edit --project-id PVT_kwHOBvMdD84BVzLB --id $itemId --field-id PVTSSF_lAHOBvMdD84BVzLBzhRMS0g --single-select-option-id 08d5e081
+   ```
+   `PVT_kwHOBvMdD84BVzLB` is board #13's node id; `PVTSSF_lAHOBvMdD84BVzLBzhRMS0g` is the Status field id; `08d5e081` is the `Hold` option id. If the item id query returns empty, the auto-add hasn't fired yet — wait another 10 seconds and retry once before stopping.
+4. **Create the working branch** off the latest `main` so a downstream resolver starts on a non-`main` branch:
    ```pwsh
    git fetch origin main
    git switch main
@@ -232,7 +238,7 @@ Run, in order, echoing each command:
    ```
    - `<slug>` is 2–5 hyphen-separated words derived from the title, lowercase, no punctuation.
    - This step runs **even when this agent is not the implementer**.
-4. **Hand off** only if the user explicitly said so:
+5. **Hand off** only if the user explicitly said so:
    - `@triage` — usually the next step; happens implicitly when the user runs the triage agent.
    - `@projects-publishing` — once the project is real (typically after triage + initial implementation).
    - `@issue-resolver` — pass `<issue#>` and the branch name, then stop.
@@ -245,7 +251,7 @@ Final output:
 ```
 Filed:    #<n> — <title> — <url>
 Labels:   project, needs-triage, priority:p<n>
-Boards:   #13 Projects Roadmap (via project tag), #19 Triage Queue (via needs-triage tag)
+Boards:   #13 Projects Roadmap (via project tag, Status=Hold), #19 Triage Queue (via needs-triage tag)
 Branch:   feat/<n>-<slug> (checked out, 0 commits)
 Handoff:  <agent name or "none — awaiting @triage">
 ```
