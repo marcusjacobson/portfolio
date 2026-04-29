@@ -1,0 +1,32 @@
+# Code ownership for marcusjacobson/portfolio
+#
+# This is a solo-maintained portfolio repo. The global rule routes every
+# review request to @marcusjacobson. The path-scoped rules below are not
+# different owners — they exist to make ownership intent explicit for the
+# areas that change most often (CI, agent/prompt config, wiki content) so
+# future contributors or automated tools can reason about review routing
+# without reading every workflow file.
+#
+# Syntax: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners
+
+# Global fallback — every path not matched below.
+*                           @marcusjacobson
+
+# Static site pages at the repo root (the actual published portfolio).
+/*.html                     @marcusjacobson
+
+# CI, Copilot agents, prompts, and instruction files.
+/.github/                   @marcusjacobson
+/.github/workflows/         @marcusjacobson
+/.github/agents/            @marcusjacobson
+/.github/prompts/           @marcusjacobson
+/.github/instructions/      @marcusjacobson
+
+# Wiki-as-code source (one-way synced to the GitHub wiki).
+/wiki/                      @marcusjacobson
+
+# Operations scripts (branch protection, board seeding, gh CLI helpers).
+/scripts/                   @marcusjacobson
+
+# Test config and visual snapshots.
+/tests/                     @marcusjacobson
