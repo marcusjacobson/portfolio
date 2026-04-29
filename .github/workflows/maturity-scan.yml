@@ -663,6 +663,386 @@ jobs:
           NEW_TOTAL=$((FILED_SO_FAR+1))
           echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
 
+      # ---- github-docs rule 2 (issue #257): every workflow under
+      # .github/workflows/*.yml must declare a top-level `permissions:`
+      # block (repo convention from .github/copilot-instructions.md and
+      # AGENTS.md). Files at most one consolidated issue per run.
+      - name: Run github-docs check (permissions-block presence) and file gap issue
+        id: scan_permissions_block
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX="${MAX_FILED}"
+          FILED_SO_FAR="${{ steps.scan_github_docs.outputs.filed_total }}"
+          FILED_SO_FAR="${FILED_SO_FAR:-0}"
+
+          if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
+            echo "Hit MAX ($MAX) in earlier steps; skipping permissions-block check."
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (permissions-block)"
+              echo ""
+              echo "Skipped: MAX cap of $MAX reached by earlier steps."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Scan: every .github/workflows/*.yml must have a top-level
+          # `permissions:` key. yq detects it cheaply; fall back to grep
+          # if yq returns null/empty.
+          FINDINGS=""
+          COUNT=0
+          shopt -s nullglob
+          for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
+            HAS_PERMS=$(yq -r '.permissions // "" | tostring' "$wf" 2>/dev/null || echo "")
+            if [[ -z "$HAS_PERMS" || "$HAS_PERMS" == "null" || "$HAS_PERMS" == '""' ]]; then
+              FINDINGS+=$'- `'"$wf"$'` — no top-level `permissions:` block.\n'
+              COUNT=$((COUNT+1))
+            fi
+          done
+          shopt -u nullglob
+
+          if [[ "$COUNT" -eq 0 ]]; then
+            echo "All workflows declare a top-level permissions: block."
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (permissions-block)"
+              echo ""
+              echo "Filed: 0 (every workflow has a top-level permissions: block)"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Dedupe.
+          TITLE_PREFIX="Workflows missing top-level permissions: block"
+          EXISTING=$(gh issue list \
+            --state open \
+            --search "in:title \"$TITLE_PREFIX\" label:source:github-docs" \
+            --json number,title,url \
+            --limit 50)
+          MATCH=$(echo "$EXISTING" | jq -r --arg p "$TITLE_PREFIX" \
+            '[.[] | select(.title | startswith($p))] | .[0] // empty | "\(.number)|\(.url)"')
+          if [[ -n "$MATCH" ]]; then
+            echo "Dedup suppressed: existing open issue $MATCH"
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (permissions-block)"
+              echo ""
+              echo "Filed: 0"
+              echo ""
+              echo "Suppressed (dedupe): 1"
+              echo "  - permissions-block presence — overlaps with $MATCH"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TITLE="${TITLE_PREFIX} — ${COUNT} workflow file(s)"
+          BODY_FILE=$(mktemp)
+          TEMPLATE=$(cat .github/workflows/templates/github-docs-permissions-block-issue-body.md)
+          TEMPLATE="${TEMPLATE//__COUNT__/$COUNT}"
+          FINDINGS_TRIMMED="${FINDINGS%$'\n'}"
+          TEMPLATE="${TEMPLATE//__FINDINGS__/$FINDINGS_TRIMMED}"
+          printf '%s\n' "$TEMPLATE" > "$BODY_FILE"
+
+          echo "Filing: $TITLE"
+          URL=$(gh issue create \
+            --title "$TITLE" \
+            --label "needs-triage,source:github-docs,area:workflow" \
+            --body-file "$BODY_FILE")
+          rm -f "$BODY_FILE"
+
+          GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+            --owner marcusjacobson --url "$URL" >/dev/null
+
+          {
+            echo ""
+            echo "## Maturity Scout — github-docs (permissions-block)"
+            echo ""
+            echo "Filed: 1"
+            echo "  - $URL — $TITLE"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          NEW_TOTAL=$((FILED_SO_FAR+1))
+          echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
+
+      # ---- github-docs rule 3 (issue #257): if a CODEOWNERS file exists,
+      # every non-comment, non-blank line must match
+      # `<glob> @<owner>[ @<owner>...]`. Absence is covered by the
+      # repo-hygiene file-existence lane (CODEOWNERS target). Files at
+      # most one consolidated issue per run.
+      - name: Run github-docs check (CODEOWNERS shape) and file gap issue
+        id: scan_codeowners_shape
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX="${MAX_FILED}"
+          FILED_SO_FAR="${{ steps.scan_permissions_block.outputs.filed_total }}"
+          FILED_SO_FAR="${FILED_SO_FAR:-0}"
+
+          if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
+            echo "Hit MAX ($MAX) in earlier steps; skipping CODEOWNERS shape check."
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (CODEOWNERS shape)"
+              echo ""
+              echo "Skipped: MAX cap of $MAX reached by earlier steps."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Locate CODEOWNERS. If absent, skip silently — the
+          # repo-hygiene step already files an issue for missing CODEOWNERS.
+          CO_PATH=""
+          for candidate in .github/CODEOWNERS CODEOWNERS docs/CODEOWNERS; do
+            if [[ -f "$candidate" ]]; then
+              CO_PATH="$candidate"
+              break
+            fi
+          done
+          if [[ -z "$CO_PATH" ]]; then
+            echo "No CODEOWNERS file found; skipping shape check (repo-hygiene lane handles absence)."
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (CODEOWNERS shape)"
+              echo ""
+              echo "Skipped: no CODEOWNERS file present (covered by repo-hygiene lane)."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Validate each non-comment, non-blank line.
+          # Expected shape: <glob>(whitespace)@owner[(whitespace)@owner...]
+          # Owners may also be email addresses (contain @ and a domain).
+          FINDINGS=""
+          COUNT=0
+          LINENO_TRACK=0
+          while IFS= read -r raw || [[ -n "$raw" ]]; do
+            LINENO_TRACK=$((LINENO_TRACK+1))
+            # Strip leading/trailing whitespace.
+            line="${raw#"${raw%%[![:space:]]*}"}"
+            line="${line%"${line##*[![:space:]]}"}"
+            [[ -z "$line" ]] && continue
+            [[ "$line" == \#* ]] && continue
+            # Must have at least two whitespace-separated fields.
+            # First field = glob (non-whitespace, no @ at start).
+            # Remaining fields = each must start with @ or look like an email.
+            read -r -a fields <<<"$line"
+            if [[ ${#fields[@]} -lt 2 ]]; then
+              FINDINGS+=$'- `'"$CO_PATH"':'"$LINENO_TRACK"$'` — fewer than 2 fields: `'"$line"$'`\n'
+              COUNT=$((COUNT+1))
+              continue
+            fi
+            BAD_OWNER=""
+            for ((i=1; i<${#fields[@]}; i++)); do
+              owner="${fields[$i]}"
+              if [[ "$owner" == @* ]]; then
+                continue
+              fi
+              # Email shape: contains @ and a dot after.
+              if [[ "$owner" == *@*.* ]]; then
+                continue
+              fi
+              BAD_OWNER="$owner"
+              break
+            done
+            if [[ -n "$BAD_OWNER" ]]; then
+              FINDINGS+=$'- `'"$CO_PATH"':'"$LINENO_TRACK"$'` — owner field `'"$BAD_OWNER"$'` is not `@<user>` or an email: `'"$line"$'`\n'
+              COUNT=$((COUNT+1))
+            fi
+          done < "$CO_PATH"
+
+          if [[ "$COUNT" -eq 0 ]]; then
+            echo "CODEOWNERS shape OK ($CO_PATH)."
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (CODEOWNERS shape)"
+              echo ""
+              echo "Filed: 0 ($CO_PATH parses cleanly)"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TITLE_PREFIX="CODEOWNERS contains malformed lines"
+          EXISTING=$(gh issue list \
+            --state open \
+            --search "in:title \"$TITLE_PREFIX\" label:source:github-docs" \
+            --json number,title,url \
+            --limit 50)
+          MATCH=$(echo "$EXISTING" | jq -r --arg p "$TITLE_PREFIX" \
+            '[.[] | select(.title | startswith($p))] | .[0] // empty | "\(.number)|\(.url)"')
+          if [[ -n "$MATCH" ]]; then
+            echo "Dedup suppressed: existing open issue $MATCH"
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (CODEOWNERS shape)"
+              echo ""
+              echo "Filed: 0"
+              echo ""
+              echo "Suppressed (dedupe): 1"
+              echo "  - CODEOWNERS shape — overlaps with $MATCH"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TITLE="${TITLE_PREFIX} — ${COUNT} line(s)"
+          BODY_FILE=$(mktemp)
+          TEMPLATE=$(cat .github/workflows/templates/github-docs-codeowners-shape-issue-body.md)
+          TEMPLATE="${TEMPLATE//__COUNT__/$COUNT}"
+          FINDINGS_TRIMMED="${FINDINGS%$'\n'}"
+          TEMPLATE="${TEMPLATE//__FINDINGS__/$FINDINGS_TRIMMED}"
+          printf '%s\n' "$TEMPLATE" > "$BODY_FILE"
+
+          echo "Filing: $TITLE"
+          URL=$(gh issue create \
+            --title "$TITLE" \
+            --label "needs-triage,source:github-docs,area:workflow" \
+            --body-file "$BODY_FILE")
+          rm -f "$BODY_FILE"
+
+          GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+            --owner marcusjacobson --url "$URL" >/dev/null
+
+          {
+            echo ""
+            echo "## Maturity Scout — github-docs (CODEOWNERS shape)"
+            echo ""
+            echo "Filed: 1"
+            echo "  - $URL — $TITLE"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          NEW_TOTAL=$((FILED_SO_FAR+1))
+          echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
+
+      # ---- github-docs rule 4 (issue #257): reusable-workflow refs
+      # (`<owner>/<repo>/.github/workflows/<wf>.yml@<ref>`) must be
+      # pinned to a 40-char commit SHA. Mirrors the existing
+      # third-party-action SHA-pin rule but targets reusable-workflow
+      # shape, which the existing scan deliberately skipped. Files at
+      # most one consolidated issue per run.
+      - name: Run github-docs check (reusable-workflow SHA pin) and file gap issue
+        id: scan_reusable_workflow_pin
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX="${MAX_FILED}"
+          FILED_SO_FAR="${{ steps.scan_codeowners_shape.outputs.filed_total }}"
+          FILED_SO_FAR="${FILED_SO_FAR:-0}"
+
+          if [[ "$FILED_SO_FAR" -ge "$MAX" ]]; then
+            echo "Hit MAX ($MAX) in earlier steps; skipping reusable-workflow SHA-pin check."
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (reusable-workflow pin)"
+              echo ""
+              echo "Skipped: MAX cap of $MAX reached by earlier steps."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ---- Scan: any uses: ref matching the reusable-workflow shape
+          # `<owner>/<repo>/.github/workflows/<wf>.yml@<ref>` whose ref
+          # after `@` is not a 40-char SHA.
+          FINDINGS=""
+          COUNT=0
+          shopt -s nullglob
+          for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
+            while IFS= read -r line; do
+              [[ -z "$line" ]] && continue
+              LINENO_HIT="${line%%:*}"
+              REST="${line#*:}"
+              USES_VAL=$(echo "$REST" | sed -E 's/^[[:space:]]*-?[[:space:]]*uses:[[:space:]]*//; s/[[:space:]]*#.*$//; s/[[:space:]]*$//')
+              [[ "$USES_VAL" == ./* || "$USES_VAL" == ../* ]] && continue
+              [[ "$USES_VAL" != *@* ]] && continue
+              # Reusable-workflow shape only: must contain `/.github/workflows/`
+              # and end in `.yml@<ref>` or `.yaml@<ref>`.
+              if [[ "$USES_VAL" != */.github/workflows/*.yml@* && "$USES_VAL" != */.github/workflows/*.yaml@* ]]; then
+                continue
+              fi
+              REF="${USES_VAL##*@}"
+              if [[ "$REF" =~ ^[0-9a-f]{40}$ ]]; then
+                continue
+              fi
+              FINDINGS+=$'- `'"$wf"':'"$LINENO_HIT"'` — `'"$USES_VAL"'`'$'\n'
+              COUNT=$((COUNT+1))
+            done < <(grep -nE '^[[:space:]]*-?[[:space:]]*uses:[[:space:]]*[^[:space:]]+' "$wf" || true)
+          done
+          shopt -u nullglob
+
+          if [[ "$COUNT" -eq 0 ]]; then
+            echo "No unpinned reusable-workflow refs found."
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (reusable-workflow pin)"
+              echo ""
+              echo "Filed: 0 (no unpinned reusable-workflow refs found)"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TITLE_PREFIX="Pin reusable-workflow refs to commit SHAs"
+          EXISTING=$(gh issue list \
+            --state open \
+            --search "in:title \"$TITLE_PREFIX\" label:source:github-docs" \
+            --json number,title,url \
+            --limit 50)
+          MATCH=$(echo "$EXISTING" | jq -r --arg p "$TITLE_PREFIX" \
+            '[.[] | select(.title | startswith($p))] | .[0] // empty | "\(.number)|\(.url)"')
+          if [[ -n "$MATCH" ]]; then
+            echo "Dedup suppressed: existing open issue $MATCH"
+            {
+              echo ""
+              echo "## Maturity Scout — github-docs (reusable-workflow pin)"
+              echo ""
+              echo "Filed: 0"
+              echo ""
+              echo "Suppressed (dedupe): 1"
+              echo "  - reusable-workflow SHA pin — overlaps with $MATCH"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "filed_total=$FILED_SO_FAR" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TITLE="${TITLE_PREFIX} in ${COUNT} reference(s)"
+          BODY_FILE=$(mktemp)
+          TEMPLATE=$(cat .github/workflows/templates/github-docs-reusable-workflow-pin-issue-body.md)
+          TEMPLATE="${TEMPLATE//__COUNT__/$COUNT}"
+          FINDINGS_TRIMMED="${FINDINGS%$'\n'}"
+          TEMPLATE="${TEMPLATE//__FINDINGS__/$FINDINGS_TRIMMED}"
+          printf '%s\n' "$TEMPLATE" > "$BODY_FILE"
+
+          echo "Filing: $TITLE"
+          URL=$(gh issue create \
+            --title "$TITLE" \
+            --label "needs-triage,source:github-docs,area:workflow" \
+            --body-file "$BODY_FILE")
+          rm -f "$BODY_FILE"
+
+          GH_TOKEN="$PROJECT_TOKEN" gh project item-add 15 \
+            --owner marcusjacobson --url "$URL" >/dev/null
+
+          {
+            echo ""
+            echo "## Maturity Scout — github-docs (reusable-workflow pin)"
+            echo ""
+            echo "Filed: 1"
+            echo "  - $URL — $TITLE"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          NEW_TOTAL=$((FILED_SO_FAR+1))
+          echo "filed_total=$NEW_TOTAL" >> "$GITHUB_OUTPUT"
+
       - name: Run WCAG static a11y checks and file gap issues
         id: scan_wcag
         shell: bash
@@ -670,10 +1050,19 @@ jobs:
           set -euo pipefail
 
           MAX="${MAX_FILED}"
-          FILED_SO_FAR="${{ steps.scan_github_docs.outputs.filed_total }}"
-          # Fall back to the repo-hygiene tally if the github-docs step
-          # exited before writing filed_total (defensive — every exit
-          # path now writes it).
+          FILED_SO_FAR="${{ steps.scan_reusable_workflow_pin.outputs.filed_total }}"
+          # Fall back through the github-docs chain in case an earlier
+          # step exited before writing filed_total (defensive — every
+          # exit path now writes it).
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan_codeowners_shape.outputs.filed_total }}"
+          fi
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan_permissions_block.outputs.filed_total }}"
+          fi
+          if [[ -z "$FILED_SO_FAR" ]]; then
+            FILED_SO_FAR="${{ steps.scan_github_docs.outputs.filed_total }}"
+          fi
           if [[ -z "$FILED_SO_FAR" ]]; then
             FILED_SO_FAR="${{ steps.scan.outputs.filed }}"
           fi
