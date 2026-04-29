@@ -25,6 +25,18 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 
 ## Sweep log
 
+### 2026-04-28 — boards-worker session: Portfolio Maturity (#15) — post-triage drain
+
+- **Branch:** `boards-worker/portfolio-maturity-20260428-2007` — PR _(opened at session close)_
+- **Operator:** boards-worker agent
+- **Queue at start (Todo, post-`@triage`):** #118, #126, #135 (planned `--max=3`)
+- **Skipped (dependency halt):** #127 — body explicitly says "File only after Option B has shipped" (Option B = #126 still open). User excluded via "drain except 127" directive.
+- **Status field options captured:** Source=Todo (`f75ad846`), In-flight=In Progress (`47fc9ee4`), In-review parking=_(none — using audit-log fallback per Status field handling)_, Done=Done (`98236657`)
+- **Schema mutations applied:** _(none)_
+- **Per-issue transitions:**
+  - _(seeded; populated as the batch executes)_
+- **Outcome:** _(in flight)_
+
 ### 2026-04-28 — boards-worker session: Portfolio Maturity (#15)
 
 - **Branch:** `boards-worker/portfolio-maturity-20260428-1936` — PR _(opened at session close)_
