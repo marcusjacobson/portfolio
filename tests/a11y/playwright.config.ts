@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
 // Dedicated config for the WCAG axe-core a11y scan (issue #127).
 // Kept separate from `tests/playwright.config.ts` so the visual-regression
