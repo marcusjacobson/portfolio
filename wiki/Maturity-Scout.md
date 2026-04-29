@@ -40,7 +40,7 @@ This is the canonical answer to "why did the weekly scan find so few things?" Au
 |---|---|---|---|---|
 | `source:repo-hygiene` | `maturity-scan.yml` step `scan` | 7 file-existence checks: `SECURITY.md`, `CONTRIBUTING.md`, `CODEOWNERS`, `.github/ISSUE_TEMPLATE`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/dependabot.yml`, `LICENSE` | Branch-protection drift detection (compare `scripts/apply-branch-protection.ps1` baseline vs. live API state); label drift (`.github/labels.yml` vs. `gh label list`); stale-workflow detection (referenced action no longer exists upstream); auto-merge / require-review baseline drift | **Expand** — follow-up #256 filed for branch-protection + label drift producer. |
 | `source:github-docs` | `maturity-scan.yml` step `scan_github_docs` | 1 rule: action SHA-pin audit across `.github/workflows/*.yml` | CODEOWNERS shape validation (path globs cover the surfaces they need to); branch-protection doc completeness (does the wiki match what's enforced?); `permissions:` block presence on every workflow; concurrency block hygiene; `pull_request_target` usage audit | **Expand** — follow-up #257 filed for `permissions:`-presence, CODEOWNERS shape, and reusable-workflow pin checks. |
-| `source:wcag` | `maturity-scan.yml` steps `scan_wcag` (v1, regex) and `scan_wcag_axe` (v2, axe-core CLI against a local static server) | v1: 3 regex rules — `html-has-lang` (3.1.1), `link-name` (4.1.2), `heading-order` (1.3.1). v2 (#126): every `@axe-core/cli` rule under tags `wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa`, minus rules already covered by `htmlhint` and v1. Both pass scope to the 6 top-level `*.html` portfolio pages. | Multi-page flow checks, keyboard navigation, focus-trap interaction — anything that needs Playwright-driven DOM interaction rather than a single static load. | **v1 + v2 shipped** in #113 and #126. Playwright + axe-core integration tracked in #127 and stays gated on a runtime decision. |
+| `source:wcag` | `maturity-scan.yml` steps `scan_wcag` (v1, regex), `scan_wcag_axe` (v2 / Option B, axe-core CLI against a local static server), and `scan_wcag_axe_pw` (Option C, axe-core driven via Playwright — disabled by default) | v1: 3 regex rules — `html-has-lang` (3.1.1), `link-name` (4.1.2), `heading-order` (1.3.1). Option B (#126): every `@axe-core/cli` rule under tags `wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa`, minus rules already covered by `htmlhint` and v1. Option C (#127): same tag set and exclusion list run via `@axe-core/playwright` so computed-style rules (e.g. `color-contrast`) can fire. All three pass scope to the 6 top-level `*.html` portfolio pages. | Multi-page flow checks, keyboard navigation, focus-trap interaction — anything that needs cross-page Playwright-driven DOM interaction rather than a single static load. | **v1 + Option B + Option C shipped** in #113, #126, and #127. Option C is gated behind a `workflow_dispatch` flag pending a head-to-head comparison run; see [Option B vs. Option C](#option-b-vs-option-c-coexistence) below. |
 | `source:owasp` | None — unwired | None | Static checks deterministic for a static-HTML site: external `<script src=...>` without `integrity=` (SRI); `<link rel="stylesheet" href=...>` without `integrity=`; `target="_blank"` without `rel="noopener noreferrer"`; mixed-content (`http://` references in `*.html`); inline `<script>` blocks vs. CSP posture | **Expand** — follow-up #255 filed to add a producer step. |
 | `source:ms-learn` | None — unwired (by design) | None | Microsoft Learn page coverage for the security technologies claimed on the portfolio — every check requires LLM judgment to map a Learn page to a portfolio claim and assess whether the claim is current. | **Defer indefinitely — keep chat-mode only.** Adding a deterministic producer for this lane is not viable; the value is in the LLM-driven `@maturity-scout` chat audits already documented above. No follow-up issue. If a future deterministic check is identified (e.g. "the cert badge URL on `certification_strategy.html` resolves and matches the claimed exam code"), file it then. |
 
@@ -90,7 +90,8 @@ What it does:
 - `source:github-docs` v1 covers the action SHA-pin audit only — it scans every `.github/workflows/*.yml` file and files **one consolidated issue** per run when any `uses:` ref is not pinned to a 40-character commit SHA. Other github-docs checks (CODEOWNERS shape, branch-protection doc completeness) remain on-demand under `@maturity-scout` until added in a follow-up.
 - `source:wcag` v1 covers three regex-only static checks across the six top-level `*.html` portfolio pages: `html-has-lang` (WCAG 3.1.1), `link-name` (WCAG 4.1.2), and `heading-order` (WCAG 1.3.1). Each rule files at most one consolidated issue per run, listing every page that fails.
 - `source:wcag` v2 (added in #126) extends coverage via `@axe-core/cli` against a local `http-server` instance booted in CI. The step runs after v1, filters out rule ids already enforced by `htmlhint` (`alt-require`, `title-require`, `id-unique`, `tagname-lowercase`, `attr-no-duplication`, `src-not-empty`, `doctype-html5`) and the three v1 rules, dedupes against open `source:wcag` issues by rule id in title, and files **one issue per remaining failing rule id** with the same `needs-triage,source:wcag,area:html` label set. The v1 + v2 + earlier scan steps share a single MAX cap (chained via step outputs). Network egress: the step installs `@axe-core/cli` from the cached `npm ci` plus loads the locally served pages; no live external service is queried.
-- Playwright + axe-core integration is tracked separately in #127 and stays gated on a runtime decision (Playwright-driven flow tests vs. the simpler v2 scan above).
+- `source:wcag` Option C (added in #127) extends coverage further via `@axe-core/playwright` driving a real Chromium load of each page, which is the prerequisite for any rule that needs computed styles (notably `color-contrast`). Option C is **disabled by default** to avoid double-filing alongside Option B; it runs only when the workflow is dispatched manually with `enable_axe_pw=true`. Both Option B and Option C use the same issue title format (`Fix axe-core violation: <rule> on portfolio pages`), the same exclusion list, and the same MAX cap chain — so even if both ever ran in the same run, the title-prefix dedupe pass would suppress the second filing for any rule already covered by the first. See the [Option B vs. Option C](#option-b-vs-option-c-coexistence) section below for the consolidation plan.
+- Playwright + axe-core integration is shipped as Option C above (#127). The runtime tradeoff (Option B is fast and CLI-only; Option C needs `npx playwright install --with-deps chromium` and a real browser load per page) is the reason Option C stays manual-dispatch only for now.
 - Runs deterministic file-existence checks against the checkout (no live external fetches).
 - Performs the same dedupe pass against open issues and board items via `gh`.
 - Files each surviving candidate with `needs-triage`, the matching `source:*` label, and the matching `area:*` label.
@@ -176,6 +177,34 @@ Do **not** edit the issue's labels to "retrigger" the fallback `maturity-autoadd
 If `maturity-scan.yml` ever needs to label issues itself (today it relies on `gh issue create --label` running under the default `GITHUB_TOKEN`, which has `issues: write` from the workflow's `permissions:` block), keep the two-token split: probe / attach with `BUG_PROJECT_TOKEN`, label with `secrets.GITHUB_TOKEN`. See PR #83 for the canonical pattern. **Do not widen the PAT scope** — it is shared with `bug-autoadd.yml`, `project-autoadd.yml`, and `project-converted-issue.yml`, and broader scope expands the blast radius across all four workflows.
 
 The same constraint is captured in the repo's stored agent memory under "BUG_PROJECT_TOKEN classic PAT scope limits".
+
+## Option B vs. Option C coexistence
+
+Both the `@axe-core/cli` scan (Option B, #126) and the `@axe-core/playwright` scan (Option C, #127) currently live in `maturity-scan.yml`. The decision in #127 was to **keep both checked in but only run one unattended** until we have a side-by-side comparison from a real run.
+
+| | Option B — `scan_wcag_axe` | Option C — `scan_wcag_axe_pw` |
+|---|---|---|
+| Tool | `@axe-core/cli` against `http://localhost:8080/<page>` | `@axe-core/playwright` driving a real Chromium load |
+| When it runs | Every scheduled cron + every `workflow_dispatch` | Only when dispatched with `enable_axe_pw=true` |
+| Computed-style rules (e.g. `color-contrast`) | No — CLI loads pages without a real layout engine | Yes — full Chromium with computed styles |
+| CI cost | Light — `npm ci` is already cached | Heavier — adds `npx playwright install --with-deps chromium` |
+| Title format | `Fix axe-core violation: <rule> on portfolio pages` | Same — verbatim |
+| Body template | `.github/workflows/templates/wcag-axe-issue-body.md` | `.github/workflows/templates/wcag-axe-pw-issue-body.md` |
+| Exclusion list | htmlhint-covered rules + v1 regex rules | Identical to Option B |
+| MAX cap | Shares the chain — consumes `scan_wcag.outputs.filed_total`, emits its own | Shares the chain — consumes `scan_wcag_axe.outputs.filed_total`, emits its own |
+
+Why both stay in the repo for now:
+
+- Option C is the only path to `color-contrast` findings, which is the single biggest gap Option B can't close.
+- Running Option C on every cron without first comparing its output to Option B risks a flood of duplicate filings on first contact (e.g. when one scan reports `nested-interactive` against a page the other reports `aria-allowed-role` against the same selector).
+- Title-format parity means the Option C dedupe pass will silently suppress any rule Option B already filed in an earlier step of the same run, so the worst case is a no-op rather than double-filing.
+
+Consolidation plan (follow-up issue to be filed once the comparison run is in hand):
+
+1. Dispatch `Maturity Scout` manually with `enable_axe_pw=true` and `max=20` so both scans run end-to-end on the same DOM.
+2. Diff the two filed-issue sets by rule id. Triage any rule Option C reports but Option B doesn't (likely `color-contrast`, possibly `aria-hidden-focus` or `nested-interactive`).
+3. If Option C is a strict superset, retire Option B (delete the `scan_wcag_axe` step + `wcag-axe-issue-body.md`, drop `@axe-core/cli` from `package.json`) and flip `enable_axe_pw` to default-true (or remove the gate entirely).
+4. If Option B has its own unique rule coverage worth keeping, leave both wired and drop Option C's `if:` gate so it runs every cron — the title-prefix dedupe is already proved out by step 1.
 
 ## See also
 
