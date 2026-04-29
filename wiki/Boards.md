@@ -36,6 +36,8 @@ Tracks the GitHub Projects (v2) **boards** used for portfolio work, plus the red
 - **Per-issue transitions:**
   - #118 Todo → In Progress at 2026-04-28T20:08-07:00
   - #118 In Progress → Done — PR #254, merge `fb72032`
+  - #135 Todo → In Progress at 2026-04-28T20:15-07:00
+  - #135 In Progress → Done — PR #258, merge `8abdca8`
 - **Outcome:** _(in flight)_
 
 ### 2026-04-28 — boards-worker session: Portfolio Maturity (#15)
