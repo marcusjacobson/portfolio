@@ -25,6 +25,9 @@
 | HTML page authoring | [.github/instructions/html-pages.instructions.md](instructions/html-pages.instructions.md) (auto-attaches to `*.html`) |
 | Wiki authoring | [.github/instructions/wiki-content.instructions.md](instructions/wiki-content.instructions.md) (auto-attaches to `wiki/**`) |
 | Workflow authoring | [.github/instructions/workflows.instructions.md](instructions/workflows.instructions.md) (auto-attaches to `.github/workflows/**`) |
+| PowerShell ops scripts | [.github/instructions/scripts-powershell.instructions.md](instructions/scripts-powershell.instructions.md) (auto-attaches to `scripts/**/*.ps1`) |
+| Playwright tests | [.github/instructions/tests-playwright.instructions.md](instructions/tests-playwright.instructions.md) (auto-attaches to `tests/**/*.ts`) |
+| Agent / prompt / instruction authoring | [.github/agents/README.md](agents/README.md), [.github/prompts/README.md](prompts/README.md) |
 | Cloud-agent contract | [AGENTS.md](../AGENTS.md) |
 | Folder map, full architecture | [wiki/Repo-Architecture.md](../wiki/Repo-Architecture.md) |
 | Full agent catalog + handoffs | [wiki/Agents.md](../wiki/Agents.md) |
