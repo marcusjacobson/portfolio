@@ -28,7 +28,9 @@
 | PowerShell ops scripts | [.github/instructions/scripts-powershell.instructions.md](instructions/scripts-powershell.instructions.md) (auto-attaches to `scripts/**/*.ps1`) |
 | Playwright tests | [.github/instructions/tests-playwright.instructions.md](instructions/tests-playwright.instructions.md) (auto-attaches to `tests/**/*.ts`) |
 | Agent / prompt / instruction authoring | [.github/agents/README.md](agents/README.md), [.github/prompts/README.md](prompts/README.md) |
+| External best-practice URLs (MDN, OWASP, WCAG, GitHub docs, MS Learn) | [.github/instructions/grounding-sources.instructions.md](instructions/grounding-sources.instructions.md) |
 | Cloud-agent contract | [AGENTS.md](../AGENTS.md) |
+| Repo governance | [SECURITY.md](../SECURITY.md), [CONTRIBUTING.md](../CONTRIBUTING.md), [.github/CODEOWNERS](CODEOWNERS), [LICENSE](../LICENSE) |
 | Folder map, full architecture | [wiki/Repo-Architecture.md](../wiki/Repo-Architecture.md) |
 | Full agent catalog + handoffs | [wiki/Agents.md](../wiki/Agents.md) |
 

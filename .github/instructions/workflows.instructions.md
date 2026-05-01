@@ -39,3 +39,52 @@ applyTo: ".github/workflows/**"
 - Unpinned `uses: actions/checkout@main` — pin to `@v4` minimum.
 - Overlapping deploy workflows without `concurrency:` — causes race conditions on Pages.
 - Using `pull_request_target` to comment on PRs when `pull_request` + `permissions: pull-requests: write` works.
+
+## Tested gotchas (verified in this repo)
+
+### Heredoc inside `run: |` breaks the YAML block scalar
+
+A `cat <<EOF ... EOF` heredoc whose body has any column-0 line will terminate the YAML block scalar early. The workflow registers as active, but every push fails with `Invalid workflow file ... line N` and `gh workflow run` returns a misleading HTTP 422 `Workflow does not have workflow_dispatch trigger`.
+
+Don't:
+
+```yaml
+- name: File issue
+  run: |
+    BODY=$(cat <<EOF
+    ## Source
+    Some text at column 0.   # ← terminates the block scalar
+    EOF
+    )
+```
+
+Do — extract the body to a template under `.github/workflows/templates/` and substitute placeholders:
+
+```yaml
+- name: File issue
+  run: |
+    read_body () { sed "s|__PATH__|$1|g" .github/workflows/templates/repo-hygiene-issue-body.md; }
+    BODY=$(read_body "$path")
+```
+
+See `maturity-scan.yml` (`read_body` helper, ~line 58) for the working pattern.
+
+### Path-filtered jobs cannot be required PR contexts
+
+A workflow with a `paths:` filter that sometimes does not run (e.g., the `build` job in `pages-deploy.yml` on a docs-only PR) **cannot** be a required status check, or PRs deadlock waiting for a check that never registers. Either drop the `paths:` filter (run always, fast-exit when irrelevant) or remove the context from `apply-branch-protection.ps1`'s required list.
+
+### Matrix job context names include the matrix value
+
+`actions/codeql-action`'s `analyze` job renders as `analyze (javascript-typescript)` — required-context strings in branch protection must match the rendered name including the matrix params in parens, not the bare job name.
+
+### `gh api` boolean serialization
+
+`-f enabled=true` sends the **string** `"true"` and a JSON-typed boolean field returns 422. Use `ConvertTo-Json` and pipe to `--input -`:
+
+```pwsh
+@{ enabled = $true } | ConvertTo-Json | gh api ... --input -
+```
+
+## Best-practice sources
+
+When auditing a workflow against external recommendations (during PR review or `@maturity-scout` runs), ground in the canonical URLs catalogued in [grounding-sources.instructions.md](grounding-sources.instructions.md) — Actions security hardening, `permissions:` reference, third-party action pinning, and `pull_request_target` security model.
