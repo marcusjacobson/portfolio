@@ -16,12 +16,31 @@ For the agents that drive the flow, see [Agents](Agents). For the workflows that
 | [`.github/ISSUE_TEMPLATE/`](https://github.com/marcusjacobson/portfolio/tree/main/.github/ISSUE_TEMPLATE) | Issue templates used by intake agents and humans alike. |
 | [`.github/copilot-instructions.md`](https://github.com/marcusjacobson/portfolio/blob/main/.github/copilot-instructions.md) | Repo-wide Copilot rules — including the always-on intake routing. |
 | [`.github/labels.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/labels.yml) | Canonical label manifest synced by `scripts/gh/sync-labels.ps1`. Holds the `agent:*` namespace (`agent:wiki-sync`, `agent:copilot-enablement`, `agent:triage`) so agent-scoped tasks keep a stable color and description across runs. |
-| [`scripts/`](https://github.com/marcusjacobson/portfolio/tree/main/scripts) | PowerShell ops scripts. `apply-branch-protection.ps1` is the source of truth for required PR contexts. `gh/` holds Projects v2 helpers (`create-board.ps1`, `add-issue-to-board.ps1`, `bulk-close-stale.ps1`, `sync-labels.ps1`). |
+| [`.github/CODEOWNERS`](https://github.com/marcusjacobson/portfolio/blob/main/.github/CODEOWNERS) | Routes every PR review to the maintainer (`@marcusjacobson`). Pairs with branch protection's required-conversation-resolution rule so reviews cannot be silently bypassed. |
+| [`.github/PULL_REQUEST_TEMPLATE.md`](https://github.com/marcusjacobson/portfolio/blob/main/.github/PULL_REQUEST_TEMPLATE.md) | Default PR body: summary + tested checklist + screenshots for visual changes + changelog entry. |
+| [`.github/ISSUE_TEMPLATE/agent-task.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/ISSUE_TEMPLATE/agent-task.yml) | Issue template for cloud-agent-shaped work. Pairs with the `agent-task` label and the `agent:*` namespace; intake agents fall back to this when a request needs cloud resolver follow-up. |
+| [`SECURITY.md`](https://github.com/marcusjacobson/portfolio/blob/main/SECURITY.md) | Private vulnerability reporting channel via GitHub Security Advisories. The repo opts out of public issue triage for security-shaped reports. |
+| [`CONTRIBUTING.md`](https://github.com/marcusjacobson/portfolio/blob/main/CONTRIBUTING.md) | External-facing intake + PR guide: branch naming, lint commands, PR description shape. Mirrors the always-on intake rule documented in `copilot-instructions.md`. |
+| [`.cleanupignore`](https://github.com/marcusjacobson/portfolio/blob/main/.cleanupignore) | Per-path keep list for `@repo-cleanup`. Adding a path here suppresses the agent from re-flagging it on future sweeps. |
+| [`scripts/`](https://github.com/marcusjacobson/portfolio/tree/main/scripts) | PowerShell ops scripts. `apply-branch-protection.ps1` is the source of truth for required PR contexts. `gh/` holds Projects v2 helpers (`create-board.ps1`, `add-issue-to-board.ps1`, `bulk-close-stale.ps1`, `sync-labels.ps1`, `sync-board-fields.ps1`). |
 | [`tests/`](https://github.com/marcusjacobson/portfolio/tree/main/tests) | Lychee config, Playwright config, and visual specs. `tests/visual/__snapshots__/` is regenerated only via `npm run test:visual:update` — never hand-edit. |
 | [`wiki/`](https://github.com/marcusjacobson/portfolio/tree/main/wiki) | This wiki. Source of truth, mirrored one-way to the GitHub wiki by [`wiki-sync.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/wiki-sync.yml). Direct edits on github.com are overwritten on the next sync. |
 | [`staging-inbox/`](https://github.com/marcusjacobson/portfolio/tree/main/staging-inbox) | Gitignored drop zone for the Claude project export. Nothing here ships to the live site. |
 | [`package.json`](https://github.com/marcusjacobson/portfolio/blob/main/package.json) | Dev tooling only (`htmlhint`, `stylelint`, `lychee` runner, Playwright). The site itself has no runtime dependencies. |
 | [`LICENSE`](https://github.com/marcusjacobson/portfolio/blob/main/LICENSE) | MIT License — terms under which the code and content may be reused. |
+
+## Governance and community health
+
+The repo ships the standard GitHub community-health files so external contributors and security researchers know how to engage. None of them gate the build, but they are checked by the `source:github-docs` lane of the maturity scan.
+
+| File | Role |
+|------|------|
+| [`SECURITY.md`](https://github.com/marcusjacobson/portfolio/blob/main/SECURITY.md) | Reports vulnerabilities through GitHub Security Advisories — never as public issues. The maintainer triages privately and ships fixes through the same issue-first PR flow. |
+| [`.github/CODEOWNERS`](https://github.com/marcusjacobson/portfolio/blob/main/.github/CODEOWNERS) | Routes every PR review to the maintainer. Combined with branch protection's `required_conversation_resolution: true`, ensures every PR is acknowledged before merge. |
+| [`CONTRIBUTING.md`](https://github.com/marcusjacobson/portfolio/blob/main/CONTRIBUTING.md) | External-facing version of the intake-to-PR contract. Points contributors at `npm run lint`, `npm run test:visual`, and the PR template. |
+| [`.github/PULL_REQUEST_TEMPLATE.md`](https://github.com/marcusjacobson/portfolio/blob/main/.github/PULL_REQUEST_TEMPLATE.md) | Renders the PR body skeleton: summary + tested checklist + screenshots + changelog entry. |
+| [`.github/ISSUE_TEMPLATE/agent-task.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/ISSUE_TEMPLATE/agent-task.yml) | Cloud-agent-shaped task template. Carries the `agent-task` label so the cloud resolver can self-assign through the `agent:*` namespace. |
+| [`LICENSE`](https://github.com/marcusjacobson/portfolio/blob/main/LICENSE) | MIT — referenced from the README and surfaced in GitHub's community standards check. |
 
 ## Request intake flow
 
