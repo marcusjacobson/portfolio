@@ -96,6 +96,14 @@ If either answer is "no", do not add it to the required list.
 
 `gh api ... -f strict=true` sends the string `"true"` and the GitHub API returns HTTP 422. The script avoids this by `ConvertTo-Json`-ing a hashtable with the boolean `$true` and piping the result via `--input -`. Stick to that pattern when extending the payload.
 
+## Action pinning status
+
+As of [PR #233](https://github.com/marcusjacobson/portfolio/pull/233) (2026-04-28), every action used in every workflow under [`.github/workflows/`](https://github.com/marcusjacobson/portfolio/tree/main/.github/workflows) is pinned to a full 40-char commit SHA, with the major-tag version recorded in a trailing comment for human readability. This satisfies the `source:github-docs` action-pin lane in the maturity scan and matches the rule in [.github/instructions/workflows.instructions.md](https://github.com/marcusjacobson/portfolio/blob/main/.github/instructions/workflows.instructions.md).
+
+The pinning is maintained automatically by Dependabot. The `dev-tooling` group in [`.github/dependabot.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/dependabot.yml) batches GitHub Actions bumps so each Dependabot PR replaces the SHA + comment together; merge them as-is unless the PR description flags a breaking change.
+
+When adding a new action to a workflow, do **not** pin to a tag (`@v4`) — find the target release on the action's GitHub `releases` page and copy the full SHA from the release notes. Verify against the upstream release page before pinning; do not fabricate from memory.
+
 ## Cross-references
 
 - [Workflows](Workflows) — the catalog of every workflow including the ones listed above.
