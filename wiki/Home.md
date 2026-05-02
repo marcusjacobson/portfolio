@@ -29,4 +29,5 @@ How this repo is wired — the agents, prompts, workflows, and rules that turn a
 - [Deployment-Rules](Deployment-Rules) — Branch protection, required status contexts, and the Pages deploy contract.
 - [Boards](Boards) — GitHub Projects v2 audit log, schemas, and sweep history.
 - [Maturity-Scout](Maturity-Scout) — The repo-hygiene scanner that files gap issues against authoritative sources.
+- [Squad-Evaluation](Squad-Evaluation) — Evaluation of the bradygaster/squad agent-team CLI against this repo's existing agent system.
 - [Terminology](Terminology) — "Project" (portfolio) vs "Board" (GitHub Projects v2). Read this first.
