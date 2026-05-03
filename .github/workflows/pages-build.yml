@@ -62,12 +62,16 @@ jobs:
       - name: Render CHANGELOG.md into changelog.html
         # Convert the curated CHANGELOG.md into HTML and inject it into the
         # `<!-- CHANGELOG_BODY -->...<!-- /CHANGELOG_BODY -->` placeholder.
-        # pandoc is preinstalled on ubuntu-latest GitHub runners.
         run: |
           set -euo pipefail
           if [ ! -f CHANGELOG.md ]; then
             echo "CHANGELOG.md missing; skipping changelog render."
             exit 0
+          fi
+          # pandoc is no longer preinstalled on ubuntu-latest; install on demand.
+          if ! command -v pandoc >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends pandoc
           fi
           pandoc --from=gfm --to=html5 CHANGELOG.md -o /tmp/changelog-body.html
           # Drop the leading "# Changelog" h1 — the page header already provides it.
