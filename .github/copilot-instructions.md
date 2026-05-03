@@ -49,10 +49,14 @@ When in doubt, ask once: "Track this as an issue, or handle it inline?" Default 
 
 ## Other entry points
 
-- Publish a portfolio update → `/publish-update` or `@publish-manager`.
+- Publish a portfolio update → `/publish-update` or `@publish-manager`. The publish-manager runs `./scripts/preview-pr.ps1 -Pr <N>` after PR checks go green and **refuses to recommend merge until you sign off on the rendered preview**. This is the canonical agent for routine page edits in your working tree.
 - Security review of a PR → `/secure-code-review` or `@security-reviewer`.
 - Issues / Boards / Wiki ops via `gh` → `@repo-ops`.
 - Triage `needs-triage` queue → `@triage` (chat-only; one issue at a time; `apply` / `dismiss` / `edit:` / `cancel`).
 - Sweep stale artefacts (test outputs, `staging-inbox/`, merged branches) → `/repo-cleanup` or `@repo-cleanup`.
 
 See [wiki/Agents.md](../wiki/Agents.md) for the full catalog and handoff diagram.
+
+## Staging preview (PR-side)
+
+Every PR runs [`pages-build.yml`](workflows/pages-build.yml) (the same reusable workflow that powers production deploy) and uploads the rendered site as a `site-preview` artifact. To preview a PR locally before recommending merge, run `./scripts/preview-pr.ps1 -Pr <N>` — it downloads the artifact to `staging-inbox/pr-<N>/` and serves it on `http://localhost:8080/`. The preview is bit-identical to what `pages-deploy.yml` publishes on merge. `@publish-manager` automates this gate; reach for `@issue-resolver` (or the hosted `@copilot`) only when there is no uncommitted working-tree state to preview.
