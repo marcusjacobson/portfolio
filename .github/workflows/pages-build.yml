@@ -1,0 +1,115 @@
+name: Build Pages
+
+# Renders the static portfolio (Last-updated stamps + CHANGELOG injection) and
+# uploads the result as a downloadable artifact. Runs on every PR so the
+# maintainer can preview the built site locally before merge via
+# `scripts/preview-pr.ps1`. Also reusable from `pages-deploy.yml` on push to
+# `main`, where it additionally produces the special `github-pages` artifact
+# that `actions/deploy-pages` consumes.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+    inputs:
+      upload-pages-artifact:
+        description: "Also upload the special github-pages artifact for actions/deploy-pages."
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  # Cancel superseded PR builds; never cancel a build feeding a deploy.
+  group: pages-build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          # Need full history so `git log -1` can resolve the last commit
+          # that touched each page when injecting "Last updated" timestamps.
+          fetch-depth: 0
+
+      - name: Setup Pages
+        if: ${{ inputs.upload-pages-artifact }}
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Inject per-page Last updated timestamps
+        # Replace the `<!-- LAST_UPDATED -->...<!-- /LAST_UPDATED -->` placeholder
+        # in each root HTML page with the date (YYYY-MM-DD) of the last commit
+        # that touched that file on the current ref. The rendered HTML is only
+        # written into the build artifact — never committed back to main.
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for f in *.html; do
+            ts=$(git log -1 --format=%cs -- "$f" 2>/dev/null || true)
+            if [ -z "$ts" ]; then
+              ts=$(date -u +%Y-%m-%d)
+            fi
+            perl -i -pe "s|<!-- LAST_UPDATED -->.*?<!-- /LAST_UPDATED -->|<!-- LAST_UPDATED -->${ts}<!-- /LAST_UPDATED -->|g" "$f"
+            echo "  $f -> $ts"
+          done
+
+      - name: Render CHANGELOG.md into changelog.html
+        # Convert the curated CHANGELOG.md into HTML and inject it into the
+        # `<!-- CHANGELOG_BODY -->...<!-- /CHANGELOG_BODY -->` placeholder.
+        run: |
+          set -euo pipefail
+          if [ ! -f CHANGELOG.md ]; then
+            echo "CHANGELOG.md missing; skipping changelog render."
+            exit 0
+          fi
+          # pandoc is no longer preinstalled on ubuntu-latest; install on demand.
+          if ! command -v pandoc >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends pandoc
+          fi
+          pandoc --from=gfm --to=html5 CHANGELOG.md -o /tmp/changelog-body.html
+          # Drop the leading "# Changelog" h1 — the page header already provides it.
+          perl -0777 -i -pe 's|<h1[^>]*>.*?</h1>\s*||s' /tmp/changelog-body.html
+          python3 scripts/render_changelog.py /tmp/changelog-body.html
+
+      - name: Stage rendered site
+        # Copy the rendered tree into _site/ so artifact uploads carry only
+        # what would be served, not the whole repo (tests, scripts, .github).
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          # Root HTML pages and assets that ship to the live site.
+          shopt -s nullglob
+          cp -v *.html _site/
+          # Copy any top-level static assets if they exist (none today, but
+          # keeps the workflow forward-compatible).
+          for d in assets images img css js; do
+            if [ -d "$d" ]; then
+              cp -rv "$d" "_site/$d"
+            fi
+          done
+
+      - name: Upload preview artifact (downloadable)
+        # Always upload a regular workflow artifact named `site-preview` so
+        # `scripts/preview-pr.ps1` can fetch and serve it locally regardless
+        # of whether this run is feeding a deploy.
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: site-preview
+          path: _site
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload Pages artifact (deploy)
+        # Only when invoked by the deploy workflow; produces the special
+        # `github-pages` artifact that `actions/deploy-pages` picks up.
+        if: ${{ inputs.upload-pages-artifact }}
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site

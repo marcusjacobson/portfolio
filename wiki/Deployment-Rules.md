@@ -42,7 +42,7 @@ Other settings enforced by the script:
 
 ## Pages deploy contract
 
-Publishing to <https://marcusjacobson.github.io/portfolio/> is owned exclusively by [`pages-deploy.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/pages-deploy.yml).
+Publishing to <https://marcusjacobson.github.io/portfolio/> is owned exclusively by [`pages-deploy.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/pages-deploy.yml), which delegates rendering to the reusable [`pages-build.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/pages-build.yml).
 
 | Aspect | Value |
 |--------|-------|
@@ -51,9 +51,17 @@ Publishing to <https://marcusjacobson.github.io/portfolio/> is owned exclusively
 | Permissions | `contents: read`, `pages: write`, `id-token: write` (OIDC for `actions/deploy-pages`). |
 | Secrets | None. Uses `GITHUB_TOKEN` via OIDC. |
 | Concurrency | `group: pages`, `cancel-in-progress: false` — in-flight deploys finish before the next starts, preventing torn artifacts. |
-| Jobs | `build` uploads the repo root as a Pages artifact; `deploy` consumes it via [`actions/deploy-pages`](https://github.com/actions/deploy-pages). |
+| Jobs | `build` calls `pages-build.yml` with `upload-pages-artifact: true` to render `_site/` and emit the special `github-pages` artifact; `deploy` consumes it via [`actions/deploy-pages`](https://github.com/actions/deploy-pages). |
 
 Because `pages-deploy.yml` only fires on `push` to `main`, it never produces a status check on a PR. That is by design: the merge gates above already protect `main`, and Pages publishes after merge.
+
+## Staging preview gate (PR-side)
+
+[`pages-build.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/pages-build.yml) runs on every PR to `main` and on `workflow_call` from the deploy pipeline. The PR-side run uploads the rendered site as a `site-preview` workflow artifact (14-day retention), enabling a hard merge gate:
+
+- Rule: **no content PR is merged before the maintainer fetches the artifact via [`scripts/preview-pr.ps1`](https://github.com/marcusjacobson/portfolio/blob/main/scripts/preview-pr.ps1) and clicks through the rendered site locally.** This is why PR-side rendering exists.
+- The [`@publish-manager`](Agents) agent enforces this: it refuses to advise merge without preview confirmation. See [Agents](Agents) for the full handoff.
+- The reusable workflow runs identical render steps in both the PR and deploy paths, so a green preview is a faithful representation of what will go live.
 
 ## Wiki deploy contract
 

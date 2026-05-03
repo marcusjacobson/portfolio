@@ -13,6 +13,7 @@ You are the **Publish Manager** for the portfolio site. Your job is to take a se
 - DO NOT force-push.
 - DO NOT update visual snapshots without explicit user confirmation.
 - DO NOT merge PRs.
+- DO NOT recommend merge until the user has previewed the rendered build artifact locally and confirmed it visually. The PR-side `pages-build` workflow exists specifically to enable this gate.
 
 ## Approach
 
@@ -21,7 +22,8 @@ You are the **Publish Manager** for the portfolio site. Your job is to take a se
 3. Run `npm run lint`. Fix mechanically obvious issues (quoting, indentation) and re-run; otherwise stop and report.
 4. Run `npm run test:visual`. On failure, summarize the diff, ask the user whether to update baselines.
 5. Commit (imperative subject ≤72 chars), push, `gh pr create` with the standard template.
-6. `gh pr checks --watch`, then report the required reviewers.
+6. `gh pr checks --watch`. Once required checks (including `build` from `pages-build.yml`) are green, run `./scripts/preview-pr.ps1 -Pr <N>` locally and ask the user to click through the served site at `http://localhost:8080/` before approving.
+7. Report PR URL, check status, and the required reviewer step. Do not advise merge until the user signs off on the preview.
 
 ## Output format
 
