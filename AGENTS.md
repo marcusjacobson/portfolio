@@ -25,6 +25,10 @@ For VS Code Copilot Chat conventions, the canonical source remains [.github/copi
 - Visual regression: `npm run test:visual` (update snapshots: `npm run test:visual:update`).
 - Link check: configured in `tests/lychee.toml`; runs in CI via `Link Check/lychee`.
 
+## Staging preview (informational — not a cloud-agent step)
+
+Every PR runs `.github/workflows/pages-build.yml` and uploads the rendered site as a `site-preview` artifact. Maintainers preview that artifact locally via `scripts/preview-pr.ps1` before merging routine page changes. The cloud agent does **not** run the preview script — it has no interactive surface to gate merge on, and the required PR checks (`pages-build`, lint, visual regression, link-check) are the merge gate for cloud-agent PRs. Just make sure your PR's `pages-build` check is green; the maintainer will preview the artifact before merging.
+
 ## Commit and PR style
 
 - Commit subject: imperative, ≤72 chars. Body explains *why* if non-obvious.

@@ -33,7 +33,18 @@ open index.html   # macOS
 
 ## Hosting
 
-The site is hosted via [GitHub Pages](https://pages.github.com/) using the modern **GitHub Actions** Pages source. Pushes to `main` deploy via [.github/workflows/pages-deploy.yml](.github/workflows/pages-deploy.yml).
+The site is hosted via [GitHub Pages](https://pages.github.com/) using the modern **GitHub Actions** Pages source. Pushes to `main` deploy via [.github/workflows/pages-deploy.yml](.github/workflows/pages-deploy.yml), which calls the reusable [.github/workflows/pages-build.yml](.github/workflows/pages-build.yml) workflow to render the site (Last-updated stamps + CHANGELOG injection) before publishing.
+
+## Staging preview (PR-side)
+
+Every PR against `main` runs the same `pages-build.yml` workflow and uploads the rendered site as a `site-preview` artifact (14-day retention). Reviewers preview the **exact build that will deploy on merge** locally — no third-party hosting required:
+
+```powershell
+./scripts/preview-pr.ps1 -Pr <pr-number>
+# downloads site-preview artifact to staging-inbox/pr-<N>/ and serves at http://localhost:8080/
+```
+
+[`@publish-manager`](.github/agents/publish-manager.agent.md) runs this script automatically and **refuses to recommend merge until you sign off on the rendered preview**. See [wiki/GitHub-Pages-Publishing.md](wiki/GitHub-Pages-Publishing.md) for the full flow.
 
 ## Quick start
 
@@ -68,7 +79,8 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `pages-deploy.yml` | push to `main` | Builds and deploys the site via the modern Pages Actions flow. |
+| `pages-build.yml` | PR to `main` + `workflow_call` | Reusable build: renders site, uploads `site-preview` artifact for PR review and (when called by `pages-deploy`) the Pages deploy artifact. |
+| `pages-deploy.yml` | push to `main` | Thin caller for `pages-build.yml` that promotes the build to production via `actions/deploy-pages`. |
 | `link-check.yml` | PR + weekly cron | Lychee link checker; opens a `link-rot` issue on scheduled failures. |
 | `html-css-lint.yml` | PR (paths) | `htmlhint` + `stylelint`. |
 | `visual-regression.yml` | PR (paths) | Playwright snapshots across mobile/tablet/desktop. |
@@ -77,7 +89,7 @@ The site is hosted via [GitHub Pages](https://pages.github.com/) using the moder
 | `labeler.yml` | PR | Path-based auto-labeling from `.github/labeler.yml`. |
 | `wiki-sync.yml` | push to `main` (paths: `wiki/**`) | Mirrors `wiki/` to the GitHub wiki. |
 
-> **No PR previews.** Reviewers open the changed HTML files locally (`start index.html`). Visual regression, lint, and link-check provide automated confidence; a hosted preview URL was deemed unnecessary for a small static site. To add previews later, connect the repo to Cloudflare Pages or Netlify — both auto-deploy per-PR URLs without changes here.
+> **PR preview via artifact.** PRs publish the rendered site as a `site-preview` workflow artifact rather than a hosted URL. Run [`scripts/preview-pr.ps1`](scripts/preview-pr.ps1) to download and serve it locally — no third-party hosting required. The preview is bit-identical to what `pages-deploy.yml` will publish on merge.
 
 ## Local commands
 
@@ -103,6 +115,19 @@ In VS Code chat:
 - Type `/` and pick `publish-update`, `secure-code-review`, `triage-issue`, or `groom-backlog`.
 - In the agent picker, choose `publish-manager`, `security-reviewer`, or `repo-ops`.
 - The GitHub MCP server (defined in [.vscode/mcp.json](.vscode/mcp.json)) prompts for a PAT on first use; the token is never written to disk.
+
+### Which agent for which task?
+
+| Situation | Agent | Why |
+|-----------|-------|-----|
+| Routine page edit you have in your working tree (content tweak, layout fix, screenshot refresh) | [`@publish-manager`](.github/agents/publish-manager.agent.md) | Chat-only; runs `preview-pr.ps1` and refuses to recommend merge until you sign off on the rendered preview. Sees uncommitted local changes. |
+| A scoped GitHub issue ready to ship end-to-end (branch → implement → PR → merge) | [`@issue-resolver`](.github/agents/issue-resolver.agent.md) | Synchronous, cloud-hardened. Use locally for orchestration; assign `@copilot` for unattended cloud runs. |
+| New feature, page, or backlog idea raised in chat | [`@request-intake`](.github/agents/request-intake.agent.md) (or `@bug-intake` / `@project-intake` / `@cert-intake`) | Drafts the issue and routes to a board before implementation. |
+| PR security review (XSS, secrets, supply-chain, workflow permissions) | [`@security-reviewer`](.github/agents/security-reviewer.agent.md) | Read-only diff review with repo-specific rules. |
+| Drain a board column in batch | [`@boards-worker`](.github/agents/boards-worker.agent.md) | Loops `@issue-resolver` over board items. |
+| Ad-hoc `gh` / Issues / Wiki / Labels work | [`@repo-ops`](.github/agents/repo-ops.agent.md) | Generic side-channel; use when nothing else fits. |
+
+The staging-preview gate (`preview-pr.ps1`) is a `@publish-manager` responsibility. `@issue-resolver` runs in cloud-agent context where there is no human in the loop, so it cannot honor an interactive preview gate — its required green checks (lint, visual regression, link-check, `pages-build`) are the merge gate instead. See [wiki/Agents.md](wiki/Agents.md#decision-guide-local-or-hosted) for the full local-vs-hosted decision guide.
 
 ## Agents
 
