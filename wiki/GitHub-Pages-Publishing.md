@@ -77,3 +77,21 @@ if (typeof sendPrompt === 'undefined') {
 ```
 
 **Custom domain** — add a `CNAME` file to the repo root with your domain, then configure DNS to point to `marcusjacobson.github.io`.
+
+---
+
+## Staging preview (PR-side)
+
+There is no externally-hosted staging URL. Instead, every PR runs the same render pipeline as production via the reusable [`pages-build.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/pages-build.yml) workflow and uploads the rendered tree as a downloadable `site-preview` artifact (14-day retention).
+
+Before merging a content PR, fetch and serve the artifact locally:
+
+```powershell
+./scripts/preview-pr.ps1 -Pr <number>
+```
+
+The script downloads the latest successful `pages-build` artifact for the PR's head SHA, unpacks it under `staging-inbox/pr-<N>/`, and starts `npx http-server` on `http://localhost:8080/`. Click through the four portfolio pages, the changelog, and any newly added pages before approving the merge.
+
+The [`@publish-manager`](Agents) agent treats this preview step as a hard gate: it will not advise merging a content PR until the maintainer signs off on the local preview.
+
+The deploy pipeline ([`pages-deploy.yml`](https://github.com/marcusjacobson/portfolio/blob/main/.github/workflows/pages-deploy.yml)) calls the same reusable build on push to `main` and feeds the result into [`actions/deploy-pages`](https://github.com/actions/deploy-pages), so PR previews and the live site are bit-identical.
