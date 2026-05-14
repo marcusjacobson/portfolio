@@ -26,7 +26,7 @@ jobs:
       (github.event.action == 'opened' && (contains(github.event.issue.labels.*.name, 'source:repo-hygiene') || contains(github.event.issue.labels.*.name, 'source:github-docs') || contains(github.event.issue.labels.*.name, 'source:wcag')))
     steps:
       - name: Add issue to board #15
-        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+        uses: actions/add-to-project@5afcf98fcd03f1c2f92c3c83f58ae24323cc57fd # v2.0.0
         with:
           project-url: https://github.com/users/marcusjacobson/projects/15
           # Reuses the classic-PAT secret with `project` scope. The default
