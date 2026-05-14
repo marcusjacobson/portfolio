@@ -38,7 +38,7 @@ jobs:
       (github.event.action == 'labeled' && github.event.label.name == 'compass') ||
       (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'compass'))
     steps:
-      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+      - uses: actions/add-to-project@5afcf98fcd03f1c2f92c3c83f58ae24323cc57fd # v2.0.0
         with:
           project-url: https://github.com/users/marcusjacobson/projects/9
           github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
@@ -50,7 +50,7 @@ jobs:
       (github.event.action == 'labeled' && github.event.label.name == 'certification') ||
       (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'certification'))
     steps:
-      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+      - uses: actions/add-to-project@5afcf98fcd03f1c2f92c3c83f58ae24323cc57fd # v2.0.0
         with:
           project-url: https://github.com/users/marcusjacobson/projects/2
           github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
@@ -62,7 +62,7 @@ jobs:
       (github.event.action == 'labeled' && github.event.label.name == 'wiki') ||
       (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'wiki'))
     steps:
-      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+      - uses: actions/add-to-project@5afcf98fcd03f1c2f92c3c83f58ae24323cc57fd # v2.0.0
         with:
           project-url: https://github.com/users/marcusjacobson/projects/16
           github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
@@ -74,7 +74,7 @@ jobs:
       (github.event.action == 'labeled' && github.event.label.name == 'maturity') ||
       (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'maturity'))
     steps:
-      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+      - uses: actions/add-to-project@5afcf98fcd03f1c2f92c3c83f58ae24323cc57fd # v2.0.0
         with:
           project-url: https://github.com/users/marcusjacobson/projects/15
           github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
@@ -86,7 +86,7 @@ jobs:
       (github.event.action == 'labeled' && github.event.label.name == 'project') ||
       (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'project'))
     steps:
-      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
+      - uses: actions/add-to-project@5afcf98fcd03f1c2f92c3c83f58ae24323cc57fd # v2.0.0
         with:
           project-url: https://github.com/users/marcusjacobson/projects/13
           github-token: ${{ secrets.BUG_PROJECT_TOKEN }}
