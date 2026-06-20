@@ -1,0 +1,16 @@
+/*
+ * Injected before every visual screenshot via `expect.toHaveScreenshot.stylePath`
+ * in tests/playwright.config.ts. Site CSS is not affected.
+ *
+ * The pages set `body { min-height: 100vh }`. During a `fullPage` capture
+ * Playwright resizes the viewport to fit the document, which feeds back into
+ * `100vh` and changes the body height in turn. The trailing background padding
+ * then jitters a few pixels between consecutive captures, so Playwright reports
+ * "Failed to take two consecutive stable screenshots" even though the rendered
+ * content is pixel-identical. Pinning min-height to 0 breaks that feedback loop,
+ * making the captured height deterministic (equal to the content height).
+ */
+html,
+body {
+  min-height: 0 !important;
+}
