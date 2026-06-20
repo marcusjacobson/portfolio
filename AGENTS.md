@@ -35,6 +35,15 @@ Every PR runs `.github/workflows/pages-build.yml` and uploads the rendered site 
 - PR title: same style as commit subject.
 - PR description: summary, screenshots for visual changes, tested checklist.
 
+## Merging PRs and updating stale branches
+
+When merging is in scope (e.g. clearing the Dependabot queue), the most common mistake is misreading normal CI latency as a fault. Follow this:
+
+- **Bring the PR up to date first.** A PR opened before another merge landed is behind `main`, and branch protection requires the head be current before merge. Update it with `@dependabot rebase` (Dependabot PRs) or the **Update branch** button / `update_pull_request_branch`.
+- **After a rebase or branch update, the required checks take a few minutes to register.** An immediately-checked PR shows an empty or partial check list (often only fast jobs like `label`), and a merge attempt returns `405 — N of N required status checks are expected`. This is normal latency, **not** a missing-check or path-filter fault — wait and re-check. **Never force-merge or bypass branch protection.**
+- **Merge only when** all required checks (`pages-build`, lint, visual regression, link-check) are green **and** the branch is current with `main`.
+- **Sequence interdependent PRs.** When PRs touch overlapping files, merge one, then update/rebase the next onto the result before merging — don't run them in parallel.
+
 ## Cloud-agent contract
 
 When you are assigned to an issue, follow the **resolver flow**: read the issue body, branch, implement, lint, commit, and open **one PR per issue**. One issue → one PR.
