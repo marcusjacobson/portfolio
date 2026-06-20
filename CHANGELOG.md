@@ -14,6 +14,14 @@ and this project loosely tracks dated entries (no strict semver).
 - Public `changelog.html` page, generated from this file at deploy time and
   linked from the site footer.
 
+### Changed
+
+- Completed cross-page navigation so every main page links to all of the
+  others. Added the missing **Home** and **Skills** links to the top nav and
+  footer of the Roles, Projects, and Certifications pages, and the missing
+  **Compass** and **Roles** links (plus a footer page-nav row) on the Skills
+  page.
+
 ## [2026-04-27]
 
 ### Added
@@ -63,4 +71,3 @@ and this project loosely tracks dated entries (no strict semver).
 
 - `pages-deploy.yml` permissions tightened to least-privilege per job
   (`contents: read`, `pages: write`, `id-token: write` only on the deploy job).
-</content>
