@@ -6,6 +6,7 @@ const PAGES = [
   'ms_security_roles.html',
   'ms_security_projects.html',
   'certification_strategy.html',
+  'skills_inventory.html',
 ];
 
 for (const page of PAGES) {
