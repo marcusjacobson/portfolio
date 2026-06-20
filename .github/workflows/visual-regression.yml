@@ -38,14 +38,18 @@ jobs:
         run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        # desktop project uses chromium; mobile/tablet emulate iPhone/iPad (webkit).
+        run: npx playwright install --with-deps chromium webkit
 
       - name: Update visual baselines
         if: ${{ inputs.update_snapshots }}
         run: npm run test:visual:update
 
       - name: Upload regenerated baselines
-        if: ${{ inputs.update_snapshots }}
+        # Upload even if the update step exits non-zero: Playwright reports a
+        # non-zero status when it writes first-time baselines, but the PNGs are
+        # still produced and are what we want to capture.
+        if: ${{ always() && inputs.update_snapshots }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: visual-baselines
