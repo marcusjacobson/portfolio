@@ -11,6 +11,11 @@ on:
       - 'package.json'
       - '.github/workflows/visual-regression.yml'
   workflow_dispatch:
+    inputs:
+      update_snapshots:
+        description: 'Regenerate visual baselines and upload them as the visual-baselines artifact'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -35,8 +40,21 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Update visual baselines
+        if: ${{ inputs.update_snapshots }}
+        run: npm run test:visual:update
+
+      - name: Upload regenerated baselines
+        if: ${{ inputs.update_snapshots }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: visual-baselines
+          path: tests/visual/__snapshots__/
+          retention-days: 14
+
       - name: Run visual tests
         id: visual
+        if: ${{ ! inputs.update_snapshots }}
         # Option B: advisory until Linux baselines are committed.
         # Generate baselines via:
         #   docker run --rm -v ${PWD}:/work -w /work mcr.microsoft.com/playwright:v1.48.0-jammy \
