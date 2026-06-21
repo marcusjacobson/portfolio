@@ -27,7 +27,7 @@ For VS Code Copilot Chat conventions, the canonical source remains [.github/copi
 
 ## Staging preview (informational — not a cloud-agent step)
 
-Every PR runs `.github/workflows/pages-build.yml` and uploads the rendered site as a `site-preview` artifact. Maintainers preview that artifact locally via `scripts/preview-pr.ps1` before merging routine page changes. The cloud agent does **not** run the preview script — it has no interactive surface to gate merge on. Make sure your PR's `pages-build` check is green (it runs on every PR even though it is not a required branch-protection context); the maintainer will preview the artifact before merging.
+Every PR runs `.github/workflows/pages-build.yml` and uploads the rendered site as a `site-preview` artifact. Maintainers preview that artifact locally via `scripts/preview-pr.ps1` before merging routine page changes. The cloud agent does **not** run the preview script — it has no interactive surface to gate merge on. Make sure your PR's `build` check (from `pages-build.yml`) is green — it runs on every PR and is a required branch-protection context; the maintainer will preview the artifact before merging.
 
 ## Commit and PR style
 
@@ -41,7 +41,7 @@ When merging is in scope (e.g. clearing the Dependabot queue), the most common m
 
 - **Bring the PR up to date first.** A PR opened before another merge landed is behind `main`, and branch protection requires the head be current before merge. Update it with `@dependabot rebase` (Dependabot PRs) or the **Update branch** button / `update_pull_request_branch`.
 - **After a rebase or branch update, the required checks take a few minutes to register.** An immediately-checked PR shows an empty or partial check list (often only fast jobs like `label`), and a merge attempt returns `405 — N of N required status checks are expected`. This is normal latency, **not** a missing-check or path-filter fault — wait and re-check. **Never force-merge or bypass branch protection.**
-- **Merge only when** the required checks are green **and** the branch is current with `main`. The required contexts on `main` are `lint`, `lychee`, `scan`, and `analyze (javascript-typescript)` — note `pages-build` and `playwright`/visual-regression run but are **not** required contexts (path-filtered jobs can't be required without deadlocking docs-only PRs), so a visual failure shows red on the PR but does not block merge unless the check is refactored to always report and added to branch protection.
+- **Merge only when** the required checks are green **and** the branch is current with `main`. The required contexts on `main` are `lint`, `lychee`, `scan`, `analyze (javascript-typescript)`, `playwright`, and `build`. The `playwright` (visual-regression) job runs on **every** PR and fast-exits to a green-skip in seconds when no visual-relevant files changed, so it blocks merge only when a relevant PR has a real visual diff — refresh baselines via the `update_snapshots` dispatch, don't bypass. `build` (`pages-build.yml`) also runs on every PR. Neither is path-filtered, so requiring them does not deadlock docs-only PRs.
 - **Sequence interdependent PRs.** When PRs touch overlapping files, merge one, then update/rebase the next onto the result before merging — don't run them in parallel.
 
 ## Cloud-agent contract
