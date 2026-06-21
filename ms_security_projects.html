@@ -188,18 +188,51 @@ body{background:var(--gray-bg);color:var(--text);
   .hero{flex-direction:column}
   .hero-meta{padding-top:0}
 }
+/* Custom dropdown nav — Anthropic-token dark system (literal palette, no new families) */
+.ddnav-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  padding:.85rem 2rem;border-bottom:1px solid rgba(255,255,255,0.1);
+  position:sticky;top:0;z-index:1000;background:rgba(17,17,16,0.95);backdrop-filter:blur(8px)}
+.ddnav-bar-brand{font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:rgba(232,230,224,0.45);text-decoration:none;font-family:'Courier New',monospace}
+a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
+.ddnav-menu{position:relative;font-family:'Courier New',monospace;margin-left:auto}
+.ddnav-toggle{display:inline-flex;align-items:center;gap:.5rem;font-family:inherit;font-size:12px;
+  color:rgba(232,230,224,0.7);background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:6px 14px;cursor:pointer;
+  transition:color .15s,border-color .15s,background .15s}
+.ddnav-toggle:hover,.ddnav-toggle[aria-expanded="true"]{color:#E8E6E0;
+  border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.12)}
+.ddnav-caret{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;
+  border-top:5px solid currentColor;transition:transform .2s}
+.ddnav-toggle[aria-expanded="true"] .ddnav-caret{transform:rotate(180deg)}
+.ddnav-list{position:absolute;top:calc(100% + 8px);right:0;min-width:212px;list-style:none;margin:0;padding:6px;
+  background:#1C1C1A;border:1px solid rgba(255,255,255,0.18);border-radius:10px;
+  box-shadow:0 14px 34px rgba(0,0,0,0.5);z-index:1000}
+.ddnav-list[hidden]{display:none}
+.ddnav-list li{margin:0}
+.ddnav-list a{display:block;font-size:12px;color:rgba(232,230,224,0.7);text-decoration:none;
+  padding:8px 12px;border-radius:6px;letter-spacing:.02em;transition:background .12s,color .12s}
+.ddnav-list a:hover,.ddnav-list a:focus{background:rgba(255,255,255,0.08);color:#E8E6E0;outline:none}
+.ddnav-list a[aria-current="page"]{background:rgba(255,255,255,0.10);color:#E8E6E0}
 </style>
 </head>
 <body>
 
 <nav class="nav">
   <span class="nav-brand">Microsoft Security · Consultant Reference</span>
-  <div class="nav-links">
-    <a class="nav-link back" href="index.html">Home</a>
-    <a class="nav-link" href="ms_security_roles.html">Roles →</a>
-    <a class="nav-link" href="certification_strategy.html">Certifications →</a>
-    <a class="nav-link" href="skills_inventory.html">Skills →</a>
-    <a class="nav-link back" href="ms_security_compass.html">Security Compass</a>
+  <div class="ddnav-menu">
+    <button class="ddnav-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="ddnav-list">
+      <span>Navigate</span><span class="ddnav-caret" aria-hidden="true"></span>
+    </button>
+    <ul class="ddnav-list" id="ddnav-list" role="menu" hidden>
+      <li role="none"><a role="menuitem" href="index.html">Home</a></li>
+      <li role="none"><a role="menuitem" href="ms_security_compass.html">Security Compass</a></li>
+      <li role="none"><a role="menuitem" href="ms_security_roles.html">Roles &amp; Scenarios</a></li>
+      <li role="none"><a role="menuitem" href="ms_security_projects.html" aria-current="page">Projects</a></li>
+      <li role="none"><a role="menuitem" href="certification_strategy.html">Certifications</a></li>
+      <li role="none"><a role="menuitem" href="skills_inventory.html">Skills</a></li>
+      <li role="none"><a role="menuitem" href="changelog.html">Changelog</a></li>
+    </ul>
   </div>
 </nav>
 
@@ -547,5 +580,22 @@ body{background:var(--gray-bg);color:var(--text);
 </div>
 
 </div><!-- /page -->
+<script>
+(function(){
+  var t=document.querySelector('.ddnav-toggle'),l=document.getElementById('ddnav-list');
+  if(!t||!l)return;
+  function close(){l.hidden=true;t.setAttribute('aria-expanded','false');}
+  function open(){l.hidden=false;t.setAttribute('aria-expanded','true');}
+  t.addEventListener('click',function(e){e.stopPropagation();l.hidden?open():close();});
+  document.addEventListener('click',function(e){if(!l.hidden&&!l.contains(e.target)&&!t.contains(e.target))close();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!l.hidden){close();t.focus();}});
+  l.addEventListener('keydown',function(e){
+    var items=[].slice.call(l.querySelectorAll('a')),i=items.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){e.preventDefault();(items[i+1]||items[0]).focus();}
+    else if(e.key==='ArrowUp'){e.preventDefault();(items[i-1]||items[items.length-1]).focus();}
+  });
+})();
+</script>
+
 </body>
 </html>
