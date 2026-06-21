@@ -9,6 +9,9 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Added
 
+- Active **GitHub projects** buttons on the Security Compass *Purview as Code*,
+  *Microsoft Purview*, and *IaC Foundations* nodes, linking the generic
+  Purview-as-Code template repository.
 - Per-page "Last updated" footer line, populated at deploy time from the last
   Git commit that touched each page.
 - Public `changelog.html` page, generated from this file at deploy time and
@@ -16,6 +19,10 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Changed
 
+- Repointed the Projects page *Purview-as-Code* card to the tenant-neutral
+  generic template repository (`Purview-as-Code-Generic`) and refreshed its
+  outcome and next-steps copy to reflect the two-plane design (Bicep control
+  plane + YAML/PowerShell data plane).
 - Moved the Security Compass page's "Navigate" dropdown out of the centered hint row and into the standard sticky top bar, matching every other page.
 - Replaced the top-of-page navigation button row with a single accessible dropdown menu ("Navigate") across all pages, including a new top bar on the landing and changelog pages. The menu now lists every page (Home, Security Compass, Roles & Scenarios, Projects, Certifications, Skills, Changelog) and marks the current page.
 - Completed cross-page navigation so every main page links to all of the

@@ -515,6 +515,7 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
 // Schema: github:[{label:'Display name', url:'https://github.com/marcusjacobson/portfolio'}]
 const D={
   'ov-pu':{label:'Microsoft Purview',layer:'Venn pillar',color:'#EEEDFE',border:'#534AB7',text:'#3C3489',
+    github:[{label:'Purview-as-Code (generic template)',url:'https://github.com/marcusjacobson/Purview-as-Code-Generic'}],
     what:['I advise on classification, sensitivity labelling, and DLP across the full M365 + data estate','Insider risk management — helping clients detect, scope, and respond to internal threats','Data governance via the Data Map — catalog, lineage, protection policies for regulated industries','Extending Purview to AI: governing Copilot, Studio, and Foundry agent outputs under the same label taxonomy'],
     why:['Purview is the connective tissue of the whole stack — every pillar gets smarter when data has context','Clients underestimate it; my role is to show how labels flow into CA, SOC, and compliance simultaneously'],
     flows:['Labels → Entra CA policy enforcement downstream','DLP alerts → optional escalation into Defender XDR incidents','Insider risk signals → Defender XDR user entity enrichment','Audit log → Sentinel for long-term SIEM correlation']},
@@ -740,8 +741,7 @@ const D={
     flows:['SFI patterns published as customer-facing guidance — I use these in architecture reviews','SFI standards operationalised inside Microsoft product teams — visible as product defaults that benefit clients']},
 
   'iac-foundations':{label:'IaC Foundations',layer:'IaC / DevSecOps',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
-    // github: [{label:'Project name',url:'https://github.com/...'}]
-    github:[],
+    github:[{label:'Purview-as-Code (generic template)',url:'https://github.com/marcusjacobson/Purview-as-Code-Generic'}],
     what:['I advise on Bicep and ARM as native Azure IaC — version-controlled, peer-reviewed, drift-detectable','Terraform via AzureRM and AzureAD/Entra providers — preferred for multi-cloud and complex Entra scenarios','GitOps pattern — Git as single source of truth; PRs gate every infrastructure change before it reaches production','Policy as Code — Azure Policy definitions in the same repo as infra templates, tested in CI before apply'],
     why:['IaC is the prerequisite for auditable security controls — I will not deliver controls that were click-ops configured','Manual changes leave no review trail and drift silently; IaC makes security posture verifiable'],
     flows:['IaC PR → MSDO/GHAS scan → SARIF findings published to Defender for Cloud','Merged template → Azure Resource Manager → Policy compliance check runs automatically','Config drift detected → GitHub Issue raised → reconciliation workflow triggered']},
@@ -757,6 +757,7 @@ const D={
     flows:['CA policy PR → tested in staging tenant → approved merge → Graph API deploys to production','PIM config change → Terraform plan reviewed → apply → audit event flows to Sentinel','Agent ID registration → IaC deploy → CA policy automatically scoped to agent identity']},
 
   'iac-purview':{label:'Purview as Code',layer:'IaC / DevSecOps',color:'#E1F5EE',border:'#0F6E56',text:'#085041',
+    github:[{label:'Purview-as-Code (generic template)',url:'https://github.com/marcusjacobson/Purview-as-Code-Generic'}],
     what:['Sensitivity labels and label policies as JSON — deployed via Microsoft Graph or Compliance PowerShell in CI/CD','DLP policies exported as JSON, stored in Git, redeployed via approved pipeline change — no manual edits','Retention labels and policies managed via Graph API or Compliance PowerShell in the same pipeline','Data Map scanning rules and custom classifiers version-controlled and pipeline-deployed across environments'],
     why:['Label and DLP policy sprawl is the most common Purview governance failure I find — IaC enforces a single taxonomy','Consistent label policies across dev, staging, and production tenants prevents classification gaps at source'],
     flows:['Label policy PR → compliance review → Graph API deploy → propagates to M365 + Fabric + Databricks','DLP rule change → simulation mode test in staging → merge → deploy → audit event confirms activation','Scanning rule update → Purview rescans affected sources → new classifications surface in Unified Catalog']},
