@@ -16,6 +16,7 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Changed
 
+- Moved the Security Compass page's "Navigate" dropdown out of the centered hint row and into the standard sticky top bar, matching every other page.
 - Replaced the top-of-page navigation button row with a single accessible dropdown menu ("Navigate") across all pages, including a new top bar on the landing and changelog pages. The menu now lists every page (Home, Security Compass, Roles & Scenarios, Projects, Certifications, Skills, Changelog) and marks the current page.
 - Completed cross-page navigation so every main page links to all of the
   others. Added the missing **Home** and **Skills** links to the top nav and
