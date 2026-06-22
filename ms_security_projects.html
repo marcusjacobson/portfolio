@@ -116,6 +116,24 @@ body{background:var(--gray-bg);color:var(--text);
 .status.paused{background:rgba(95,94,90,0.2);border-color:var(--gray);
   color:var(--gray-hi)}
 .status.paused::before{background:var(--gray-hi)}
+.status.stable{background:rgba(59,109,17,0.15);border-color:var(--green);
+  color:var(--green-hi)}
+.status.stable::before{background:var(--green-hi)}
+.status.stale{background:rgba(133,79,11,0.15);border-color:var(--amber);
+  color:var(--amber-hi)}
+.status.stale::before{background:var(--amber-hi)}
+.status.archived{background:rgba(95,94,90,0.2);border-color:var(--gray);
+  color:var(--gray-hi)}
+.status.archived::before{background:var(--gray-hi)}
+
+/* ── Badge row (maturity tier + state) ── */
+.badge-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:.1rem}
+.maturity{display:inline-flex;align-items:center;font-size:10px;font-family:monospace;
+  letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:3px;
+  border:0.5px solid;width:fit-content}
+.maturity.productized{color:var(--purple-hi);border-color:var(--purple);background:rgba(83,74,183,0.15)}
+.maturity.simulation{color:var(--text2);border-color:var(--border);background:var(--surface2)}
+.maturity.lab{color:var(--text3);border-color:var(--border2);background:var(--surface2)}
 
 /* ── GitHub link ── */
 .github-link{display:inline-flex;align-items:center;gap:5px;
@@ -248,13 +266,13 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
   <div class="hero-text">
     <p class="hero-eyebrow">Live Projects · v1</p>
     <h1 class="hero-title">Live<br><em>Projects</em></h1>
-    <p class="hero-sub">Portfolio projects and lab implementations organised by Microsoft product area. Each card links to the source repository.</p>
+    <p class="hero-sub">Portfolio projects and lab implementations organised by Microsoft product area, ranked by maturity. Each card links to the source repository.</p>
   </div>
   <div class="hero-meta">
     <div class="meta-chip">Active &nbsp;<span>1</span></div>
-    <div class="meta-chip">Complete &nbsp;<span>7</span></div>
+    <div class="meta-chip">Stable &nbsp;<span>5</span></div>
     <div class="meta-chip">On Hold &nbsp;<span>1</span></div>
-    <div class="meta-chip">Total &nbsp;<span>9</span></div>
+    <div class="meta-chip">Archived &nbsp;<span>1</span></div>
   </div>
 </div>
 
@@ -290,9 +308,9 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
         <a class="compass-tag" href="ms_security_compass.html#out-dlpalert" target="_blank">DLP policy alerts</a>
               </div>
       </div>
-      <div class="field">
-        <span class="field-label">Status</span>
-        <span class="status complete">Complete</span>
+      <div class="badge-row">
+        <span class="maturity simulation">Simulation</span>
+        <span class="status stable">Stable</span>
       </div>
       <a class="github-link" href="https://github.com/marcusjacobson/Projects/tree/main/Microsoft/Multi-Discipline-Projects/Fabric-Purview-Governance-Simulation" target="_blank" rel="noopener">marcusjacobson/Projects · Fabric-Purview-Governance-Simulation</a>
     </div>
@@ -300,43 +318,53 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
   </div>
 </section>
 
-<!-- ══ PURVIEW ══ -->
-<section class="section">
+<!-- ══ PURVIEW · FLAGSHIP ══ -->
+<section class="section capstone">
   <div class="section-header">
-    <p class="section-label">Microsoft Purview</p>
-    <span class="section-count">3 projects</span>
+    <p class="section-label">Microsoft Purview · Flagship</p>
+    <span class="section-count">1 project</span>
   </div>
   <div class="cards">
 
-    <div class="card purple">
-      <p class="card-title">Purview Skills Ramp (On-Prem and Cloud)</p>
+    <div class="card capstone purple">
+      <p class="card-title">Purview-as-Code — Generic Template</p>
       <div class="field">
         <span class="field-label">Product area</span>
-        <span class="field-value">Purview Data Governance · Data Discovery &amp; Classification</span>
+        <span class="field-value">Purview as Code · IaC / DevSecOps · Bicep / PowerShell</span>
       </div>
       <div class="field">
         <span class="field-label">Outcome</span>
-        <span class="field-value">Structured lab series covering Purview Information Protection Scanner, DLP policy design and enforcement, retention labels, eDiscovery, and Activity Explorer — across on-premises file shares and SharePoint/OneDrive cloud environments</span>
+        <span class="field-value">Tenant-neutral template that version-controls a full Microsoft Purview environment as code across two planes — Bicep for the Purview account (control plane) and declarative YAML rendered by idempotent PowerShell reconcilers for the data plane (sensitivity labels, DLP, data lifecycle, records, insider risk, communication compliance, DSPM, Data Map). Deployed by GitHub Actions over OIDC with no long-lived secrets</span>
       </div>
       <div class="next-steps">
         <p class="next-steps-label">Next steps</p>
-        <p class="next-steps-value">1) Migrate to dedicated repo · 2) Archive once the proper skills are represented in more comprehensive and targeted projects</p>
+        <p class="next-steps-value">1) Expand data-plane solution coverage per the v2 roadmap · 2) Light up the planned code- and feature-currency watch loops alongside the existing drift loop</p>
       </div>
       <div class="compass-tags-block">
         <p class="compass-tags-label">Compass nodes</p>
         <div class="compass-tags">
         <a class="compass-tag" href="ms_security_compass.html#ov-pu" target="_blank">Microsoft Purview</a>
-        <a class="compass-tag" href="ms_security_compass.html#out-labels" target="_blank">Sensitivity labels</a>
-        <a class="compass-tag" href="ms_security_compass.html#out-dlpalert" target="_blank">DLP policy alerts</a>
-        <a class="compass-tag" href="ms_security_compass.html#comp-ediscovery" target="_blank">eDiscovery</a>
+        <a class="compass-tag" href="ms_security_compass.html#iac-purview" target="_blank">Purview as Code</a>
+        <a class="compass-tag" href="ms_security_compass.html#iac-pipeline" target="_blank">Pipeline Security</a>
               </div>
       </div>
-      <div class="field">
-        <span class="field-label">Status</span>
-        <span class="status complete">Complete</span>
+      <div class="badge-row">
+        <span class="maturity productized">Productized</span>
+        <span class="status active">Active</span>
       </div>
-      <a class="github-link" href="https://github.com/marcusjacobson/Projects/tree/main/Microsoft/Purview/Purview-Skills-Ramp-OnPrem-and-Cloud" target="_blank" rel="noopener">marcusjacobson/Projects · Purview-Skills-Ramp-OnPrem-and-Cloud</a>
+      <a class="github-link" href="https://github.com/marcusjacobson/Purview-as-Code-Generic" target="_blank" rel="noopener">marcusjacobson/Purview-as-Code-Generic</a>
     </div>
+
+  </div>
+</section>
+
+<!-- ══ PURVIEW · SUPPORTING ══ -->
+<section class="section">
+  <div class="section-header">
+    <p class="section-label">Microsoft Purview · Supporting labs &amp; simulations</p>
+    <span class="section-count">1 project</span>
+  </div>
+  <div class="cards">
 
     <div class="card purple">
       <p class="card-title">Purview Discovery Methods Simulation</p>
@@ -361,40 +389,11 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
         <a class="compass-tag" href="ms_security_compass.html#comp-ediscovery" target="_blank">eDiscovery</a>
               </div>
       </div>
-      <div class="field">
-        <span class="field-label">Status</span>
-        <span class="status complete">Complete</span>
+      <div class="badge-row">
+        <span class="maturity simulation">Simulation</span>
+        <span class="status stable">Stable</span>
       </div>
       <a class="github-link" href="https://github.com/marcusjacobson/Projects/tree/main/Microsoft/Purview/Purview-Discovery-Methods-Simulation" target="_blank" rel="noopener">marcusjacobson/Projects · Purview-Discovery-Methods-Simulation</a>
-    </div>
-
-    <div class="card purple">
-      <p class="card-title">Purview-as-Code — Generic Template</p>
-      <div class="field">
-        <span class="field-label">Product area</span>
-        <span class="field-value">Purview as Code · IaC / DevSecOps · Bicep / PowerShell</span>
-      </div>
-      <div class="field">
-        <span class="field-label">Outcome</span>
-        <span class="field-value">Tenant-neutral template that version-controls a full Microsoft Purview environment as code across two planes — Bicep for the Purview account (control plane) and declarative YAML rendered by idempotent PowerShell reconcilers for the data plane (sensitivity labels, DLP, data lifecycle, records, insider risk, communication compliance, DSPM, Data Map). Deployed by GitHub Actions over OIDC with no long-lived secrets</span>
-      </div>
-      <div class="next-steps">
-        <p class="next-steps-label">Next steps</p>
-        <p class="next-steps-value">1) Expand data-plane solution coverage per the v2 roadmap · 2) Light up the planned code- and feature-currency watch loops alongside the existing drift loop</p>
-      </div>
-      <div class="compass-tags-block">
-        <p class="compass-tags-label">Compass nodes</p>
-        <div class="compass-tags">
-        <a class="compass-tag" href="ms_security_compass.html#ov-pu" target="_blank">Microsoft Purview</a>
-        <a class="compass-tag" href="ms_security_compass.html#iac-purview" target="_blank">Purview as Code</a>
-        <a class="compass-tag" href="ms_security_compass.html#iac-pipeline" target="_blank">Pipeline Security</a>
-              </div>
-      </div>
-      <div class="field">
-        <span class="field-label">Status</span>
-        <span class="status active">Active</span>
-      </div>
-      <a class="github-link" href="https://github.com/marcusjacobson/Purview-as-Code-Generic" target="_blank" rel="noopener">marcusjacobson/Purview-as-Code-Generic</a>
     </div>
 
   </div>
@@ -442,9 +441,9 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
         <a class="compass-tag" href="ms_security_compass.html#iac-pipeline" target="_blank">Pipeline Security</a>
               </div>
       </div>
-      <div class="field">
-        <span class="field-label">Status</span>
-        <span class="status complete">Complete</span>
+      <div class="badge-row">
+        <span class="maturity simulation">Simulation</span>
+        <span class="status stable">Stable</span>
       </div>
       <a class="github-link" href="https://github.com/marcusjacobson/Entra-Deployments-Marcusj-Lab" target="_blank" rel="noopener">marcusjacobson/Entra-Deployments-Marcusj-Lab</a>
     </div>
@@ -473,9 +472,9 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
         <a class="compass-tag" href="ms_security_compass.html#out-access" target="_blank">Access decisions</a>
               </div>
       </div>
-      <div class="field">
-        <span class="field-label">Status</span>
-        <span class="status complete">Complete</span>
+      <div class="badge-row">
+        <span class="maturity simulation">Simulation</span>
+        <span class="status stable">Stable</span>
       </div>
       <a class="github-link" href="https://github.com/marcusjacobson/Projects/tree/main/Microsoft/Entra/Entra-Zero-Trust-RBAC-Simulation" target="_blank" rel="noopener">marcusjacobson/Projects · Entra-Zero-Trust-RBAC-Simulation</a>
     </div>
@@ -504,9 +503,9 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
         <a class="compass-tag" href="ms_security_compass.html#out-access" target="_blank">Access decisions</a>
               </div>
       </div>
-      <div class="field">
-        <span class="field-label">Status</span>
-        <span class="status complete">Complete</span>
+      <div class="badge-row">
+        <span class="maturity lab">Lab</span>
+        <span class="status stable">Stable</span>
       </div>
       <a class="github-link" href="https://github.com/marcusjacobson/Projects/tree/main/Microsoft/Entra/SC-300-Identity-Access-Masterclass" target="_blank" rel="noopener">marcusjacobson/Projects · SC-300-Identity-Access-Masterclass</a>
     </div>
@@ -534,7 +533,7 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
       </div>
       <div class="next-steps">
         <p class="next-steps-label">Next steps</p>
-        <p class="next-steps-value">1) Migrate to dedicated repo · 2) Expand into full Sentinel-as-Code framework covering hunting queries, automation rules, and playbook deployment</p>
+        <p class="next-steps-value">1) Migrate to dedicated repo · 2) Expand into full Sentinel-as-Code framework covering hunting queries, automation rules, and playbook deployment</span>
       </div>
       <div class="compass-tags-block">
         <p class="compass-tags-label">Compass nodes</p>
@@ -544,9 +543,9 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
         <a class="compass-tag" href="ms_security_compass.html#iac-pipeline" target="_blank">Pipeline Security</a>
               </div>
       </div>
-      <div class="field">
-        <span class="field-label">Status</span>
-        <span class="status paused">On Hold</span>
+      <div class="badge-row">
+        <span class="maturity simulation">Simulation</span>
+        <span class="status paused">On hold</span>
       </div>
       <a class="github-link" href="https://github.com/marcusjacobson/Projects/tree/main/Microsoft/Sentinel/Sentinel-as-Code" target="_blank" rel="noopener">marcusjacobson/Projects · Sentinel-as-Code</a>
     </div>
@@ -562,6 +561,50 @@ a.ddnav-bar-brand:hover{color:rgba(232,230,224,0.8)}
   </div>
   <div style="padding:.75rem 0;font-size:11px;font-family:monospace;color:var(--text3);opacity:.55">
     More projects in progress — check back soon.
+  </div>
+</section>
+
+<!-- ══ ARCHIVED ══ -->
+<section class="section">
+  <div class="section-header">
+    <p class="section-label">Archived</p>
+    <span class="section-count">1 project</span>
+  </div>
+  <div style="padding:.5rem 0 .75rem;font-size:11px;font-family:monospace;color:var(--text3);opacity:.55">
+    Superseded work, retained for provenance — coverage now lives in more targeted projects.
+  </div>
+  <div class="cards">
+
+    <div class="card purple">
+      <p class="card-title">Purview Skills Ramp (On-Prem and Cloud)</p>
+      <div class="field">
+        <span class="field-label">Product area</span>
+        <span class="field-value">Purview Data Governance · Data Discovery &amp; Classification</span>
+      </div>
+      <div class="field">
+        <span class="field-label">Outcome</span>
+        <span class="field-value">Structured lab series covering Purview Information Protection Scanner, DLP policy design and enforcement, retention labels, eDiscovery, and Activity Explorer — across on-premises file shares and SharePoint/OneDrive cloud environments</span>
+      </div>
+      <div class="next-steps">
+        <p class="next-steps-label">Status note</p>
+        <p class="next-steps-value">Superseded — discovery, classification, and DLP coverage now live in the Discovery Methods simulation and the Purview-as-Code template. Retained for provenance.</p>
+      </div>
+      <div class="compass-tags-block">
+        <p class="compass-tags-label">Compass nodes</p>
+        <div class="compass-tags">
+        <a class="compass-tag" href="ms_security_compass.html#ov-pu" target="_blank">Microsoft Purview</a>
+        <a class="compass-tag" href="ms_security_compass.html#out-labels" target="_blank">Sensitivity labels</a>
+        <a class="compass-tag" href="ms_security_compass.html#out-dlpalert" target="_blank">DLP policy alerts</a>
+        <a class="compass-tag" href="ms_security_compass.html#comp-ediscovery" target="_blank">eDiscovery</a>
+              </div>
+      </div>
+      <div class="badge-row">
+        <span class="maturity lab">Lab</span>
+        <span class="status archived">Archived</span>
+      </div>
+      <a class="github-link" href="https://github.com/marcusjacobson/Projects/tree/main/Microsoft/Purview/Purview-Skills-Ramp-OnPrem-and-Cloud" target="_blank" rel="noopener">marcusjacobson/Projects · Purview-Skills-Ramp-OnPrem-and-Cloud</a>
+    </div>
+
   </div>
 </section>
 

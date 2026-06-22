@@ -9,6 +9,16 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Added
 
+- Two-chip project-card system on the Projects page: a **maturity tier**
+  (Productized / Simulation / Lab) and an intent-aware **state** badge
+  (Active / Stable / Stale / On hold / Archived). "Stable" marks work that is
+  finished by design so it never reads as decaying; only living projects can
+  flag "Stale" once untouched past nine months.
+- Featured **Microsoft Purview · Flagship** capstone section spotlighting the
+  Purview-as-Code generic template, with the remaining Purview work moved to a
+  supporting "labs & simulations" section.
+- **Archived** section on the Projects page for superseded work, retained for
+  provenance.
 - Active **GitHub projects** buttons on the Security Compass *Purview as Code*,
   *Microsoft Purview*, and *IaC Foundations* nodes, linking the generic
   Purview-as-Code template repository.
@@ -19,6 +29,11 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Changed
 
+- Archived the **Purview Skills Ramp** card (superseded by the Discovery Methods
+  simulation and the Purview-as-Code template) and corrected the Projects hero
+  counts to match the current inventory.
+- Restated the Entra and Sentinel project states in the new shared vocabulary
+  (Complete -> Stable; On hold) and gave each a maturity chip.
 - Repointed the Projects page *Purview-as-Code* card to the tenant-neutral
   generic template repository (`Purview-as-Code-Generic`) and refreshed its
   outcome and next-steps copy to reflect the two-plane design (Bicep control
