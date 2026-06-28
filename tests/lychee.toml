@@ -26,6 +26,8 @@ exclude = [
     "example\\.com",
     # User-scoped GitHub Projects (v2) require auth; lychee gets 404 unauthenticated
     "^https?://github\\.com/users/[^/]+/projects/",
+    # Repo Projects tab requires auth; lychee gets 400 unauthenticated
+    "^https?://github\\.com/marcusjacobson/portfolio/projects",
     # Private lab repos referenced from project cards (lychee gets 404 unauthenticated)
     "^https?://github\\.com/marcusjacobson/Purview-as-Code-MarcusJ-Lab",
     "^https?://github\\.com/marcusjacobson/Entra-Deployments-Marcusj-Lab",
