@@ -31,6 +31,13 @@ and this project loosely tracks dated entries (no strict semver).
   **Compass** and **Roles** links (plus a footer page-nav row) on the Skills
   page.
 
+### Removed
+
+- Retired the **Purview Skills Ramp (On-Prem and Cloud)** project card from the
+  Projects page; its scope is now covered by more targeted Purview projects.
+  Updated the Microsoft Purview section count (3 -> 2) and corrected the hero
+  project tallies to the accurate remaining totals (Complete 5, Total 7).
+
 ## [2026-04-27]
 
 ### Added
