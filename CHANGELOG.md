@@ -19,6 +19,10 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Changed
 
+- Repointed the **Purview Discovery Methods Simulation** project card to its new public
+  repo (`marcusjacobson/Purview-Data-Discovery-Methods`) and re-scoped its copy and
+  compass tags to data discovery (built-in SITs, On-Demand Classification, eDiscovery,
+  Graph API) — removed the out-of-scope sensitivity-label and DLP references.
 - Repointed the Projects page *Purview-as-Code* card to the tenant-neutral
   generic template repository (`Purview-as-Code-Generic`) and refreshed its
   outcome and next-steps copy to reflect the two-plane design (Bicep control
