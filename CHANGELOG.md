@@ -19,6 +19,9 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Changed
 
+- Repointed the **Purview Data Discovery Methods** project card from the GitHub repo
+  to its published Lab Navigator landing page
+  (`marcusjacobson.github.io/Purview-Data-Discovery-Methods`).
 - Reordered the Microsoft Purview project cards to lead with the active *Purview as
   Code* project ahead of *Purview Data Discovery Methods*, and shortened both card
   titles ("Purview-as-Code — Generic Template" → "Purview as Code"; "Purview Discovery
