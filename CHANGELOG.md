@@ -19,6 +19,10 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Changed
 
+- Reordered the Microsoft Purview project cards to lead with the active *Purview as
+  Code* project ahead of *Purview Data Discovery Methods*, and shortened both card
+  titles ("Purview-as-Code — Generic Template" → "Purview as Code"; "Purview Discovery
+  Methods Simulation" → "Purview Data Discovery Methods").
 - Repointed the **Purview Discovery Methods Simulation** project card to its new public
   repo (`marcusjacobson/Purview-Data-Discovery-Methods`) and re-scoped its copy and
   compass tags to data discovery (built-in SITs, On-Demand Classification, eDiscovery,
