@@ -19,8 +19,9 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Changed
 
-- Repointed the **Purview as Code** project card from the GitHub repo to its
-  published project overview page (`marcusjacobson.github.io/Purview-as-Code-Generic`).
+- Repointed the **Purview as Code** project card to its published project overview
+  page (`marcusjacobson.github.io/Purview-as-Code`), following the repository rename
+  from Purview-as-Code-Generic.
 - Repointed the **Purview Data Discovery Methods** project card from the GitHub repo
   to its published Lab Navigator landing page
   (`marcusjacobson.github.io/Purview-Data-Discovery-Methods`).
