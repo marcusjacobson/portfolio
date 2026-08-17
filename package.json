@@ -12,9 +12,9 @@
     "test:a11y": "playwright test --config tests/a11y/playwright.config.ts"
   },
   "devDependencies": {
-    "@axe-core/cli": "^4.12.1",
-    "@axe-core/playwright": "^4.12.1",
-    "@playwright/test": "^1.62.0",
+    "@axe-core/cli": "^4.13.0",
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1",
     "htmlhint": "^1.1.4",
     "http-server": "^14.1.1",
     "stylelint": "^17.14.1",
