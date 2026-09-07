@@ -14,10 +14,10 @@
   "devDependencies": {
     "@axe-core/cli": "^4.13.0",
     "@axe-core/playwright": "^4.13.0",
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.63.0",
     "htmlhint": "^1.1.4",
     "http-server": "^14.1.1",
-    "stylelint": "^17.14.1",
+    "stylelint": "^17.15.0",
     "stylelint-config-standard": "^40.0.0"
   }
 }
