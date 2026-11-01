@@ -19,6 +19,9 @@ and this project loosely tracks dated entries (no strict semver).
 
 ### Changed
 
+- Pointed the Security Compass *Purview as Code*, *Microsoft Purview*, and *IaC
+  Foundations* GitHub buttons at the renamed `Purview-as-Code` repository and
+  matched their label to the project card ("Purview as Code").
 - Repointed the **Purview as Code** project card to its published project overview
   page (`marcusjacobson.github.io/Purview-as-Code`), following the repository rename
   from Purview-as-Code-Generic.
